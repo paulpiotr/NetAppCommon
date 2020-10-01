@@ -1,5 +1,4 @@
-﻿using EncryptDecrypt;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Reflection;
@@ -11,13 +10,16 @@ namespace NetAppCommon
     /// Klasa wspólna do połączeń z bazą danych
     /// Common class for connections to data
     /// </summary>
-    public class DataContext
+    public class DatabaseMssql
     {
+        #region private static readonly log4net.ILog _log4net
         /// <summary>
         /// Log4 Net Logger
         /// </summary>
         private static readonly log4net.ILog _log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
+        #endregion
 
+        #region public static string ParseConnectionString(string connectionString)
         /// <summary>
         /// Parsuj połączenie do bazy danych i zastąp zmiennymi systemowymi
         /// </summary>
@@ -76,7 +78,9 @@ namespace NetAppCommon
                 return null;
             }
         }
+        #endregion
 
+        #region public static string GetConnectionString(string connectionStringName, string settingsJsonFileName = null)
         /// <summary>
         /// Pobierz parametry połączenia
         /// Get the connection string
@@ -85,15 +89,19 @@ namespace NetAppCommon
         /// Nazwa ciągu połączenia String
         /// The name of the connection String
         /// </param>
+        /// <param name="settingsJsonFileName">
+        /// Nazwa pliku .json
+        /// The name of the .json file
+        /// </param>
         /// <returns>
         /// Parametry połączenia String lub null
         /// A String or null connection string
         /// </returns>
-        public static string GetConnectionString(string connectionStringName)
+        public static string GetConnectionString(string connectionStringName, string settingsJsonFileName = null)
         {
             try
             {
-                return ParseConnectionString(DataConfiguration.GetConfigurationRoot().GetConnectionString(connectionStringName));
+                return ParseConnectionString(Configuration.GetConfigurationRoot(settingsJsonFileName).GetConnectionString(connectionStringName));
             }
             catch (Exception e)
             {
@@ -101,7 +109,9 @@ namespace NetAppCommon
                 return null;
             }
         }
+        #endregion
 
+        #region public static async Task<string> GetConnectionStringAsync(string connectionStringName, string settingsJsonFileName = null)
         /// <summary>
         /// Pobierz parametry połączenia asynchronicznie
         /// Get the connection string asynchronously
@@ -110,15 +120,19 @@ namespace NetAppCommon
         /// Nazwa ciągu połączenia String
         /// The name of the connection String
         /// </param>
+        /// <param name="settingsJsonFileName">
+        /// Nazwa pliku .json
+        /// The name of the .json file
+        /// </param>
         /// <returns>
         /// Parametry połączenia String lub null
         /// A String or null connection string
         /// </returns>
-        public static async Task<string> GetConnectionStringAsync(string connectionStringName)
+        public static async Task<string> GetConnectionStringAsync(string connectionStringName, string settingsJsonFileName = null)
         {
             try
             {
-                return await Task.Run(() => GetConnectionString(connectionStringName));
+                return await Task.Run(() => GetConnectionString(connectionStringName, settingsJsonFileName));
             }
             catch (Exception e)
             {
@@ -126,7 +140,9 @@ namespace NetAppCommon
                 return null;
             }
         }
+        #endregion
 
+        #region public static string GetDecryptConnectionString(string connectionStringName, string settingsJsonFileName = null)
         /// <summary>
         /// Pobierz i odszyfruj połączenie do bazy danych
         /// Get and decrypt the connection to the database
@@ -139,11 +155,11 @@ namespace NetAppCommon
         /// Parametry połączenia String lub null
         /// A String or null connection string
         /// </returns>
-        public static string GetDecryptConnectionString(string connectionStringName)
+        public static string GetDecryptConnectionString(string connectionStringName, string settingsJsonFileName = null)
         {
             try
             {
-                string connectionString = GetConnectionString(connectionStringName);
+                string connectionString = GetConnectionString(connectionStringName, settingsJsonFileName);
                 if (null != connectionString && !string.IsNullOrWhiteSpace(connectionString))
                 {
                     connectionString = ParseConnectionString(EncryptDecrypt.EncryptDecrypt.DecryptString(connectionString, EncryptDecrypt.EncryptDecrypt.GetRsaFileContent()));
@@ -156,7 +172,9 @@ namespace NetAppCommon
                 return null;
             }
         }
+        #endregion
 
+        #region public static async Task<string> GetDecryptConnectionStringAsync(string connectionStringName, string settingsJsonFileName = null)
         /// <summary>
         /// Pobierz i odszyfruj połączenie do bazy danych asynchronicznie
         /// Get and decrypt the connection to the database asynchronously
@@ -169,11 +187,11 @@ namespace NetAppCommon
         /// Parametry połączenia String lub null
         /// A String or null connection string
         /// </returns>
-        public static async Task<string> GetDecryptConnectionStringAsync(string connectionStringName)
+        public static async Task<string> GetDecryptConnectionStringAsync(string connectionStringName, string settingsJsonFileName = null)
         {
             try
             {
-                return await Task.Run(() => GetDecryptConnectionString(connectionStringName));
+                return await Task.Run(() => GetDecryptConnectionString(connectionStringName, settingsJsonFileName));
             }
             catch (Exception e)
             {
@@ -181,7 +199,9 @@ namespace NetAppCommon
                 return null;
             }
         }
+        #endregion
 
+        #region public static string GetDecryptConnectionString(string connectionStringName, string rsaFileName, string settingsJsonFileName = null)
         /// <summary>
         /// Pobierz i odszyfruj połączenie do bazy danych
         /// Get and decrypt the connection to the database
@@ -198,11 +218,11 @@ namespace NetAppCommon
         /// Parametry połączenia String lub null
         /// A String or null connection string
         /// </returns>
-        public static string GetDecryptConnectionString(string connectionStringName, string rsaFileName)
+        public static string GetDecryptConnectionString(string connectionStringName, string rsaFileName, string settingsJsonFileName = null)
         {
             try
             {
-                string connectionString = GetConnectionString(connectionStringName);
+                string connectionString = GetConnectionString(connectionStringName, settingsJsonFileName);
                 if (null != connectionString && !string.IsNullOrWhiteSpace(connectionString))
                 {
                     connectionString = ParseConnectionString(EncryptDecrypt.EncryptDecrypt.DecryptString(connectionString, EncryptDecrypt.EncryptDecrypt.GetRsaFileContent(rsaFileName)));
@@ -215,7 +235,9 @@ namespace NetAppCommon
                 return null;
             }
         }
+        #endregion
 
+        #region public static async Task<string> GetDecryptConnectionStringAsync(string connectionStringName, string rsaFileName, string settingsJsonFileName = null)
         /// <summary>
         /// Pobierz i odszyfruj połączenie do bazy danych asynchronicznie
         /// Get and decrypt the connection to the database asynchronously
@@ -232,11 +254,11 @@ namespace NetAppCommon
         /// Parametry połączenia String lub null
         /// A String or null connection string
         /// </returns>
-        public static async Task<string> GetDecryptConnectionStringAsync(string connectionStringName, string rsaFileName)
+        public static async Task<string> GetDecryptConnectionStringAsync(string connectionStringName, string rsaFileName, string settingsJsonFileName = null)
         {
             try
             {
-                return await Task.Run(() => GetDecryptConnectionString(connectionStringName, rsaFileName));
+                return await Task.Run(() => GetDecryptConnectionString(connectionStringName, rsaFileName, settingsJsonFileName));
             }
             catch (Exception e)
             {
@@ -244,6 +266,7 @@ namespace NetAppCommon
                 return null;
             }
         }
+        #endregion
 
         /// <summary>
         /// Odszyfruj i pobierz opcje budowania kontekstu serwera Sql
