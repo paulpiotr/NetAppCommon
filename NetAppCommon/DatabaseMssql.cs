@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Reflection;
@@ -237,7 +238,7 @@ namespace NetAppCommon
         }
         #endregion
 
-        #region public static async Task<string> GetDecryptConnectionStringAsync(string connectionStringName, string rsaFileName, string settingsJsonFileName = null)
+        #region public static async Task<string> GetDecryptConnectionStringAsync...
         /// <summary>
         /// Pobierz i odszyfruj połączenie do bazy danych asynchronicznie
         /// Get and decrypt the connection to the database asynchronously
@@ -712,5 +713,82 @@ namespace NetAppCommon
                 return null;
             }
         }
+
+        #region public static bool CanConnect(string connectionString)
+        /// <summary>
+        /// Sprawdź, czy można połączyćsięz bazą danych Mssql
+        /// Verify that you can connect to the Mssql database
+        /// </summary>
+        /// <param name="connectionString">
+        /// Ciąg połączenia do bazy danych Mssql jako string
+        /// The connection string to the Mssql database as a string
+        /// </param>
+        /// <returns>
+        /// Prawda jeśli udało się połączyć z bazą danych Mssql, przeciwnie fałsz
+        /// True if successful when connecting to the Mssql database, otherwise false
+        /// </returns>
+        public static bool CanConnect(string connectionString)
+        {
+            SqlConnection sqlConnection = null;
+            try
+            {
+                using (sqlConnection = new SqlConnection(connectionString))
+                {
+                    sqlConnection.Open();
+                    return true;
+                }
+            }
+            catch (SqlException e)
+            {
+                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+            }
+            catch (Exception e)
+            {
+                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+            }
+            finally
+            {
+                try
+                {
+                    if (null != sqlConnection)
+                    {
+                        sqlConnection.Close();
+                    }
+                }
+                catch (Exception e)
+                {
+                    _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                }
+            }
+            return false;
+        }
+        #endregion
+
+        #region public static async Task<bool> CanConnectAsync(string connectionString)
+        /// <summary>
+        /// Sprawdź, czy można połączyćsięz bazą danych Mssql asynchronicznie
+        /// Verify that you can connect to the Mssql database asynchronously
+        /// </summary>
+        /// <param name="connectionString">
+        /// Ciąg połączenia do bazy danych Mssql jako string
+        /// The connection string to the Mssql database as a string
+        /// </param>
+        /// <returns>
+        /// Prawda jeśli udało się połączyć z bazą danych Mssql, przeciwnie fałsz
+        /// True if successful when connecting to the Mssql database, otherwise false
+        /// </returns>
+        public static async Task<bool> CanConnectAsync(string connectionString)
+        {
+            try
+            {
+                return await Task.Run(() => CanConnect(connectionString));
+            }
+            catch (Exception e)
+            {
+                await Task.Run(() => _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+            }
+            return false;
+        }
+        #endregion
     }
 }

@@ -1,6 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -17,6 +21,52 @@ namespace NetAppCommon
         /// Log4 Net Logger
         /// </summary>
         private static readonly log4net.ILog _log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
+        #endregion
+
+        #region public static string GetBaseDirectory()
+        /// <summary>
+        /// Pobierz podstawową (bazową) ścieżkę aplikacji
+        /// Get the application's base path
+        /// </summary>
+        /// <returns>
+        /// Podstawowa ścieżka aplikacji jako string lub null
+        /// Base application path as string or null
+        /// </returns>
+        public static string GetBaseDirectory()
+        {
+            try
+            {
+                return AppDomain.CurrentDomain.BaseDirectory;
+            }
+            catch (Exception e)
+            {
+                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+            }
+            return null;
+        }
+        #endregion
+
+        #region public static async Task<string> GetBaseDirectoryAsync()
+        /// <summary>
+        /// Pobierz podstawową (bazową) ścieżkę aplikacji asynchronicznie
+        /// Get the application's base path asynchronously
+        /// </summary>
+        /// <returns>
+        /// Podstawowa ścieżka aplikacji jako string lub null
+        /// Base application path as string or null
+        /// </returns>
+        public static async Task<string> GetBaseDirectoryAsync()
+        {
+            try
+            {
+                await Task.Run(() => GetBaseDirectory());
+            }
+            catch (Exception e)
+            {
+                await Task.Run(() => _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+            }
+            return null;
+        }
         #endregion
 
         #region public static string GetAppSettingsPath(string settingsJsonFileName = null)
@@ -71,13 +121,12 @@ namespace NetAppCommon
                         return Path.Combine(baseDirectory, string.Format("{0}.json", Assembly.GetEntryAssembly().GetName().Name));
                     }
                 }
-                return null;
             }
             catch (Exception e)
             {
                 _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
-                return null;
             }
+            return null;
         }
         #endregion
 
@@ -325,13 +374,12 @@ namespace NetAppCommon
                         return (T)Convert.ChangeType(configurationRoot.GetValue<T>(key), typeof(T));
                     }
                 }
-                return (T)Convert.ChangeType(null, typeof(T));
             }
             catch (Exception e)
             {
                 _log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
-                return (T)Convert.ChangeType(null, typeof(T));
             }
+            return (T)Convert.ChangeType(null, typeof(T));
         }
         #endregion
 
@@ -366,6 +414,90 @@ namespace NetAppCommon
             {
                 await Task.Run(() => _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return (T)Convert.ChangeType(null, typeof(T));
+            }
+        }
+        #endregion
+
+        #region public static void SaveConfigurationToFile<T>(T _object, string appSettingsPath = null)
+        /// <summary>
+        /// Zapisz kofigurację do pliku
+        /// Save configuration to file
+        /// </summary>
+        /// <typeparam name="T">
+        /// Typ obiektu jako parametr typu T
+        /// Object type as a parameter of type T
+        /// </typeparam>
+        /// <param name="_object">
+        /// Obiekt typu parametru T
+        /// Object of the T parameter type
+        /// </param>
+        /// <param name="appSettingsPath">
+        /// Opcjonalnie ścieżka do pliku jako string
+        /// Optional file path as string
+        /// </param>
+        public static void SaveConfigurationToFile<T>(T _object, string appSettingsPath = null)
+        {
+            try
+            {
+                if (null == appSettingsPath)
+                {
+                    appSettingsPath = GetAppSettingsPath();
+                }
+                if (null != appSettingsPath && !string.IsNullOrWhiteSpace(appSettingsPath) && File.Exists(appSettingsPath))
+                {
+                    string json = JsonConvert.SerializeObject(_object, Formatting.Indented);
+                    if (null != json)
+                    {
+                        File.WriteAllText(appSettingsPath, json);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
+            }
+        }
+        #endregion
+
+        #region public static async Task SaveConfigurationToFileAsync<T>(T _object, string appSettingsPath = null)
+        /// <summary>
+        /// Zapisz kofigurację do pliku asynchronicznie
+        /// Save configuration to file asynchronously
+        /// </summary>
+        /// <typeparam name="T">
+        /// Typ obiektu jako parametr typu T
+        /// Object type as a parameter of type T
+        /// </typeparam>
+        /// <param name="_object">
+        /// Obiekt typu parametru T
+        /// Object of the T parameter type
+        /// </param>
+        /// <param name="appSettingsPath">
+        /// Opcjonalnie ścieżka do pliku jako string
+        /// Optional file path as string
+        /// </param>
+        public static async Task SaveConfigurationToFileAsync<T>(T _object, string appSettingsPath = null)
+        {
+            try
+            {
+                await Task.Run(() => {
+                    if (null == appSettingsPath)
+                    {
+                        appSettingsPath = GetAppSettingsPath();
+                    }
+                    if (null != appSettingsPath && !string.IsNullOrWhiteSpace(appSettingsPath) && File.Exists(appSettingsPath))
+                    {
+                        string json = JsonConvert.SerializeObject(_object, Formatting.Indented);
+                        if (null != json)
+                        {
+                            File.WriteAllText(appSettingsPath, json);
+                        }
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                await Task.Run(() => _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
             }
         }
         #endregion
