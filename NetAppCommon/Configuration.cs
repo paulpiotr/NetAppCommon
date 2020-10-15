@@ -1,10 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -480,7 +477,8 @@ namespace NetAppCommon
         {
             try
             {
-                await Task.Run(() => {
+                await Task.Run(() =>
+                {
                     if (null == appSettingsPath)
                     {
                         appSettingsPath = GetAppSettingsPath();

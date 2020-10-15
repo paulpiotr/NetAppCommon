@@ -1,8 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Reflection;
 
 namespace NetAppCommon.Validation
@@ -53,13 +51,13 @@ namespace NetAppCommon.Validation
                 SqlConnection sqlConnection = null;
                 try
                 {
-                    using (sqlConnection = new SqlConnection((string) value))
+                    using (sqlConnection = new SqlConnection((string)value))
                     {
                         sqlConnection.Open();
                         return ValidationResult.Success;
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
                 }
@@ -67,7 +65,8 @@ namespace NetAppCommon.Validation
                 {
                     try
                     {
-                        if(null != sqlConnection) {
+                        if (null != sqlConnection)
+                        {
                             sqlConnection.Close();
                         }
                     }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace NetAppCommon.Models
+﻿namespace NetAppCommon.Models
 {
     /// <summary>
     /// Model danych tworzących połączenie do bazy danych
@@ -11,10 +7,10 @@ namespace NetAppCommon.Models
     {
         ///Data Source
         ///Server
-        
+
         ///AttachDbFilename
         ///Database
-        
+
         ///User Id
         ///Password
 

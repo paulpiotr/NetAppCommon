@@ -60,7 +60,7 @@ namespace NetAppCommon.Validation
                 char[] delimiterChars = { ',', ';' };
                 ListOfAttributes = new List<string>(separatedListOfAttributes.Split(delimiterChars)).Select(x => x.Trim()).ToList();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
             }
