@@ -27,6 +27,44 @@ namespace NetAppCommon.Validation
         public new string ErrorMessage { get; set; }
         #endregion
 
+        #region public string Exception { get; set; }
+        /// <summary>
+        /// Ciąg wyjątku Exception jako string
+        /// An Exception string as a string
+        /// </summary>
+        public string Exception { get; set; }
+        #endregion
+
+        #region private bool CheskForConnection { get; set; } = true;
+        /// <summary>
+        /// Sprawdź możliwość podłączenia do bazy danych z wpisania parametru Ciąg połączenia do bazy danych Mssql
+        /// Check the possibility of connecting to the database by entering the Mssql database connection string parameter
+        /// </summary>
+        private bool CheskForConnection { get; set; } = true;
+        #endregion
+
+        #region private void SetValidationContext(ValidationContext validationContext)
+        /// <summary>
+        /// Ustaw właściwości klasy walidatora z instancji przekazanego kontekstu
+        /// Set the validator class properties from the instance of the passed context
+        /// </summary>
+        /// <param name="validationContext">
+        /// Przekazany kontekst do walidatora jako ValidationContext
+        /// The context passed to the validator as ValidationContext
+        /// </param>
+        private void SetValidationContext(ValidationContext validationContext)
+        {
+            try
+            {
+                CheskForConnection = (bool)validationContext.ObjectInstance.GetType().GetProperty("CheskForConnection", BindingFlags.Public | BindingFlags.Instance).GetValue(validationContext.ObjectInstance);
+            }
+            catch (Exception)
+            {
+                CheskForConnection = false;
+            }
+        }
+        #endregion
+
         #region protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         /// <summary>
         /// Sprawdź, czy wartość występuje w podanej liści argumentów rozdzielonych separatorem ',', ';'
@@ -46,12 +84,16 @@ namespace NetAppCommon.Validation
         /// </returns>
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            if (null != value)
+            if (null != validationContext)
+            {
+                SetValidationContext(validationContext);
+            }
+            if (null != value && CheskForConnection == true)
             {
                 SqlConnection sqlConnection = null;
                 try
                 {
-                    using (sqlConnection = new SqlConnection((string)value))
+                    using (sqlConnection = new SqlConnection(DatabaseMssql.ParseConnectionString((string)value)))
                     {
                         sqlConnection.Open();
                         return ValidationResult.Success;
@@ -59,7 +101,8 @@ namespace NetAppCommon.Validation
                 }
                 catch (Exception e)
                 {
-                    _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                    Exception = string.Format("{0}, {1}.", e.Message, e.StackTrace);
+                    _log4net.Error(Exception, e);
                 }
                 finally
                 {
@@ -72,7 +115,8 @@ namespace NetAppCommon.Validation
                     }
                     catch (Exception e)
                     {
-                        _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                        Exception = string.Format("{0}, {1}.", e.Message, e.StackTrace);
+                        _log4net.Error(Exception, e);
                     }
                 }
                 if (null != ErrorMessage)
@@ -81,7 +125,7 @@ namespace NetAppCommon.Validation
                 }
                 else
                 {
-                    return new ValidationResult(string.Format("Nie można utworzyć połączenia do bazy danych Mssql używając danych: {0}", value));
+                    return new ValidationResult(string.Format("Nie można utworzyć połączenia do bazy danych Mssql używając danych: {0} {1}", value, Exception));
                 }
             }
             return ValidationResult.Success;

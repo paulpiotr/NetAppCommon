@@ -40,8 +40,10 @@ namespace NetAppCommon.Helpers
                     {
                         if (null != dbContext)
                         {
+                            _log4net.Debug($"Check Migrate");
                             if ((await dbContext.Database.GetPendingMigrationsAsync().ConfigureAwait(false)).Any())
                             {
+                                _log4net.Debug($"Migrate");
                                 await dbContext.Database.MigrateAsync().ConfigureAwait(false);
                             }
                         }

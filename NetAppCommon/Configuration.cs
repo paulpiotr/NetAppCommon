@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using static System.Environment;
 
 namespace NetAppCommon
 {
@@ -18,6 +19,44 @@ namespace NetAppCommon
         /// Log4 Net Logger
         /// </summary>
         private static readonly log4net.ILog _log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
+        #endregion
+
+        #region public static string SpecialFoldeGetFolderPath(string key)
+        /// <summary>
+        /// Pobierz ścieżkę do katalogu specjalnego
+        /// Get the path to the special directory
+        /// </summary>
+        /// <param name="key">
+        /// Wyszukiwany klucz jako string
+        /// Search key as string
+        /// </param>
+        /// <returns>
+        /// Ścieżka do katalogu specjalnego SpecialFolder jako string
+        /// Path to the SpecialFolder special directory as a string
+        /// </returns>
+        public static string SpecialFoldeGetFolderPath(string key)
+        {
+            try
+            {
+                SpecialFolder specialFolder;
+                if (Enum.TryParse(key, true, out specialFolder))
+                {
+                    try
+                    {
+                        return GetFolderPath(specialFolder);
+                    }
+                    catch (Exception e)
+                    {
+                        _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+            }
+            return null;
+        }
         #endregion
 
         #region public static string GetBaseDirectory()

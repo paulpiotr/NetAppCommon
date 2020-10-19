@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static System.Environment;
 
 namespace NetAppCommon
 {
@@ -36,13 +38,39 @@ namespace NetAppCommon
         {
             try
             {
+                _log4net.Debug(connectionString);
+                //Regex regex = new Regex(@"%.*?%");
+                MatchCollection matchCollection = new Regex(@"%.*?%").Matches(connectionString);
+                foreach (Match match in matchCollection)
+                {
+                    if (null != match.Value && !string.IsNullOrWhiteSpace(match.Value))
+                    {
+                        string stringType = match.Value.Replace("%", string.Empty);
+                        //_log4net.Debug(match.Value);
+                        //_log4net.Debug(stringType);
+                        if (
+                            (stringType.Contains("System.Environment.GetFolderPath") ||
+                            stringType.Contains("Environment.GetFolderPath")) &&
+                            (stringType.Contains("System.Environment.SpecialFolder") ||
+                            stringType.Contains("Environment.SpecialFolder"))
+                            )
+                        {
+                            string key = stringType.Replace(".", string.Empty).Replace("(", string.Empty).Replace(")", string.Empty).Replace("System", string.Empty).Replace("Environment", string.Empty).Replace("GetFolderPath", string.Empty).Replace("SpecialFolder", string.Empty);
+                            try
+                            {
+                                connectionString = connectionString.Replace(match.Value, Configuration.SpecialFoldeGetFolderPath(key));
+                            }
+                            catch (Exception e)
+                            {
+                                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                            }
+                        }
+                        _log4net.Debug(connectionString);
+                    }
+                }
                 if (!string.IsNullOrWhiteSpace(connectionString) && connectionString.Contains("%AppDomain.CurrentDomain.BaseDirectory%"))
                 {
                     connectionString = connectionString.Replace("%AppDomain.CurrentDomain.BaseDirectory%", AppDomain.CurrentDomain.BaseDirectory);
-                }
-                if (!string.IsNullOrWhiteSpace(connectionString) && connectionString.Contains("%Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)%"))
-                {
-                    connectionString = connectionString.Replace("%Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)%", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
                 }
                 ///GetExecutingAssembly
                 if (!string.IsNullOrWhiteSpace(connectionString) && connectionString.Contains("%Assembly.GetExecutingAssembly().GetName().Name%"))
@@ -95,8 +123,8 @@ namespace NetAppCommon
         /// The name of the .json file
         /// </param>
         /// <returns>
-        /// Parametry połączenia String lub null
-        /// A String or null connection string
+        /// Parametry połączenia jako string lub null
+        /// Connection string as string or null
         /// </returns>
         public static string GetConnectionString(string connectionStringName, string settingsJsonFileName = null)
         {
