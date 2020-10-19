@@ -1,4 +1,6 @@
-﻿namespace NetAppCommon
+﻿using System.Threading.Tasks;
+
+namespace NetAppCommon
 {
     public class DatabaseMssqlMdf : Mssql.DatabaseMssqlMdf
     {
@@ -48,6 +50,14 @@
                 Instance = new DatabaseMssqlMdf(connectionStringName, settingsJsonFileName);
             }
             return Instance;
+        }
+
+        public async Task <bool> CreateAsync()
+        {
+            return await Task.Run(() =>
+             {
+                 return base.Create(ConnectionString, ConnectionStringName, SettingsJsonFileName);
+             });
         }
 
         public bool Create()

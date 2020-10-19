@@ -38,74 +38,84 @@ namespace NetAppCommon
         {
             try
             {
-                _log4net.Debug(connectionString);
-                //Regex regex = new Regex(@"%.*?%");
-                MatchCollection matchCollection = new Regex(@"%.*?%").Matches(connectionString);
-                foreach (Match match in matchCollection)
+                if (null != connectionString && !string.IsNullOrWhiteSpace(connectionString))
                 {
-                    if (null != match.Value && !string.IsNullOrWhiteSpace(match.Value))
+                    //_log4net.Debug(connectionString);
+                    //Regex regex = new Regex(@"%.*?%");
+                    MatchCollection matchCollection = new Regex(@"%.*?%").Matches(connectionString);
+                    foreach (Match match in matchCollection)
                     {
-                        string stringType = match.Value.Replace("%", string.Empty);
-                        //_log4net.Debug(match.Value);
-                        //_log4net.Debug(stringType);
-                        if (
-                            (stringType.Contains("System.Environment.GetFolderPath") ||
-                            stringType.Contains("Environment.GetFolderPath")) &&
-                            (stringType.Contains("System.Environment.SpecialFolder") ||
-                            stringType.Contains("Environment.SpecialFolder"))
-                            )
+                        if (null != match.Value && !string.IsNullOrWhiteSpace(match.Value))
                         {
-                            string key = stringType.Replace(".", string.Empty).Replace("(", string.Empty).Replace(")", string.Empty).Replace("System", string.Empty).Replace("Environment", string.Empty).Replace("GetFolderPath", string.Empty).Replace("SpecialFolder", string.Empty);
-                            try
+                            string stringType = match.Value.Replace("%", string.Empty);
+                            //_log4net.Debug(match.Value);
+                            //_log4net.Debug(stringType);
+                            if (
+                                (stringType.Contains("System.Environment.GetFolderPath") ||
+                                stringType.Contains("Environment.GetFolderPath")) &&
+                                (stringType.Contains("System.Environment.SpecialFolder") ||
+                                stringType.Contains("Environment.SpecialFolder"))
+                                )
                             {
-                                connectionString = connectionString.Replace(match.Value, Configuration.SpecialFoldeGetFolderPath(key));
+                                string key = stringType.Replace(".", string.Empty).Replace("(", string.Empty).Replace(")", string.Empty).Replace("System", string.Empty).Replace("Environment", string.Empty).Replace("GetFolderPath", string.Empty).Replace("SpecialFolder", string.Empty);
+                                try
+                                {
+                                    connectionString = connectionString.Replace(match.Value, Configuration.SpecialFoldeGetFolderPath(key));
+                                }
+                                catch (Exception e)
+                                {
+                                    _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                                }
                             }
-                            catch (Exception e)
-                            {
-                                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
-                            }
+                            //_log4net.Debug(connectionString);
                         }
-                        _log4net.Debug(connectionString);
+                    }
+                    if (connectionString.Contains("%AppDomain.CurrentDomain.BaseDirectory%"))
+                    {
+                        connectionString = connectionString.Replace("%AppDomain.CurrentDomain.BaseDirectory%", AppDomain.CurrentDomain.BaseDirectory);
+                    }
+                    ///GetExecutingAssembly
+                    if (connectionString.Contains("%Assembly.GetExecutingAssembly().GetName().Name%"))
+                    {
+                        connectionString = connectionString.Replace("%Assembly.GetExecutingAssembly().GetName().Name%", Assembly.GetExecutingAssembly().GetName().Name);
+                    }
+                    if (connectionString.Contains("%System.Reflection.Assembly.GetExecutingAssembly().GetName().Name%"))
+                    {
+                        connectionString = connectionString.Replace("%System.Reflection.Assembly.GetExecutingAssembly().GetName().Name%", System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
+                    }
+                    ///GetCallingAssembly
+                    if (connectionString.Contains("%Assembly.GetCallingAssembly().GetName().Name%"))
+                    {
+                        connectionString = connectionString.Replace("%Assembly.GetCallingAssembly().GetName().Name%", Assembly.GetCallingAssembly().GetName().Name);
+                    }
+                    if (connectionString.Contains("%System.Reflection.Assembly.GetCallingAssembly().GetName().Name%"))
+                    {
+                        connectionString = connectionString.Replace("%System.Reflection.Assembly.GetCallingAssembly().GetName().Name%", System.Reflection.Assembly.GetCallingAssembly().GetName().Name);
+                    }
+                    ///GetEntryAssembly
+                    if (connectionString.Contains("%Assembly.GetEntryAssembly().GetName().Name%"))
+                    {
+                        connectionString = connectionString.Replace("%Assembly.GetEntryAssembly().GetName().Name%", Assembly.GetEntryAssembly().GetName().Name);
+                    }
+                    if (connectionString.Contains("%System.Reflection.Assembly.GetEntryAssembly().GetName().Name%"))
+                    {
+                        connectionString = connectionString.Replace("%System.Reflection.Assembly.GetEntryAssembly().GetName().Name%", System.Reflection.Assembly.GetEntryAssembly().GetName().Name);
+                    }
+                    if (connectionString.Contains("%AttachDbFilename%"))
+                    {
+                        SqlConnectionStringBuilder sqlConnectionStringBuilder = new SqlConnectionStringBuilder(connectionString);
+                        if (null != sqlConnectionStringBuilder && null != sqlConnectionStringBuilder.AttachDBFilename && !string.IsNullOrWhiteSpace(sqlConnectionStringBuilder.AttachDBFilename))
+                        {
+                            connectionString = connectionString.Replace("%AttachDbFilename%", string.Format("{0}{1}", "MSSQLLocalDB", Math.Abs(sqlConnectionStringBuilder.AttachDBFilename.GetHashCode())));
+                        }
                     }
                 }
-                if (!string.IsNullOrWhiteSpace(connectionString) && connectionString.Contains("%AppDomain.CurrentDomain.BaseDirectory%"))
-                {
-                    connectionString = connectionString.Replace("%AppDomain.CurrentDomain.BaseDirectory%", AppDomain.CurrentDomain.BaseDirectory);
-                }
-                ///GetExecutingAssembly
-                if (!string.IsNullOrWhiteSpace(connectionString) && connectionString.Contains("%Assembly.GetExecutingAssembly().GetName().Name%"))
-                {
-                    connectionString = connectionString.Replace("%Assembly.GetExecutingAssembly().GetName().Name%", Assembly.GetExecutingAssembly().GetName().Name);
-                }
-                if (!string.IsNullOrWhiteSpace(connectionString) && connectionString.Contains("%System.Reflection.Assembly.GetExecutingAssembly().GetName().Name%"))
-                {
-                    connectionString = connectionString.Replace("%System.Reflection.Assembly.GetExecutingAssembly().GetName().Name%", System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
-                }
-                ///GetCallingAssembly
-                if (!string.IsNullOrWhiteSpace(connectionString) && connectionString.Contains("%Assembly.GetCallingAssembly().GetName().Name%"))
-                {
-                    connectionString = connectionString.Replace("%Assembly.GetCallingAssembly().GetName().Name%", Assembly.GetCallingAssembly().GetName().Name);
-                }
-                if (!string.IsNullOrWhiteSpace(connectionString) && connectionString.Contains("%System.Reflection.Assembly.GetCallingAssembly().GetName().Name%"))
-                {
-                    connectionString = connectionString.Replace("%System.Reflection.Assembly.GetCallingAssembly().GetName().Name%", System.Reflection.Assembly.GetCallingAssembly().GetName().Name);
-                }
-                ///GetEntryAssembly
-                if (!string.IsNullOrWhiteSpace(connectionString) && connectionString.Contains("%Assembly.GetEntryAssembly().GetName().Name%"))
-                {
-                    connectionString = connectionString.Replace("%Assembly.GetEntryAssembly().GetName().Name%", Assembly.GetEntryAssembly().GetName().Name);
-                }
-                if (!string.IsNullOrWhiteSpace(connectionString) && connectionString.Contains("%System.Reflection.Assembly.GetEntryAssembly().GetName().Name%"))
-                {
-                    connectionString = connectionString.Replace("%System.Reflection.Assembly.GetEntryAssembly().GetName().Name%", System.Reflection.Assembly.GetEntryAssembly().GetName().Name);
-                }
-                return connectionString;
             }
             catch (Exception e)
             {
                 _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
-                return null;
             }
+            return connectionString;
         }
         #endregion
 
