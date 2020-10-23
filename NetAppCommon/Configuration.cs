@@ -122,7 +122,7 @@ namespace NetAppCommon
         {
             try
             {
-                //log4net.Info(string.Format("GetExecutingAssembly {0}, GetCallingAssembly {1} GetEntryAssembly {2}", Assembly.GetExecutingAssembly().GetName().Name, Assembly.GetCallingAssembly().GetName().Name, Assembly.GetEntryAssembly().GetName().Name));
+                //log4net.Debug(string.Format("GetExecutingAssembly {0}, GetCallingAssembly {1} GetEntryAssembly {2}", Assembly.GetExecutingAssembly().GetName().Name, Assembly.GetCallingAssembly().GetName().Name, Assembly.GetEntryAssembly().GetName().Name));
                 string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
                 if (Directory.Exists(baseDirectory))
                 {

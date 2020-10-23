@@ -45,13 +45,13 @@ namespace NetAppCommon.Helpers.Db.Mssql
                 if (File.Exists(auditCreateTableScriptPath) && File.Exists(auditCreateTriggerScriptPath))
                 {
                     string sql = File.ReadAllText(auditCreateTableScriptPath).Replace("%SchemaName%", schemaName).Replace("%TableName%", tableName);
-                    log4net.Info(string.Format("Execute SQL: {0}", sql));
+                    log4net.Debug(string.Format("Execute SQL: {0}", sql));
                     migrationBuilder.Sql(sql);
-                    log4net.Info("OK");
+                    log4net.Debug("OK");
                     sql = File.ReadAllText(auditCreateTriggerScriptPath).Replace("%SchemaName%", schemaName).Replace("%TableName%", tableName);
-                    log4net.Info(string.Format("Execute SQL: {0}", sql));
+                    log4net.Debug(string.Format("Execute SQL: {0}", sql));
                     migrationBuilder.Sql(sql);
-                    log4net.Info("OK");
+                    log4net.Debug("OK");
                 }
                 else
                 {
@@ -132,13 +132,13 @@ namespace NetAppCommon.Helpers.Db.Mssql
                 if (File.Exists(auditDropTableScriptPath) && File.Exists(auditDropTriggerScriptPath))
                 {
                     string sql = File.ReadAllText(auditDropTableScriptPath).Replace("%SchemaName%", schemaName).Replace("%TableName%", tableName);
-                    log4net.Info(string.Format("Execute SQL: {0}", sql));
+                    log4net.Debug(string.Format("Execute SQL: {0}", sql));
                     migrationBuilder.Sql(sql);
-                    log4net.Info("OK");
+                    log4net.Debug("OK");
                     sql = File.ReadAllText(auditDropTriggerScriptPath).Replace("%SchemaName%", schemaName).Replace("%TableName%", tableName);
-                    log4net.Info(string.Format("Execute SQL: {0}", sql));
+                    log4net.Debug(string.Format("Execute SQL: {0}", sql));
                     migrationBuilder.Sql(sql);
-                    log4net.Info("OK");
+                    log4net.Debug("OK");
                 }
                 else
                 {

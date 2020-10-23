@@ -55,19 +55,19 @@ namespace NetAppCommon.Helpers.Object
                         {
                             default:
                                 stringBuilder.Append(propertyInfo.Name).Append(separator).Append(propertyInfo.GetValue(o, null) ?? string.Empty).Append(separator);
-                                //log4net.Info($"{ propertyInfo.PropertyType } { propertyInfo.GetValue(o, null) ?? string.Empty }");
+                                //log4net.Debug($"{ propertyInfo.PropertyType } { propertyInfo.GetValue(o, null) ?? string.Empty }");
                                 break;
                             case "Decimal":
                             case "System.Decimal":
                                 decimal decimalValue = (decimal)(propertyInfo.GetValue(o, null) ?? 0);
                                 stringBuilder.Append(propertyInfo.Name).Append(separator).Append(decimalValue.ToString("N", CultureInfo.InvariantCulture)).Append(separator);
-                                //log4net.Info($"{ propertyInfo.PropertyType } { propertyInfo.GetValue(o, null) ?? string.Empty } { decimalValue } { decimalValue.ToString("N", CultureInfo.InvariantCulture) } ");
+                                //log4net.Debug($"{ propertyInfo.PropertyType } { propertyInfo.GetValue(o, null) ?? string.Empty } { decimalValue } { decimalValue.ToString("N", CultureInfo.InvariantCulture) } ");
                                 break;
                             case "Double":
                             case "System.Double":
                                 double doubleValue = (double)(propertyInfo.GetValue(o, null) ?? 0);
                                 stringBuilder.Append(propertyInfo.Name).Append(separator).Append(doubleValue.ToString("N", CultureInfo.InvariantCulture)).Append(separator);
-                                //log4net.Info($"{ propertyInfo.PropertyType } { propertyInfo.GetValue(o, null) ?? string.Empty } { doubleValue } { doubleValue.ToString("N", CultureInfo.InvariantCulture) }");
+                                //log4net.Debug($"{ propertyInfo.PropertyType } { propertyInfo.GetValue(o, null) ?? string.Empty } { doubleValue } { doubleValue.ToString("N", CultureInfo.InvariantCulture) }");
                                 break;
                             case "System.DateTime":
                             case "System.Nullable`1[System.DateTime]":

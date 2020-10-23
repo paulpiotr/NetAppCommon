@@ -88,7 +88,7 @@ namespace NetAppCommon.Logging
         /// </param>
         public void ApplyClientBehavior(ServiceEndpoint endpoint, ClientRuntime clientRuntime)
         {
-            //log4net.Info("ApplyClientBehavior(ServiceEndpoint endpoint, ClientRuntime clientRuntime)");
+            //log4net.Debug("ApplyClientBehavior(ServiceEndpoint endpoint, ClientRuntime clientRuntime)");
             clientRuntime.ClientMessageInspectors.Add(SoapClientMessageInspector);
         }
         #endregion
@@ -108,7 +108,7 @@ namespace NetAppCommon.Logging
         /// </param>
         public void ApplyDispatchBehavior(ServiceEndpoint endpoint, EndpointDispatcher endpointDispatcher)
         {
-            //log4net.Info("ApplyDispatchBehavior(ServiceEndpoint endpoint, EndpointDispatcher endpointDispatcher)");
+            //log4net.Debug("ApplyDispatchBehavior(ServiceEndpoint endpoint, EndpointDispatcher endpointDispatcher)");
         }
         #endregion
 

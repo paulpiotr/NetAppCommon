@@ -48,4 +48,9 @@
     <Folder Include="Connected Services\" />
   </ItemGroup>
 
+  <Target Name="SetEnvConfig" BeforeTargets="Compile">
+    <Copy SourceFiles="..\..\env\log4net.debug.config" DestinationFiles="log4net.config" OverwriteReadOnlyFiles="true" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
+    <Copy SourceFiles="..\..\env\log4net.release.config" DestinationFiles="log4net.config" OverwriteReadOnlyFiles="true" Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " />
+  </Target>
+
 </Project>

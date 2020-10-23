@@ -74,11 +74,11 @@ namespace NetAppCommon.Logging
         {
             try
             {
-                log4net.Info("AfterReceiveReply(ref Message reply, object correlationState)");
+                log4net.Debug("AfterReceiveReply(ref Message reply, object correlationState)");
                 using (MessageBuffer buffer = reply.CreateBufferedCopy(int.MaxValue))
                 {
                     XmlDocument document = GetDocument(buffer.CreateMessage());
-                    log4net.Info(document.OuterXml);
+                    log4net.Debug(document.OuterXml);
                     //Logger.LogTrace(document.OuterXml);
                     reply = buffer.CreateMessage();
                 }
@@ -111,13 +111,13 @@ namespace NetAppCommon.Logging
         {
             try
             {
-                log4net.Info("BeforeSendRequest(ref Message message, IClientChannel clientChannel)");
+                log4net.Debug("BeforeSendRequest(ref Message message, IClientChannel clientChannel)");
                 using (MessageBuffer buffer = message.CreateBufferedCopy(int.MaxValue))
                 {
                     XmlDocument document = GetDocument(buffer.CreateMessage());
                     //Oryginalnie
                     //Logger.LogTrace(document.OuterXml);
-                    log4net.Info(document.OuterXml);
+                    log4net.Debug(document.OuterXml);
                     message = buffer.CreateMessage();
                     return null;
                 }

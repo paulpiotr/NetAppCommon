@@ -215,7 +215,7 @@ namespace NetAppCommon.Helpers.Files
                     try
                     {
 #if DEBUG
-                        log4net.Info($"Check");
+                        log4net.Debug($"Check");
 #endif
                         return func();
                     }
