@@ -8,11 +8,11 @@ namespace NetAppCommon.Helpers.Db.Mssql
 {
     public class AuditMigration
     {
-        #region private static readonly log4net.ILog _log4net
+        #region private static readonly log4net.ILog log4net
         /// <summary>
         /// Log4net Logger
         /// </summary>
-        private static readonly log4net.ILog _log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
 
         #region public static bool Create(MigrationBuilder migrationBuilder, string tableName)
@@ -45,13 +45,13 @@ namespace NetAppCommon.Helpers.Db.Mssql
                 if (File.Exists(auditCreateTableScriptPath) && File.Exists(auditCreateTriggerScriptPath))
                 {
                     string sql = File.ReadAllText(auditCreateTableScriptPath).Replace("%SchemaName%", schemaName).Replace("%TableName%", tableName);
-                    _log4net.Info(string.Format("Execute SQL: {0}", sql));
+                    log4net.Info(string.Format("Execute SQL: {0}", sql));
                     migrationBuilder.Sql(sql);
-                    _log4net.Info("OK");
+                    log4net.Info("OK");
                     sql = File.ReadAllText(auditCreateTriggerScriptPath).Replace("%SchemaName%", schemaName).Replace("%TableName%", tableName);
-                    _log4net.Info(string.Format("Execute SQL: {0}", sql));
+                    log4net.Info(string.Format("Execute SQL: {0}", sql));
                     migrationBuilder.Sql(sql);
-                    _log4net.Info("OK");
+                    log4net.Info("OK");
                 }
                 else
                 {
@@ -60,7 +60,7 @@ namespace NetAppCommon.Helpers.Db.Mssql
             }
             catch (Exception e)
             {
-                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
                 return false;
             }
             return true;
@@ -96,7 +96,7 @@ namespace NetAppCommon.Helpers.Db.Mssql
             }
             catch (Exception e)
             {
-                await Task.Run(() => _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return false;
             }
         }
@@ -132,13 +132,13 @@ namespace NetAppCommon.Helpers.Db.Mssql
                 if (File.Exists(auditDropTableScriptPath) && File.Exists(auditDropTriggerScriptPath))
                 {
                     string sql = File.ReadAllText(auditDropTableScriptPath).Replace("%SchemaName%", schemaName).Replace("%TableName%", tableName);
-                    _log4net.Info(string.Format("Execute SQL: {0}", sql));
+                    log4net.Info(string.Format("Execute SQL: {0}", sql));
                     migrationBuilder.Sql(sql);
-                    _log4net.Info("OK");
+                    log4net.Info("OK");
                     sql = File.ReadAllText(auditDropTriggerScriptPath).Replace("%SchemaName%", schemaName).Replace("%TableName%", tableName);
-                    _log4net.Info(string.Format("Execute SQL: {0}", sql));
+                    log4net.Info(string.Format("Execute SQL: {0}", sql));
                     migrationBuilder.Sql(sql);
-                    _log4net.Info("OK");
+                    log4net.Info("OK");
                 }
                 else
                 {
@@ -147,7 +147,7 @@ namespace NetAppCommon.Helpers.Db.Mssql
             }
             catch (Exception e)
             {
-                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
                 return false;
             }
             return true;
@@ -183,7 +183,7 @@ namespace NetAppCommon.Helpers.Db.Mssql
             }
             catch (Exception e)
             {
-                await Task.Run(() => _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return false;
             }
         }

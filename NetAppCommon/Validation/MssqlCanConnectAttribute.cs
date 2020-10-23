@@ -12,11 +12,11 @@ namespace NetAppCommon.Validation
     /// </summary>
     public class MssqlCanConnectAttribute : ValidationAttribute
     {
-        #region private static readonly log4net.ILog _log4net
+        #region private static readonly log4net.ILog log4net
         /// <summary>
         /// Log4 Net Logger
         /// </summary>
-        private static readonly log4net.ILog _log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
 
         #region public new string ErrorMessage { get; set; }
@@ -102,7 +102,7 @@ namespace NetAppCommon.Validation
                 catch (Exception e)
                 {
                     Exception = string.Format("{0}, {1}.", e.Message, e.StackTrace);
-                    _log4net.Error(Exception, e);
+                    log4net.Error(Exception, e);
                 }
                 finally
                 {
@@ -116,7 +116,7 @@ namespace NetAppCommon.Validation
                     catch (Exception e)
                     {
                         Exception = string.Format("{0}, {1}.", e.Message, e.StackTrace);
-                        _log4net.Error(Exception, e);
+                        log4net.Error(Exception, e);
                     }
                 }
                 if (null != ErrorMessage)

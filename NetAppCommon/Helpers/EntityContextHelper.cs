@@ -14,11 +14,11 @@ namespace NetAppCommon.Helpers
     /// </summary>
     public class EntityContextHelper
     {
-        #region private static readonly log4net.ILog _log4net
+        #region private static readonly log4net.ILog log4net
         /// <summary>
         /// Log4 Net Logger
         /// </summary>
-        private static readonly log4net.ILog _log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
 
         #region public static async Task RunMigrationAsync<T>(IServiceProvider serviceProvider) where T : DbContext
@@ -40,10 +40,10 @@ namespace NetAppCommon.Helpers
                     {
                         if (null != dbContext)
                         {
-                            _log4net.Debug($"Check Migrate");
+                            log4net.Debug($"Check Migrate");
                             if ((await dbContext.Database.GetPendingMigrationsAsync().ConfigureAwait(false)).Any())
                             {
-                                _log4net.Debug($"Migrate");
+                                log4net.Debug($"Migrate");
                                 await dbContext.Database.MigrateAsync().ConfigureAwait(false);
                             }
                         }
@@ -52,7 +52,7 @@ namespace NetAppCommon.Helpers
             }
             catch (Exception e)
             {
-                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
             }
         }
         #endregion

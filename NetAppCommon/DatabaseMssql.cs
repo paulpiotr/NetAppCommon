@@ -15,11 +15,11 @@ namespace NetAppCommon
     /// </summary>
     public class DatabaseMssql
     {
-        #region private static readonly log4net.ILog _log4net
+        #region private static readonly log4net.ILog log4net
         /// <summary>
         /// Log4 Net Logger
         /// </summary>
-        private static readonly log4net.ILog _log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
 
         #region public static string ParseConnectionString(string connectionString)
@@ -40,7 +40,7 @@ namespace NetAppCommon
             {
                 if (null != connectionString && !string.IsNullOrWhiteSpace(connectionString))
                 {
-                    //_log4net.Debug(connectionString);
+                    //log4net.Debug(connectionString);
                     //Regex regex = new Regex(@"%.*?%");
                     MatchCollection matchCollection = new Regex(@"%.*?%").Matches(connectionString);
                     foreach (Match match in matchCollection)
@@ -48,8 +48,8 @@ namespace NetAppCommon
                         if (null != match.Value && !string.IsNullOrWhiteSpace(match.Value))
                         {
                             string stringType = match.Value.Replace("%", string.Empty);
-                            //_log4net.Debug(match.Value);
-                            //_log4net.Debug(stringType);
+                            //log4net.Debug(match.Value);
+                            //log4net.Debug(stringType);
                             if (
                                 (stringType.Contains("System.Environment.GetFolderPath") ||
                                 stringType.Contains("Environment.GetFolderPath")) &&
@@ -64,10 +64,10 @@ namespace NetAppCommon
                                 }
                                 catch (Exception e)
                                 {
-                                    _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                                    log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
                                 }
                             }
-                            //_log4net.Debug(connectionString);
+                            //log4net.Debug(connectionString);
                         }
                     }
                     if (connectionString.Contains("%AppDomain.CurrentDomain.BaseDirectory%"))
@@ -113,7 +113,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
             }
             return connectionString;
         }
@@ -144,7 +144,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
                 return null;
             }
         }
@@ -175,7 +175,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return null;
             }
         }
@@ -207,7 +207,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
                 return null;
             }
         }
@@ -234,7 +234,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return null;
             }
         }
@@ -270,7 +270,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
                 return null;
             }
         }
@@ -301,7 +301,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return null;
             }
         }
@@ -338,7 +338,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
                 return null;
             }
         }
@@ -367,7 +367,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return null;
             }
         }
@@ -403,7 +403,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
                 return null;
             }
         }
@@ -432,7 +432,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return null;
             }
         }
@@ -472,7 +472,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
                 return null;
             }
         }
@@ -505,7 +505,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return null;
             }
         }
@@ -530,7 +530,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
                 return null;
             }
         }
@@ -555,7 +555,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return null;
             }
         }
@@ -590,7 +590,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
                 return null;
             }
         }
@@ -619,7 +619,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return null;
             }
         }
@@ -654,7 +654,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
                 return null;
             }
         }
@@ -683,7 +683,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return null;
             }
         }
@@ -718,7 +718,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
                 return null;
             }
         }
@@ -747,7 +747,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return null;
             }
         }
@@ -778,11 +778,11 @@ namespace NetAppCommon
             }
             catch (SqlException e)
             {
-                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
             }
             catch (Exception e)
             {
-                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
             }
             finally
             {
@@ -795,7 +795,7 @@ namespace NetAppCommon
                 }
                 catch (Exception e)
                 {
-                    _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                    log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
                 }
             }
             return false;
@@ -823,7 +823,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
             }
             return false;
         }

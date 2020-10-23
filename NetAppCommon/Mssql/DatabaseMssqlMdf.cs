@@ -10,12 +10,12 @@ namespace NetAppCommon.Mssql
     public abstract class DatabaseMssqlMdf : IDatabaseMssqlMdf
     {
 
-        #region private static readonly log4net.ILog _log4net
+        #region private static readonly log4net.ILog log4net
         /// <summary>
         /// Log4 Net Logger
         /// Log4 Net Logger
         /// </summary>
-        private static readonly log4net.ILog _log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
 
         public virtual string ConnectionString { get; set; }
@@ -57,45 +57,48 @@ namespace NetAppCommon.Mssql
                 {
                     SqlConnectionStringBuilder sqlConnectionStringBuilder = new SqlConnectionStringBuilder(ConnectionString);
                     AttachDBFilename = sqlConnectionStringBuilder.AttachDBFilename;
-                    InitialCatalog = sqlConnectionStringBuilder.InitialCatalog;
-                    LogAttachDBFilename = LogAttachDBFilename ?? Path.Combine(Path.GetDirectoryName(AttachDBFilename), string.Format("{0}_log.ldf", Path.GetFileName(AttachDBFilename).Replace(Path.GetExtension(Path.GetFileName(AttachDBFilename)), string.Empty)));
-                    LogInitialCatalog = LogInitialCatalog ?? string.Format("{0}_log", InitialCatalog);
-                    _log4net.Debug($"AttachDBFilename { AttachDBFilename }, InitialCatalog { InitialCatalog }, LogAttachDBFilename { LogAttachDBFilename }, LogInitialCatalog { LogInitialCatalog }");
-                    if (
-                        null != sqlConnectionStringBuilder &&
-                        null != AttachDBFilename && !string.IsNullOrWhiteSpace(AttachDBFilename) &&
-                        !File.Exists(AttachDBFilename) &&
-                        null != InitialCatalog && !string.IsNullOrWhiteSpace(InitialCatalog) &&
-                        null != LogAttachDBFilename && !string.IsNullOrWhiteSpace(LogAttachDBFilename) &&
-                        null != LogInitialCatalog && !string.IsNullOrWhiteSpace(LogInitialCatalog)
-                        )
+                    if (null != AttachDBFilename && !string.IsNullOrWhiteSpace(AttachDBFilename))
                     {
-                        CreateScript = $"" +
-                            $"BEGIN TRY EXEC sp_detach_db { InitialCatalog }; END TRY BEGIN CATCH SELECT ERROR_NUMBER() AS ErrorNumber, ERROR_MESSAGE() AS ErrorMessage; END CATCH;" +
-                            $"BEGIN TRY CREATE DATABASE { InitialCatalog } ON PRIMARY " +
-                            $"(" +
-                                $"NAME = '{ InitialCatalog }', " +
-                                $"FILENAME = '{ AttachDBFilename }', " +
-                                $"SIZE = { Size ?? "8MB" }, " +
-                                $"MAXSIZE = { MaxSize ?? "131072MB" }, " +
-                                $"FILEGROWTH = { FileGrowTh ?? "1%" }" +
-                            $") " +
-                            $"LOG ON" +
-                            $"(" +
-                                $"NAME = '{ LogInitialCatalog }', " +
-                                $"FILENAME = '{ LogAttachDBFilename }', " +
-                                $"SIZE = { LogSize ?? "8MB" }, " +
-                                $"MAXSIZE = { LogMaxSize ?? "8192MB" }, " +
-                                $"FILEGROWTH = { LogFileGrowTh ?? "1%" }" +
-                            $") END TRY BEGIN CATCH SELECT ERROR_NUMBER() AS ErrorNumber, ERROR_MESSAGE() AS ErrorMessage; END CATCH;";
-                        _log4net.Debug($"CreateScript { CreateScript }");
-                        return CreateScript;
+                        InitialCatalog = sqlConnectionStringBuilder.InitialCatalog;
+                        LogAttachDBFilename = LogAttachDBFilename ?? Path.Combine(Path.GetDirectoryName(AttachDBFilename), string.Format("{0}_log.ldf", Path.GetFileName(AttachDBFilename).Replace(Path.GetExtension(Path.GetFileName(AttachDBFilename)), string.Empty)));
+                        LogInitialCatalog = LogInitialCatalog ?? string.Format("{0}_log", InitialCatalog);
+                        log4net.Debug($"AttachDBFilename { AttachDBFilename }, InitialCatalog { InitialCatalog }, LogAttachDBFilename { LogAttachDBFilename }, LogInitialCatalog { LogInitialCatalog }");
+                        if (
+                            null != sqlConnectionStringBuilder &&
+                            null != AttachDBFilename && !string.IsNullOrWhiteSpace(AttachDBFilename) &&
+                            !File.Exists(AttachDBFilename) &&
+                            null != InitialCatalog && !string.IsNullOrWhiteSpace(InitialCatalog) &&
+                            null != LogAttachDBFilename && !string.IsNullOrWhiteSpace(LogAttachDBFilename) &&
+                            null != LogInitialCatalog && !string.IsNullOrWhiteSpace(LogInitialCatalog)
+                            )
+                        {
+                            CreateScript = $"" +
+                                $"BEGIN TRY EXEC sp_detach_db { InitialCatalog }; END TRY BEGIN CATCH SELECT ERROR_NUMBER() AS ErrorNumber, ERROR_MESSAGE() AS ErrorMessage; END CATCH;" +
+                                $"BEGIN TRY CREATE DATABASE { InitialCatalog } ON PRIMARY " +
+                                $"(" +
+                                    $"NAME = '{ InitialCatalog }', " +
+                                    $"FILENAME = '{ AttachDBFilename }', " +
+                                    $"SIZE = { Size ?? "8MB" }, " +
+                                    $"MAXSIZE = { MaxSize ?? "131072MB" }, " +
+                                    $"FILEGROWTH = { FileGrowTh ?? "1%" }" +
+                                $") " +
+                                $"LOG ON" +
+                                $"(" +
+                                    $"NAME = '{ LogInitialCatalog }', " +
+                                    $"FILENAME = '{ LogAttachDBFilename }', " +
+                                    $"SIZE = { LogSize ?? "8MB" }, " +
+                                    $"MAXSIZE = { LogMaxSize ?? "8192MB" }, " +
+                                    $"FILEGROWTH = { LogFileGrowTh ?? "1%" }" +
+                                $") END TRY BEGIN CATCH SELECT ERROR_NUMBER() AS ErrorNumber, ERROR_MESSAGE() AS ErrorMessage; END CATCH;";
+                            log4net.Debug($"CreateScript { CreateScript }");
+                            return CreateScript;
+                        }
                     }
                 }
             }
             catch (Exception e)
             {
-                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
             }
             return null;
         }
@@ -109,7 +112,7 @@ namespace NetAppCommon.Mssql
                 {
                     if (!Directory.Exists(Path.GetDirectoryName(AttachDBFilename)))
                     {
-                        _log4net.Debug($"Create directory { Path.GetDirectoryName(AttachDBFilename) }");
+                        log4net.Debug($"Create directory { Path.GetDirectoryName(AttachDBFilename) }");
                         Directory.CreateDirectory(Path.GetDirectoryName(AttachDBFilename));
                     }
                     if (
@@ -131,13 +134,13 @@ namespace NetAppCommon.Mssql
                             {
                                 sqlConnection.Open();
                                 sqlCommand.ExecuteNonQuery();
-                                _log4net.Debug($"Sql command execute non query { CreateScript } OK");
+                                log4net.Debug($"Sql command execute non query { CreateScript } OK");
                                 return true;
                             }
                         }
                         catch (Exception e)
                         {
-                            _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                            log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
                         }
                         finally
                         {
@@ -151,7 +154,7 @@ namespace NetAppCommon.Mssql
             }
             catch (Exception e)
             {
-                _log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
             }
             return false;
         }

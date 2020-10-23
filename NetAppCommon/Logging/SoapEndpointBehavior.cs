@@ -21,12 +21,12 @@ namespace NetAppCommon.Logging
         public SoapClientMessageInspector SoapClientMessageInspector { get; }
         #endregion
 
-        #region private static readonly log4net.ILog _log4net...
+        #region private static readonly log4net.ILog log4net...
         /// <summary>
         /// Log4net Logger
         /// Log4net Logger
         /// </summary>
-        private static readonly log4net.ILog _log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
 
         #region public SoapEndpointBehavior()
@@ -88,7 +88,7 @@ namespace NetAppCommon.Logging
         /// </param>
         public void ApplyClientBehavior(ServiceEndpoint endpoint, ClientRuntime clientRuntime)
         {
-            //_log4net.Info("ApplyClientBehavior(ServiceEndpoint endpoint, ClientRuntime clientRuntime)");
+            //log4net.Info("ApplyClientBehavior(ServiceEndpoint endpoint, ClientRuntime clientRuntime)");
             clientRuntime.ClientMessageInspectors.Add(SoapClientMessageInspector);
         }
         #endregion
@@ -108,7 +108,7 @@ namespace NetAppCommon.Logging
         /// </param>
         public void ApplyDispatchBehavior(ServiceEndpoint endpoint, EndpointDispatcher endpointDispatcher)
         {
-            //_log4net.Info("ApplyDispatchBehavior(ServiceEndpoint endpoint, EndpointDispatcher endpointDispatcher)");
+            //log4net.Info("ApplyDispatchBehavior(ServiceEndpoint endpoint, EndpointDispatcher endpointDispatcher)");
         }
         #endregion
 
