@@ -67,10 +67,14 @@ namespace NetAppCommon.Helpers.Xmls
                 T o = (T)xmlSerializer.Deserialize(xmlReader);
                 if (null != o)
                 {
-                    log4net.Debug(string.Format("{0} OK", o));
+#if DEBUG
+                    log4net.Debug(string.Format($"T DeserializeXmlFromString<T>(string { xml }) {0} ok", o));
+#endif
                     return o;
                 }
-                log4net.Debug(string.Format("{0} EMPTY", o));
+#if DEBUG
+                log4net.Debug(string.Format($"T DeserializeXmlFromString<T>(string { xml }) {0} fail", o));
+#endif
             }
             catch (Exception e)
             {
