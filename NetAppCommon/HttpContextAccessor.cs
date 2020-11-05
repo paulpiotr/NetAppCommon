@@ -33,18 +33,18 @@ namespace NetAppCommon
                 {
                     if (null != HttpContextCurrent)
                     {
-                        return HttpContextCurrent.User.Identity.Name;
+                        return HttpContextCurrent.User.Identity.Name ?? string.Empty;
                     }
                     else
                     {
-                        return Environment.UserName;
+                        return Environment.UserName ?? string.Empty;
                     }
                 }
                 catch (Exception e)
                 {
                     log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
                 }
-                return null;
+                return string.Empty;
             }
         }
     }
