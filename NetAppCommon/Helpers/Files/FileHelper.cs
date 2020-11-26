@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -22,7 +21,7 @@ namespace NetAppCommon.Helpers.Files
         /// Numer błędu (naruszenia) udostępniania
         /// The sharing error (violation) number
         /// </summary>
-        const int ERROR_SHARING_VIOLATION = 32;
+        private const int ERROR_SHARING_VIOLATION = 32;
         #endregion
 
         #region const int ERROR_LOCK_VIOLATION = 33;
@@ -30,7 +29,7 @@ namespace NetAppCommon.Helpers.Files
         /// Numer błędu (naruszenia) blokady
         /// Lockout error (violation) number
         /// </summary>
-        const int ERROR_LOCK_VIOLATION = 33;
+        private const int ERROR_LOCK_VIOLATION = 33;
         #endregion
 
         #region private static readonly log4net.ILog log4net
@@ -98,7 +97,7 @@ namespace NetAppCommon.Helpers.Files
         /// Skrót MD5 z treści pliku jako string lub null
         /// MD5 hash from the file content as string or null
         /// </returns>
-        public async static Task<string> GetMD5HashAsync(string filePath)
+        public static async Task<string> GetMD5HashAsync(string filePath)
         {
             return await Task.Run(() =>
             {
@@ -149,7 +148,7 @@ namespace NetAppCommon.Helpers.Files
         /// Skrót MD5 z treści pliku jako string lub null
         /// MD5 hash from the file content as string or null
         /// </returns>
-        public async static Task<string> GetMD5HashAsync(byte[] fileContent)
+        public static async Task<string> GetMD5HashAsync(byte[] fileContent)
         {
             return await Task.Run(() =>
             {
@@ -175,7 +174,7 @@ namespace NetAppCommon.Helpers.Files
         {
             try
             {
-                int errorCode = Marshal.GetHRForException(exception) & ((1 << 16) - 1);
+                var errorCode = Marshal.GetHRForException(exception) & ((1 << 16) - 1);
                 return errorCode == ERROR_SHARING_VIOLATION || errorCode == ERROR_LOCK_VIOLATION;
             }
             catch

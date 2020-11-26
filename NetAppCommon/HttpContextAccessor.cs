@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Reflection;
-using System.Text;
+using Microsoft.AspNetCore.Http;
 
 namespace NetAppCommon
 {

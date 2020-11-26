@@ -1,7 +1,7 @@
-﻿using Microsoft.Data.SqlClient;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using Microsoft.Data.SqlClient;
 
 namespace NetAppCommon.Validation
 {

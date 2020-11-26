@@ -1,9 +1,8 @@
-﻿using Microsoft.Data.SqlClient;
-using System;
+﻿using System;
 using System.Data;
 using System.IO;
 using System.Reflection;
-using System.Security.Principal;
+using Microsoft.Data.SqlClient;
 
 namespace NetAppCommon.Mssql
 {
@@ -55,7 +54,7 @@ namespace NetAppCommon.Mssql
                 ConnectionString = connectionString ?? DatabaseMssql.GetConnectionString(ConnectionStringName, SettingsJsonFileName);
                 if (null != ConnectionString)
                 {
-                    SqlConnectionStringBuilder sqlConnectionStringBuilder = new SqlConnectionStringBuilder(ConnectionString);
+                    var sqlConnectionStringBuilder = new SqlConnectionStringBuilder(ConnectionString);
                     AttachDBFilename = sqlConnectionStringBuilder.AttachDBFilename;
                     if (null != AttachDBFilename && !string.IsNullOrWhiteSpace(AttachDBFilename))
                     {
@@ -120,7 +119,7 @@ namespace NetAppCommon.Mssql
                         !File.Exists(AttachDBFilename)
                         )
                     {
-                        SqlConnectionStringBuilder sqlConnectionStringBuilder = new SqlConnectionStringBuilder(ConnectionString);
+                        var sqlConnectionStringBuilder = new SqlConnectionStringBuilder(ConnectionString);
                         SqlConnection sqlConnection = null;
                         SqlCommand sqlCommand = null;
                         if (null != sqlConnectionStringBuilder)

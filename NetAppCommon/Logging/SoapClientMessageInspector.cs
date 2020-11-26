@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Dispatcher;
 using System.Xml;
+using Microsoft.Extensions.Logging;
 
 namespace NetAppCommon.Logging
 {
@@ -146,11 +146,11 @@ namespace NetAppCommon.Logging
         {
             try
             {
-                XmlDocument document = new XmlDocument();
-                using (MemoryStream memoryStream = new MemoryStream())
+                var document = new XmlDocument();
+                using (var memoryStream = new MemoryStream())
                 {
                     // write message to memory stream
-                    XmlWriter writer = XmlWriter.Create(memoryStream);
+                    var writer = XmlWriter.Create(memoryStream);
                     message.WriteMessage(writer);
                     writer.Flush();
                     memoryStream.Position = 0;

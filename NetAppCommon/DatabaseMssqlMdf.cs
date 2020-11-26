@@ -52,7 +52,7 @@ namespace NetAppCommon
             return Instance;
         }
 
-        public async Task <bool> CreateAsync()
+        public async Task<bool> CreateAsync()
         {
             return await Task.Run(() =>
              {

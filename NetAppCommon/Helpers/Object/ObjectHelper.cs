@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace NetAppCommon.Helpers.Object
@@ -48,7 +46,7 @@ namespace NetAppCommon.Helpers.Object
             {
                 if (null != o)
                 {
-                    StringBuilder stringBuilder = new StringBuilder();
+                    var stringBuilder = new StringBuilder();
                     foreach (PropertyInfo propertyInfo in o.GetType().GetProperties().OrderBy(x => x.Name))
                     {
                         switch (propertyInfo.PropertyType.ToString())
@@ -59,13 +57,13 @@ namespace NetAppCommon.Helpers.Object
                                 break;
                             case "Decimal":
                             case "System.Decimal":
-                                decimal decimalValue = (decimal)(propertyInfo.GetValue(o, null) ?? 0);
+                                var decimalValue = (decimal)(propertyInfo.GetValue(o, null) ?? 0);
                                 stringBuilder.Append(propertyInfo.Name).Append(separator).Append(decimalValue.ToString("N", CultureInfo.InvariantCulture)).Append(separator);
                                 //log4net.Debug($"{ propertyInfo.PropertyType } { propertyInfo.GetValue(o, null) ?? string.Empty } { decimalValue } { decimalValue.ToString("N", CultureInfo.InvariantCulture) } ");
                                 break;
                             case "Double":
                             case "System.Double":
-                                double doubleValue = (double)(propertyInfo.GetValue(o, null) ?? 0);
+                                var doubleValue = (double)(propertyInfo.GetValue(o, null) ?? 0);
                                 stringBuilder.Append(propertyInfo.Name).Append(separator).Append(doubleValue.ToString("N", CultureInfo.InvariantCulture)).Append(separator);
                                 //log4net.Debug($"{ propertyInfo.PropertyType } { propertyInfo.GetValue(o, null) ?? string.Empty } { doubleValue } { doubleValue.ToString("N", CultureInfo.InvariantCulture) }");
                                 break;
@@ -109,7 +107,7 @@ namespace NetAppCommon.Helpers.Object
         /// Wartości właściwości obiektu rozdzielone separatorem jako string
         /// Object property values separated by a separator as a string
         /// </returns>
-        public async static Task<string> GetValuesToStringAsync(object o, string separator = null)
+        public static async Task<string> GetValuesToStringAsync(object o, string separator = null)
         {
             return await Task.Run(() =>
             {

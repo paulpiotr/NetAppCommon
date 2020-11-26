@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace NetAppCommon.Helpers.Db.Mssql
 {
@@ -40,11 +40,11 @@ namespace NetAppCommon.Helpers.Db.Mssql
         {
             try
             {
-                string auditCreateTableScriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "scripts", "Db", "Mssql", "AuditCreateTableScript.sql");
-                string auditCreateTriggerScriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "scripts", "Db", "Mssql", "AuditCreateTriggerScript.sql");
+                var auditCreateTableScriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "scripts", "Db", "Mssql", "AuditCreateTableScript.sql");
+                var auditCreateTriggerScriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "scripts", "Db", "Mssql", "AuditCreateTriggerScript.sql");
                 if (File.Exists(auditCreateTableScriptPath) && File.Exists(auditCreateTriggerScriptPath))
                 {
-                    string sql = File.ReadAllText(auditCreateTableScriptPath).Replace("%SchemaName%", schemaName).Replace("%TableName%", tableName);
+                    var sql = File.ReadAllText(auditCreateTableScriptPath).Replace("%SchemaName%", schemaName).Replace("%TableName%", tableName);
                     log4net.Debug(string.Format("Execute SQL: {0}", sql));
                     migrationBuilder.Sql(sql);
                     log4net.Debug("OK");
@@ -127,11 +127,11 @@ namespace NetAppCommon.Helpers.Db.Mssql
         {
             try
             {
-                string auditDropTableScriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "scripts", "Db", "Mssql", "AuditDropTableScript.sql");
-                string auditDropTriggerScriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "scripts", "Db", "Mssql", "AuditDropTriggerScript.sql");
+                var auditDropTableScriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "scripts", "Db", "Mssql", "AuditDropTableScript.sql");
+                var auditDropTriggerScriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "scripts", "Db", "Mssql", "AuditDropTriggerScript.sql");
                 if (File.Exists(auditDropTableScriptPath) && File.Exists(auditDropTriggerScriptPath))
                 {
-                    string sql = File.ReadAllText(auditDropTableScriptPath).Replace("%SchemaName%", schemaName).Replace("%TableName%", tableName);
+                    var sql = File.ReadAllText(auditDropTableScriptPath).Replace("%SchemaName%", schemaName).Replace("%TableName%", tableName);
                     log4net.Debug(string.Format("Execute SQL: {0}", sql));
                     migrationBuilder.Sql(sql);
                     log4net.Debug("OK");

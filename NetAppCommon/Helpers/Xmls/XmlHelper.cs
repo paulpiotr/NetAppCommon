@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -62,9 +60,9 @@ namespace NetAppCommon.Helpers.Xmls
         {
             try
             {
-                XmlReader xmlReader = XmlReader.Create(new StringReader(xml));
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
-                T o = (T)xmlSerializer.Deserialize(xmlReader);
+                var xmlReader = XmlReader.Create(new StringReader(xml));
+                var xmlSerializer = new XmlSerializer(typeof(T));
+                var o = (T)xmlSerializer.Deserialize(xmlReader);
                 if (null != o)
                 {
 #if DEBUG

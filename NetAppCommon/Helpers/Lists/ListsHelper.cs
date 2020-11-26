@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NetAppCommon.Helpers.Lists
@@ -23,8 +22,8 @@ namespace NetAppCommon.Helpers.Lists
         {
             return new ListsHelper();
         }
-        
-        public List<string> ConvertToListOfString (string delimiterSeparatedAttributes, char[] delimiterChars = null)
+
+        public List<string> ConvertToListOfString(string delimiterSeparatedAttributes, char[] delimiterChars = null)
         {
             try
             {
@@ -40,7 +39,8 @@ namespace NetAppCommon.Helpers.Lists
 
         public async Task<List<string>> ConvertToListOfStringAsync(string delimiterSeparatedAttributes, char[] delimiterChars = null)
         {
-            return await Task.Run(() => {
+            return await Task.Run(() =>
+            {
                 return ConvertToListOfString(delimiterSeparatedAttributes, delimiterChars);
             });
         }

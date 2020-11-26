@@ -1,11 +1,10 @@
-﻿using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using static System.Environment;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace NetAppCommon
 {
@@ -47,7 +46,7 @@ namespace NetAppCommon
                     {
                         if (null != match.Value && !string.IsNullOrWhiteSpace(match.Value))
                         {
-                            string stringType = match.Value.Replace("%", string.Empty);
+                            var stringType = match.Value.Replace("%", string.Empty);
                             //log4net.Debug(match.Value);
                             //log4net.Debug(stringType);
                             if (
@@ -57,7 +56,7 @@ namespace NetAppCommon
                                 stringType.Contains("Environment.SpecialFolder"))
                                 )
                             {
-                                string key = stringType.Replace(".", string.Empty).Replace("(", string.Empty).Replace(")", string.Empty).Replace("System", string.Empty).Replace("Environment", string.Empty).Replace("GetFolderPath", string.Empty).Replace("SpecialFolder", string.Empty);
+                                var key = stringType.Replace(".", string.Empty).Replace("(", string.Empty).Replace(")", string.Empty).Replace("System", string.Empty).Replace("Environment", string.Empty).Replace("GetFolderPath", string.Empty).Replace("SpecialFolder", string.Empty);
                                 try
                                 {
                                     connectionString = connectionString.Replace(match.Value, Configuration.SpecialFoldeGetFolderPath(key));
@@ -103,7 +102,7 @@ namespace NetAppCommon
                     }
                     if (connectionString.Contains("%AttachDbFilename%"))
                     {
-                        SqlConnectionStringBuilder sqlConnectionStringBuilder = new SqlConnectionStringBuilder(connectionString);
+                        var sqlConnectionStringBuilder = new SqlConnectionStringBuilder(connectionString);
                         if (null != sqlConnectionStringBuilder && null != sqlConnectionStringBuilder.AttachDBFilename && !string.IsNullOrWhiteSpace(sqlConnectionStringBuilder.AttachDBFilename))
                         {
                             connectionString = connectionString.Replace("%AttachDbFilename%", string.Format("{0}{1}", "MSSQLLocalDB", Math.Abs(sqlConnectionStringBuilder.AttachDBFilename.GetHashCode())));
@@ -198,7 +197,7 @@ namespace NetAppCommon
         {
             try
             {
-                string connectionString = GetConnectionString(connectionStringName, settingsJsonFileName);
+                var connectionString = GetConnectionString(connectionStringName, settingsJsonFileName);
                 if (null != connectionString && !string.IsNullOrWhiteSpace(connectionString))
                 {
                     connectionString = ParseConnectionString(EncryptDecrypt.EncryptDecrypt.DecryptString(connectionString, EncryptDecrypt.EncryptDecrypt.GetRsaFileContent()));
@@ -261,7 +260,7 @@ namespace NetAppCommon
         {
             try
             {
-                string connectionString = GetConnectionString(connectionStringName, settingsJsonFileName);
+                var connectionString = GetConnectionString(connectionStringName, settingsJsonFileName);
                 if (null != connectionString && !string.IsNullOrWhiteSpace(connectionString))
                 {
                     connectionString = ParseConnectionString(EncryptDecrypt.EncryptDecrypt.DecryptString(connectionString, EncryptDecrypt.EncryptDecrypt.GetRsaFileContent(rsaFileName)));
@@ -328,7 +327,7 @@ namespace NetAppCommon
             try
             {
                 DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder<T>();
-                string connectionString = GetConnectionString(connectionStringName);
+                var connectionString = GetConnectionString(connectionStringName);
                 if (null != connectionString && !string.IsNullOrWhiteSpace(connectionString))
                 {
                     dbContextOptionsBuilder.UseSqlServer(connectionString);
@@ -393,7 +392,7 @@ namespace NetAppCommon
             try
             {
                 DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder<T>();
-                string connectionString = GetDecryptConnectionString(connectionStringName);
+                var connectionString = GetDecryptConnectionString(connectionStringName);
                 if (null != connectionString && !string.IsNullOrWhiteSpace(connectionString))
                 {
                     dbContextOptionsBuilder.UseSqlServer(connectionString);
@@ -462,7 +461,7 @@ namespace NetAppCommon
             try
             {
                 DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder<T>();
-                string connectionString = GetDecryptConnectionString(connectionStringName, rsaFileName);
+                var connectionString = GetDecryptConnectionString(connectionStringName, rsaFileName);
                 if (null != connectionString && !string.IsNullOrWhiteSpace(connectionString))
                 {
                     dbContextOptionsBuilder.UseSqlServer(connectionString);

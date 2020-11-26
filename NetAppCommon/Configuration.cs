@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using static System.Environment;
 
 namespace NetAppCommon
@@ -38,8 +38,7 @@ namespace NetAppCommon
         {
             try
             {
-                SpecialFolder specialFolder;
-                if (Enum.TryParse(key, true, out specialFolder))
+                if (Enum.TryParse(key, true, out SpecialFolder specialFolder))
                 {
                     try
                     {
@@ -123,7 +122,7 @@ namespace NetAppCommon
             try
             {
                 //log4net.Debug(string.Format("GetExecutingAssembly {0}, GetCallingAssembly {1} GetEntryAssembly {2}", Assembly.GetExecutingAssembly().GetName().Name, Assembly.GetCallingAssembly().GetName().Name, Assembly.GetEntryAssembly().GetName().Name));
-                string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
                 if (Directory.Exists(baseDirectory))
                 {
                     /// W pierwszej kolejności sprawdź czy istnieje plik appsettings.json w katalogu głównym projektu.
@@ -206,7 +205,7 @@ namespace NetAppCommon
         {
             try
             {
-                string getAppSettingsPath = GetAppSettingsPath();
+                var getAppSettingsPath = GetAppSettingsPath();
                 if (null != getAppSettingsPath && !string.IsNullOrWhiteSpace(getAppSettingsPath))
                 {
                     IConfigurationBuilder configurationBuilder = new ConfigurationBuilder().SetBasePath(Path.GetDirectoryName(getAppSettingsPath)).AddJsonFile(Path.GetFileName(getAppSettingsPath), optional: true, reloadOnChange: true);
@@ -263,7 +262,7 @@ namespace NetAppCommon
         {
             try
             {
-                string getAppSettingsPath = GetAppSettingsPath(settingsJsonFileName);
+                var getAppSettingsPath = GetAppSettingsPath(settingsJsonFileName);
                 if (null != getAppSettingsPath && !string.IsNullOrWhiteSpace(getAppSettingsPath))
                 {
                     IConfigurationBuilder configurationBuilder = new ConfigurationBuilder().SetBasePath(Path.GetDirectoryName(getAppSettingsPath)).AddJsonFile(Path.GetFileName(getAppSettingsPath), optional: true, reloadOnChange: true);
@@ -481,7 +480,7 @@ namespace NetAppCommon
                 }
                 if (null != appSettingsPath && !string.IsNullOrWhiteSpace(appSettingsPath) && File.Exists(appSettingsPath))
                 {
-                    string json = JsonConvert.SerializeObject(_object, Formatting.Indented);
+                    var json = JsonConvert.SerializeObject(_object, Formatting.Indented);
                     if (null != json)
                     {
                         File.WriteAllText(appSettingsPath, json);
@@ -524,7 +523,7 @@ namespace NetAppCommon
                     }
                     if (null != appSettingsPath && !string.IsNullOrWhiteSpace(appSettingsPath) && File.Exists(appSettingsPath))
                     {
-                        string json = JsonConvert.SerializeObject(_object, Formatting.Indented);
+                        var json = JsonConvert.SerializeObject(_object, Formatting.Indented);
                         if (null != json)
                         {
                             File.WriteAllText(appSettingsPath, json);
@@ -566,7 +565,7 @@ namespace NetAppCommon
                 }
                 if (null != appSettingsPath && !string.IsNullOrWhiteSpace(appSettingsPath) && File.Exists(appSettingsPath))
                 {
-                    string json = File.ReadAllText(appSettingsPath);
+                    var json = File.ReadAllText(appSettingsPath);
                     dynamic jsonObj = Newtonsoft.Json.JsonConvert.DeserializeObject<Newtonsoft.Json.Linq.JObject>(json);
                     if (null != jsonObj)
                     {
