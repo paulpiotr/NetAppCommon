@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NetAppCommon.Helpers.Files
@@ -15,6 +17,22 @@ namespace NetAppCommon.Helpers.Files
     /// </summary>
     public class FileHelper
     {
+        #region const int ERROR_SHARING_VIOLATION = 32;
+        /// <summary>
+        /// Numer błędu (naruszenia) udostępniania
+        /// The sharing error (violation) number
+        /// </summary>
+        const int ERROR_SHARING_VIOLATION = 32;
+        #endregion
+
+        #region const int ERROR_LOCK_VIOLATION = 33;
+        /// <summary>
+        /// Numer błędu (naruszenia) blokady
+        /// Lockout error (violation) number
+        /// </summary>
+        const int ERROR_LOCK_VIOLATION = 33;
+        #endregion
+
         #region private static readonly log4net.ILog log4net
         /// <summary>
         /// Log4net Logger
@@ -23,10 +41,20 @@ namespace NetAppCommon.Helpers.Files
         private static readonly log4net.ILog log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
 
+        #region public static FileHelper GetInstance()
+        /// <summary>
+        /// Pobierz instancję do klasy NetAppCommon.Helpers.Files.FileHelper
+        /// Pobierz instancję do klasy NetAppCommon.Helpers.Files.FileHelper
+        /// </summary>
+        /// <returns>
+        /// Statuczny obiekt instancji klasy NetAppCommon.Helpers.Files.FileHelper
+        /// Statuczny obiekt instancji klasy NetAppCommon.Helpers.Files.FileHelper
+        /// </returns>
         public static FileHelper GetInstance()
         {
             return new FileHelper();
         }
+        #endregion
 
         #region public static string GetMD5Hash(string filePath)
         /// <summary>
@@ -50,7 +78,7 @@ namespace NetAppCommon.Helpers.Files
             catch (Exception e)
             {
 #if DEBUG
-                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
 #endif
             }
             return null;
@@ -101,7 +129,7 @@ namespace NetAppCommon.Helpers.Files
             catch (Exception e)
             {
 #if DEBUG
-                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
 #endif
             }
             return null;
@@ -130,112 +158,168 @@ namespace NetAppCommon.Helpers.Files
         }
         #endregion
 
-        #region public static bool IsFileLocked(string filePath)
+        #region private bool IsLocked(Exception exception)
         /// <summary>
-        /// Sprawdź, czy plik jest zablokowany przez inny proces
-        /// Check if the file is locked by another process
+        /// Sprawdź status błędu i zwróć prawdę, jeśli błąd dotyczy udostępniania lub blokady pliku lub fałsz jeśli inny
+        /// Check the error status and return True if the error is related to sharing or locking the file, or False if different
         /// </summary>
-        /// <param name="filePath">
-        /// Ścieżka do pliku jako string
-        /// File path as string
+        /// <param name="exception">
+        /// Wyjątek jako Exception
+        /// An exception as Exception
         /// </param>
         /// <returns>
-        /// True, jeśli plik jest zablokowany w przeciwnym razie false
-        /// True if the file is locked otherwise false
+        /// prawda, jeśli błąd dotyczy udostępniania lub blokady pliku lub fałsz jeśli inny jako bool
+        /// true if the error is related to sharing or locking the file, or false if different as bool
         /// </returns>
-        public static bool IsFileLocked(string filePath)
+        private bool IsLocked(Exception exception)
         {
-            FileStream fileStream = null;
             try
             {
-                /// NOTE: This doesn't handle situations where file is opened for writing by another process but put into write shared mode,
-                /// it will not throw an exception and won't show it as write locked
-                /// If we can't open file for reading and writing then it's locked by another process for writing
-                fileStream = File.Open(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+                int errorCode = Marshal.GetHRForException(exception) & ((1 << 16) - 1);
+                return errorCode == ERROR_SHARING_VIOLATION || errorCode == ERROR_LOCK_VIOLATION;
             }
-            catch (UnauthorizedAccessException)
+            catch
             {
-                try
-                {
-                    /// https://msdn.microsoft.com/en-us/library/y973b725(v=vs.110).aspx
-                    /// This is because the file is Read-Only and we tried to open in ReadWrite mode, now try to open in Read only mode
-                    fileStream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
-                }
-                catch (Exception)
-                {
-                    /// This file has been locked, we can't even open it to read
-                    return true;
-                }
+                return false;
             }
-            catch (Exception)
-            {
-                /// This file has been locked
-                return true;
-            }
-            finally
-            {
-                if (fileStream != null)
-                {
-                    fileStream.Close();
-                }
-            }
-            return false;
         }
         #endregion
 
-        #region public async static Task<bool> IsFileLockedAsync(string filePath)
+        #region private async Task<bool> IsLockedAsync(Exception exception)
         /// <summary>
-        /// Sprawdź, czy plik jest zablokowany przez inny proces asynchronicznie
-        /// Check if the file is locked by another process asynchronously
+        /// Sprawdź status błędu i zwróć prawdę, jeśli błąd dotyczy udostępniania lub blokady pliku lub fałsz jeśli inny asynchronicznie
+        /// Check the error status and return True if the error is related to sharing or locking the file, or False if different asynchronously
         /// </summary>
-        /// <param name="filePath">
-        /// Ścieżka do pliku jako string
-        /// File path as string
+        /// <param name="exception">
+        /// Wyjątek jako Exception
+        /// An exception as Exception
         /// </param>
         /// <returns>
-        /// True, jeśli plik jest zablokowany w przeciwnym razie false
-        /// True if the file is locked otherwise false
+        /// prawda, jeśli błąd dotyczy udostępniania lub blokady pliku lub fałsz jeśli inny jako bool
+        /// true if the error is related to sharing or locking the file, or false if different as bool
         /// </returns>
-        public async static Task<bool> IsFileLockedAsync(string filePath)
+        private async Task<bool> IsLockedAsync(Exception exception)
         {
             return await Task.Run(() =>
             {
-                return IsFileLocked(filePath);
+                return IsLocked(exception);
             });
         }
         #endregion
 
-        public T TimeoutFileAction<T>(Func<T> func, int milliseconds = 100)
+        #region public void TimeoutAction<T>(Func<T> func, string filePath)
+        /// <summary>
+        /// Dopuki plik jest zablokowany czekaj i wykonaj akcję po odblokowaniu pliku
+        /// </summary>
+        /// <typeparam name="T">
+        /// Parametr typu
+        /// </typeparam>
+        /// <param name="func">
+        /// Akcja jako func
+        /// </param>
+        /// <param name="filePath">
+        /// Ścieąka do pliku jako string
+        /// </param>
+        public void TimeoutAction<T>(Func<T> func, string filePath)
         {
-            try
+            while (true)
             {
-                DateTime started = DateTime.UtcNow;
-                while ((DateTime.UtcNow - started).TotalMilliseconds < milliseconds)
+                try
                 {
-                    try
+                    if (File.Exists(filePath))
                     {
-#if DEBUG
-                        log4net.Debug($"Check");
-#endif
-                        return func();
+                        using (FileStream fileStream = File.Open(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                        {
+                            if (fileStream != null)
+                            {
+                                fileStream.Close();
+                                func();
+                                break;
+                            }
+                        }
                     }
-                    catch (Exception e)
+                }
+                catch (Exception e) when (e is IOException)
+                {
+                    if (IsLocked(e))
+                    {
+                        Thread.Sleep((int)TimeSpan.FromSeconds(1).TotalMilliseconds);
+                    }
+                    else
                     {
 #if DEBUG
-                        log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                        log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+#else 
+                        Console.WriteLine(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace));
 #endif
                     }
                 }
-                return default(T);
-            }
-            catch(Exception e)
-            {
+                catch (Exception e)
+                {
 #if DEBUG
-                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                    log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+#else 
+                    Console.WriteLine(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace));
 #endif
+                }
             }
-            return default(T);
         }
+        #endregion
+
+        #region public void TimeoutAction<T>(Func<T> func, string filePath)
+        /// <summary>
+        /// Dopuki plik jest zablokowany czekaj i wykonaj akcję po odblokowaniu pliku
+        /// </summary>
+        /// <typeparam name="T">
+        /// Parametr typu
+        /// </typeparam>
+        /// <param name="func">
+        /// Akcja jako func
+        /// </param>
+        /// <param name="filePath">
+        /// Ścieąka do pliku jako string
+        /// </param>
+        public T TimeoutActionReturn<T>(Func<T> func, string filePath)
+        {
+            while (true)
+            {
+                try
+                {
+                    using (FileStream fileStream = File.Open(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                    {
+                        if (fileStream != null)
+                        {
+                            fileStream.Close();
+                            return func();
+                        }
+                    }
+                }
+                catch (Exception e) when (e is IOException)
+                {
+                    if (IsLocked(e))
+                    {
+                        Thread.Sleep((int)TimeSpan.FromSeconds(1).TotalMilliseconds);
+                    }
+                    else
+                    {
+#if DEBUG
+                        log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+#else 
+                        Console.WriteLine(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace));
+#endif
+                    }
+                }
+                catch (Exception e)
+                {
+#if DEBUG
+                    log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+#else 
+                    Console.WriteLine(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace));
+#endif
+                }
+            }
+        }
+        #endregion
     }
     #endregion
 }

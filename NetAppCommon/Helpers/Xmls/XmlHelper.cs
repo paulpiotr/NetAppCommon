@@ -68,12 +68,12 @@ namespace NetAppCommon.Helpers.Xmls
                 if (null != o)
                 {
 #if DEBUG
-                    log4net.Debug(string.Format($"T DeserializeXmlFromString<T>(string { xml }) {0} ok", o));
+                    //log4net.Debug(string.Format($"T DeserializeXmlFromString<T>(string { xml }) {0} ok", o));
 #endif
                     return o;
                 }
 #if DEBUG
-                log4net.Debug(string.Format($"T DeserializeXmlFromString<T>(string { xml }) {0} fail", o));
+                //log4net.Debug(string.Format($"T DeserializeXmlFromString<T>(string { xml }) {0} fail", o));
 #endif
             }
             catch (Exception e)

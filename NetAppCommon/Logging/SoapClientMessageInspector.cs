@@ -86,7 +86,6 @@ namespace NetAppCommon.Logging
             catch (Exception e)
             {
                 log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
-                throw e;
             }
         }
         #endregion
@@ -125,8 +124,8 @@ namespace NetAppCommon.Logging
             catch (Exception e)
             {
                 log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
-                throw e;
             }
+            return null;
         }
         #endregion
 
@@ -163,8 +162,8 @@ namespace NetAppCommon.Logging
             catch (Exception e)
             {
                 log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
-                throw e;
             }
+            return null;
         }
         #endregion
     }

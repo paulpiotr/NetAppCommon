@@ -72,7 +72,7 @@ namespace NetAppCommon.Helpers.Object
                             case "System.DateTime":
                             case "System.Nullable`1[System.DateTime]":
                                 DateTime dateTime;
-                                if (DateTime.TryParse((propertyInfo.GetValue(o, null) ?? string.Empty).ToString(), out dateTime) && null != dateTime)
+                                if (DateTime.TryParse((propertyInfo.GetValue(o, null) ?? string.Empty).ToString(), out dateTime))
                                 {
                                     stringBuilder.Append(propertyInfo.Name).Append(separator).Append(dateTime.ToString()).Append(separator);
                                 }
@@ -85,7 +85,7 @@ namespace NetAppCommon.Helpers.Object
             catch (Exception e)
             {
 #if DEBUG
-                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
 #endif
             }
             return null;
@@ -140,12 +140,22 @@ namespace NetAppCommon.Helpers.Object
             catch (Exception e)
             {
 #if DEBUG
-                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
 #endif
             }
             return null;
         }
         #endregion
+
+        public static Guid ConvertObjectValuesToMD5HashGuid(object o, string separator = null)
+        {
+            return new Guid(MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(GetValuesToString(o, separator))));
+        }
+
+        public static Guid GuidFromString(string s)
+        {
+            return new Guid(MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(s)));
+        }
 
         #region public async Task<string> ConvertObjectValuesToMD5HashAsync(object o, string separator = null)
         /// <param name="o">

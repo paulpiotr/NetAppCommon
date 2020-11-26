@@ -64,7 +64,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
             }
             return null;
         }
@@ -150,7 +150,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e);
+                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
             }
             return null;
         }
