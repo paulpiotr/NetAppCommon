@@ -1,30 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net5.0;netstandard2.1;net48</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net5.0;netstandard2.1</TargetFrameworks>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.9" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.9" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.9" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.9" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="3.1.9" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.9" />
-    <PackageReference Include="Polly" Version="7.2.1" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
-    <PackageReference Include="System.ServiceModel.Duplex" Version="4.7.0" />
-    <PackageReference Include="System.ServiceModel.Http" Version="4.7.0" />
-    <PackageReference Include="System.ServiceModel.NetTcp" Version="4.7.0" />
-    <PackageReference Include="System.ServiceModel.Security" Version="4.7.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\EncryptDecrypt\EncryptDecrypt\EncryptDecrypt.csproj" />
-    <ProjectReference Include="..\..\Log4netLogger\Log4netLogger.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
+    <PackageReference Include="System.ServiceModel.Duplex" Version="4.8.0" />
+    <PackageReference Include="System.ServiceModel.Http" Version="4.8.0" />
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="4.8.0" />
+    <PackageReference Include="System.ServiceModel.Security" Version="4.8.0" />
   </ItemGroup>
 
   <ItemGroup>
