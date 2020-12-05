@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -18,7 +18,7 @@ namespace NetAppCommon.Helpers
         /// <summary>
         /// Log4 Net Logger
         /// </summary>
-        private static readonly log4net.ILog log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog Log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
 
         #region public static async Task RunMigrationAsync<T>(IServiceProvider serviceProvider) where T : DbContext
@@ -40,10 +40,14 @@ namespace NetAppCommon.Helpers
                     {
                         if (null != dbContext)
                         {
-                            log4net.Debug($"Check Migrate");
+#if DEBUG 
+                            Log4net.Debug($"Check Migrate { dbContext.Database.GetDbConnection().ConnectionString }");
+#endif
                             if ((await dbContext.Database.GetPendingMigrationsAsync().ConfigureAwait(false)).Any())
                             {
-                                log4net.Debug($"Migrate");
+#if DEBUG 
+                                Log4net.Debug($"Migrate { dbContext.Database.GetDbConnection().ConnectionString }");
+#endif
                                 await dbContext.Database.MigrateAsync().ConfigureAwait(false);
                             }
                         }
@@ -52,10 +56,10 @@ namespace NetAppCommon.Helpers
             }
             catch (Exception e)
             {
-                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
             }
         }
-        #endregion
+#endregion
     }
-    #endregion
+#endregion
 }
