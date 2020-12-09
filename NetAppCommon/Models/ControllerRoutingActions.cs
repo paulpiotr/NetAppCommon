@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace NetAppCommon.Models
@@ -40,6 +41,16 @@ namespace NetAppCommon.Models
         public string RouteAction { get; set; }
         #endregion
 
+        #region public string RouteAttributeInfoTemplate { get; set; }
+        /// <summary>
+        /// Szablon informacji trasy routingu z atrybutami jako string
+        /// Routing route information template with attributes as string
+        /// </summary>
+        [JsonProperty(nameof(RouteAttributeInfoTemplate))]
+        [Display(Name = "Szablon informacji trasy routingu z atrybutami", Prompt = "Szablon informacji trasy routingu z atrybutami", Description = "Szablon informacji trasy routingu z atrybutami")]
+        public string RouteAttributeInfoTemplate { get; set; }
+        #endregion
+
         #region public string RouteUrlAction { get; set; }
         /// <summary>
         /// Adres URL dla akcji kontrolera jako string
@@ -58,6 +69,16 @@ namespace NetAppCommon.Models
         [JsonProperty(nameof(RouteUrlAbsoluteAction))]
         [Display(Name = "Absolutny adres URL dla akcji kontrolera", Prompt = "Wpisz absolutny adres URL dla akcji kontrolera", Description = "Absolutny adres URL dla akcji kontrolera")]
         public string RouteUrlAbsoluteAction { get; set; }
+        #endregion
+
+        #region public Dictionary<string, string> RouteParameters
+        /// <summary>
+        /// Słownik parametrów routingu jako Dictionary<string, string>
+        /// Dictionary of routing parameters as Dictionary <string, string>
+        /// </summary>
+        [JsonProperty(nameof(RouteParameters))]
+        [Display(Name = "Słownik parametrów routingu", Prompt = "Słownik parametrów routingu", Description = "Słownik parametrów routingu")]
+        public Dictionary<string, string> RouteParameters { get; set; }
         #endregion
     }
     #endregion

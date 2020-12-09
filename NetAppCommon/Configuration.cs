@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -81,6 +81,30 @@ namespace NetAppCommon
         }
         #endregion
 
+        #region public static string GetUserProfileDirectory()
+        /// <summary>
+        /// Pobierz podstawowy folder (katalog) użytkownika
+        /// Get the application's base path
+        /// </summary>
+        /// <returns>
+        /// Podstawowa ścieżka aplikacji jako string lub null
+        /// Base application path as string or null
+        /// </returns>
+        public static string GetUserProfileDirectory()
+        {
+            try
+            {
+                var specialFolderUserProfile = Path.Combine(GetFolderPath(SpecialFolder.UserProfile), Assembly.GetCallingAssembly().GetName().Name);
+                return specialFolderUserProfile ?? GetBaseDirectory();
+            }
+            catch (Exception e)
+            {
+                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+            }
+            return null;
+        }
+        #endregion
+
         #region public static async Task<string> GetBaseDirectoryAsync()
         /// <summary>
         /// Pobierz podstawową (bazową) ścieżkę aplikacji asynchronicznie
@@ -104,12 +128,12 @@ namespace NetAppCommon
         }
         #endregion
 
-        #region public static string GetAppSettingsPath(string settingsJsonFileName = null)
+        #region public static string GetAppSettingsPath(string settingsJsonFilePath = null)
         /// <summary>
         /// Pobierz ścieżkę do pliku konfiguracji.
         /// Get the path to the configuration file.
         /// </summary>
-        /// <param name="settingsJsonFileName">
+        /// <param name="settingsJsonFilePath">
         /// Nazwa pliku .json
         /// The name of the .json file
         /// </param>
@@ -117,19 +141,23 @@ namespace NetAppCommon
         /// Ścieżka do pliku konfiguracji String lub null
         /// Path to the String configuration file or null
         /// </returns>
-        public static string GetAppSettingsPath(string settingsJsonFileName = null)
+        public static string GetAppSettingsPath(string settingsJsonFilePath = null)
         {
             try
             {
                 //log4net.Debug(string.Format("GetExecutingAssembly {0}, GetCallingAssembly {1} GetEntryAssembly {2}", Assembly.GetExecutingAssembly().GetName().Name, Assembly.GetCallingAssembly().GetName().Name, Assembly.GetEntryAssembly().GetName().Name));
+                if (File.Exists(settingsJsonFilePath) && Directory.Exists(Path.GetDirectoryName(settingsJsonFilePath)))
+                {
+                    return settingsJsonFilePath;
+                }
                 var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
                 if (Directory.Exists(baseDirectory))
                 {
                     /// W pierwszej kolejności sprawdź czy istnieje plik appsettings.json w katalogu głównym projektu.
-                    /// First, check if there is an settingsJsonFileName file in the project's root directory
-                    if (null != settingsJsonFileName && File.Exists(Path.Combine(baseDirectory, settingsJsonFileName)))
+                    /// First, check if there is an settingsJsonFilePath file in the project's root directory
+                    if (null != settingsJsonFilePath && File.Exists(Path.Combine(baseDirectory, settingsJsonFilePath)))
                     {
-                        return Path.Combine(baseDirectory, settingsJsonFileName);
+                        return Path.Combine(baseDirectory, settingsJsonFilePath);
                     }
                     /// W pierwszej kolejności sprawdź czy istnieje plik appsettings.json w katalogu głównym projektu.
                     /// Else, check if there is an appsettings.json file in the project's root directory
@@ -165,12 +193,12 @@ namespace NetAppCommon
         }
         #endregion
 
-        #region public static async Task<string> GetAppSettingsPathAsync(string settingsJsonFileName = null)
+        #region public static async Task<string> GetAppSettingsPathAsync(string settingsJsonFilePath = null)
         /// <summary>
         /// Pobierz ścieżkę do pliku konfiguracji asynchronicznie.
         /// Get the path to the configuration file asynchronously.
         /// </summary>
-        /// <param name="settingsJsonFileName">
+        /// <param name="settingsJsonFilePath">
         /// Nazwa pliku .json
         /// The name of the .json file
         /// </param>
@@ -178,11 +206,11 @@ namespace NetAppCommon
         /// Ścieżka do pliku konfiguracji String lub null
         /// Path to the String configuration file or null
         /// </returns>
-        public static async Task<string> GetAppSettingsPathAsync(string settingsJsonFileName = null)
+        public static async Task<string> GetAppSettingsPathAsync(string settingsJsonFilePath = null)
         {
             try
             {
-                return await Task.Run(() => GetAppSettingsPath(settingsJsonFileName));
+                return await Task.Run(() => GetAppSettingsPath(settingsJsonFilePath));
             }
             catch (Exception e)
             {
@@ -245,12 +273,12 @@ namespace NetAppCommon
         }
         #endregion
 
-        #region public static IConfigurationRoot GetConfigurationRoot(string settingsJsonFileName)
+        #region public static IConfigurationRoot GetConfigurationRoot(string settingsJsonFilePath)
         /// <summary>
         /// Pobierz Objekt Konfiguracji IConfigurationRoot ConfigurationRoot asynchronicznie
         /// Get ConfigurationRoot Configuration Object asynchronously
         /// </summary>
-        /// <param name="settingsJsonFileName">
+        /// <param name="settingsJsonFilePath">
         /// Nazwa pliku .json
         /// The name of the .json file
         /// </param>
@@ -258,11 +286,11 @@ namespace NetAppCommon
         /// Objekt Konfiguracji IConfigurationRoot ConfigurationRoot lub null
         /// IConfigurationRoot ConfigurationRoot configuration Object or null
         /// </returns>
-        public static IConfigurationRoot GetConfigurationRoot(string settingsJsonFileName)
+        public static IConfigurationRoot GetConfigurationRoot(string settingsJsonFilePath)
         {
             try
             {
-                var getAppSettingsPath = GetAppSettingsPath(settingsJsonFileName);
+                var getAppSettingsPath = GetAppSettingsPath(settingsJsonFilePath);
                 if (null != getAppSettingsPath && !string.IsNullOrWhiteSpace(getAppSettingsPath))
                 {
                     IConfigurationBuilder configurationBuilder = new ConfigurationBuilder().SetBasePath(Path.GetDirectoryName(getAppSettingsPath)).AddJsonFile(Path.GetFileName(getAppSettingsPath), optional: true, reloadOnChange: true);
@@ -279,12 +307,12 @@ namespace NetAppCommon
         }
         #endregion
 
-        #region public static async Task<IConfigurationRoot> GetConfigurationRootAsync(string settingsJsonFileName)
+        #region public static async Task<IConfigurationRoot> GetConfigurationRootAsync(string settingsJsonFilePath)
         /// <summary>
         /// Pobierz Objekt Konfiguracji IConfigurationRoot ConfigurationRoot asynchronicznie
         /// Get ConfigurationRoot Configuration Object asynchronously
         /// </summary>
-        /// <param name="settingsJsonFileName">
+        /// <param name="settingsJsonFilePath">
         /// Nazwa pliku .json
         /// The name of the .json file
         /// </param>
@@ -292,11 +320,11 @@ namespace NetAppCommon
         /// Objekt Konfiguracji IConfigurationRoot ConfigurationRoot lub null
         /// IConfigurationRoot ConfigurationRoot configuration Object or null
         /// </returns>
-        public static async Task<IConfigurationRoot> GetConfigurationRootAsync(string settingsJsonFileName)
+        public static async Task<IConfigurationRoot> GetConfigurationRootAsync(string settingsJsonFilePath)
         {
             try
             {
-                return await Task.Run(() => GetConfigurationRoot(settingsJsonFileName));
+                return await Task.Run(() => GetConfigurationRoot(settingsJsonFilePath));
             }
             catch (Exception e)
             {
@@ -376,7 +404,7 @@ namespace NetAppCommon
         }
         #endregion
 
-        #region public static T GetValue<T>(string settingsJsonFileName, string key)
+        #region public static T GetValue<T>(string settingsJsonFilePath, string key)
         /// <summary>
         /// Wyszukaj ustawienia aplikacji w pliku konfiguracji.
         /// Search for application settings in the configuration file.
@@ -385,7 +413,7 @@ namespace NetAppCommon
         /// Typ parametru.
         /// Parameter type.
         /// </typeparam>
-        /// <param name="settingsJsonFileName">
+        /// <param name="settingsJsonFilePath">
         /// Nazwa pliku .json
         /// The name of the .json file
         /// </param>
@@ -397,13 +425,13 @@ namespace NetAppCommon
         /// Wartość ustawień jako typ T lub null jako typ T.
         /// Setting value as type T or null as type T.
         /// </returns>
-        public static T GetValue<T>(string settingsJsonFileName, string key)
+        public static T GetValue<T>(string settingsJsonFilePath, string key)
         {
             try
             {
-                if (null != settingsJsonFileName && !string.IsNullOrEmpty(settingsJsonFileName) && null != key && !string.IsNullOrWhiteSpace(key))
+                if (null != settingsJsonFilePath && !string.IsNullOrEmpty(settingsJsonFilePath) && null != key && !string.IsNullOrWhiteSpace(key))
                 {
-                    IConfigurationRoot configurationRoot = GetConfigurationRoot(settingsJsonFileName);
+                    IConfigurationRoot configurationRoot = GetConfigurationRoot(settingsJsonFilePath);
                     if (null != configurationRoot)
                     {
                         return (T)Convert.ChangeType(configurationRoot.GetValue<T>(key), typeof(T));
@@ -418,7 +446,7 @@ namespace NetAppCommon
         }
         #endregion
 
-        #region public static async Task<T> GetValueAsync<T>(string settingsJsonFileName, string key)
+        #region public static async Task<T> GetValueAsync<T>(string settingsJsonFilePath, string key)
         /// <summary>
         /// Wyszukaj ustawienia aplikacji w pliku konfiguracji - asynchronicznie.
         /// Search for application settings in the configuration file - asynchronously.
@@ -427,7 +455,7 @@ namespace NetAppCommon
         /// Typ parametru.
         /// Parameter type.
         /// </typeparam>
-        /// <param name="settingsJsonFileName">
+        /// <param name="settingsJsonFilePath">
         /// Nazwa pliku .json
         /// The name of the .json file
         /// </param>
@@ -439,11 +467,11 @@ namespace NetAppCommon
         /// Wartość ustawień jako typ T lub null jako typ T.
         /// Setting value as type T or null as type T.
         /// </returns>
-        public static async Task<T> GetValueAsync<T>(string settingsJsonFileName, string key)
+        public static async Task<T> GetValueAsync<T>(string settingsJsonFilePath, string key)
         {
             try
             {
-                return await Task.Run(() => GetValue<T>(settingsJsonFileName, key));
+                return await Task.Run(() => GetValue<T>(settingsJsonFilePath, key));
             }
             catch (Exception e)
             {

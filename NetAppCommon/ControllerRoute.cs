@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -52,15 +52,30 @@ namespace NetAppCommon
         {
             try
             {
-                return provider.ActionDescriptors.Items.ToList().Where(w => w.RouteValues["Controller"] == controllerName).Select(x => new
-                ControllerRoutingActions
+                var controllerRoutingActionsList = new List<ControllerRoutingActions>();
+                provider.ActionDescriptors.Items.ToList().Where(w => w.RouteValues["Controller"] == controllerName).ToList().ForEach(actionDescriptorItem =>
                 {
-                    RouteId = x.Id,
-                    RouteController = x.RouteValues["Controller"],
-                    RouteAction = x.RouteValues["Action"],
-                    RouteUrlAction = url.Action(x.RouteValues["Action"], x.RouteValues["Controller"]),
-                    RouteUrlAbsoluteAction = string.Format("{0}://{1}{2}", controllerBase.Request.Scheme, controllerBase.Request.Host, url.Action(x.RouteValues["Action"], x.RouteValues["Controller"])),
-                }).ToList();
+                    var routeParameters = new Dictionary<string, string>();
+                    actionDescriptorItem.Parameters.ToList().ForEach(parameter =>
+                    {
+                        routeParameters.Add(parameter.Name, parameter.ParameterType.Name);
+                    });
+                    var routeUrlAction = null != actionDescriptorItem.AttributeRouteInfo.Template && !string.IsNullOrWhiteSpace(actionDescriptorItem.AttributeRouteInfo.Template)
+                        ? actionDescriptorItem.AttributeRouteInfo.Template
+                        : url.Action(actionDescriptorItem.RouteValues["Action"], actionDescriptorItem.RouteValues["Controller"]);
+                    var controllerRoutingAction = new ControllerRoutingActions
+                    {
+                        RouteId = actionDescriptorItem.Id,
+                        RouteController = actionDescriptorItem.RouteValues["Controller"],
+                        RouteAction = actionDescriptorItem.RouteValues["Action"],
+                        RouteUrlAction = routeUrlAction,
+                        RouteUrlAbsoluteAction = string.Format("{0}://{1}/{2}", controllerBase.Request.Scheme, controllerBase.Request.Host, routeUrlAction),
+                        RouteParameters = routeParameters,
+                        RouteAttributeInfoTemplate = actionDescriptorItem.AttributeRouteInfo.Template,
+                    };
+                    controllerRoutingActionsList.Add(controllerRoutingAction);
+                });
+                return controllerRoutingActionsList;
             }
             catch (Exception e)
             {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.IO;
 using System.Reflection;
@@ -59,8 +59,8 @@ namespace NetAppCommon.Mssql
                     if (null != AttachDBFilename && !string.IsNullOrWhiteSpace(AttachDBFilename))
                     {
                         InitialCatalog = sqlConnectionStringBuilder.InitialCatalog;
-                        LogAttachDBFilename = LogAttachDBFilename ?? Path.Combine(Path.GetDirectoryName(AttachDBFilename), string.Format("{0}_log.ldf", Path.GetFileName(AttachDBFilename).Replace(Path.GetExtension(Path.GetFileName(AttachDBFilename)), string.Empty)));
-                        LogInitialCatalog = LogInitialCatalog ?? string.Format("{0}_log", InitialCatalog);
+                        LogAttachDBFilename ??= Path.Combine(Path.GetDirectoryName(AttachDBFilename), string.Format("{0}_log.ldf", Path.GetFileName(AttachDBFilename).Replace(Path.GetExtension(Path.GetFileName(AttachDBFilename)), string.Empty)));
+                        LogInitialCatalog ??= string.Format("{0}_log", InitialCatalog);
                         log4net.Debug($"AttachDBFilename { AttachDBFilename }, InitialCatalog { InitialCatalog }, LogAttachDBFilename { LogAttachDBFilename }, LogInitialCatalog { LogInitialCatalog }");
                         if (
                             null != sqlConnectionStringBuilder &&
