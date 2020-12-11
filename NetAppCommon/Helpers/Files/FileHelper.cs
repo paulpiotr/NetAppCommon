@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -32,12 +32,12 @@ namespace NetAppCommon.Helpers.Files
         private const int ERROR_LOCK_VIOLATION = 33;
         #endregion
 
-        #region private static readonly log4net.ILog log4net
+        #region private readonly log4net.ILog log4net
         /// <summary>
         /// Log4net Logger
         /// Log4net Logger
         /// </summary>
-        private static readonly log4net.ILog log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog Log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
 
         #region public static FileHelper GetInstance()
@@ -77,7 +77,7 @@ namespace NetAppCommon.Helpers.Files
             catch (Exception e)
             {
 #if DEBUG
-                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
 #endif
             }
             return null;
@@ -128,7 +128,7 @@ namespace NetAppCommon.Helpers.Files
             catch (Exception e)
             {
 #if DEBUG
-                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
 #endif
             }
             return null;
@@ -247,7 +247,7 @@ namespace NetAppCommon.Helpers.Files
                     else
                     {
 #if DEBUG
-                        log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                        Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
 #else 
                         Console.WriteLine(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace));
 #endif
@@ -256,7 +256,7 @@ namespace NetAppCommon.Helpers.Files
                 catch (Exception e)
                 {
 #if DEBUG
-                    log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                    Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
 #else 
                     Console.WriteLine(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace));
 #endif
@@ -302,7 +302,7 @@ namespace NetAppCommon.Helpers.Files
                     else
                     {
 #if DEBUG
-                        log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                        Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
 #else 
                         Console.WriteLine(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace));
 #endif
@@ -311,7 +311,7 @@ namespace NetAppCommon.Helpers.Files
                 catch (Exception e)
                 {
 #if DEBUG
-                    log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                    Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
 #else 
                     Console.WriteLine(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace));
 #endif

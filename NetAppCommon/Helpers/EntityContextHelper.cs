@@ -14,7 +14,7 @@ namespace NetAppCommon.Helpers
     /// </summary>
     public class EntityContextHelper
     {
-        #region private static readonly log4net.ILog log4net
+        #region private readonly log4net.ILog log4net
         /// <summary>
         /// Log4 Net Logger
         /// </summary>

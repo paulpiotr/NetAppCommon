@@ -16,11 +16,11 @@ namespace NetAppCommon.Logging
     /// </summary>
     public class SoapClientMessageInspector : IClientMessageInspector
     {
-        #region private static readonly log4net.ILog log4net
+        #region private readonly log4net.ILog log4net
         /// <summary>
         /// 
         /// </summary>
-        private static readonly log4net.ILog log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
+        private readonly log4net.ILog log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
 
         # region public ILogger<SoapClientMessageInspector> Logger { get; }

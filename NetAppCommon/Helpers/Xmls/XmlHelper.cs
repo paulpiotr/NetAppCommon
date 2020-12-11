@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Reflection;
 using System.Xml;
@@ -6,22 +6,22 @@ using System.Xml.Serialization;
 
 namespace NetAppCommon.Helpers.Xmls
 {
+    #region public class XmlHelper
     /// <summary>
     /// Klasa pomocnika XML
     /// XML helper class
     /// </summary>
     public class XmlHelper
     {
-
-        #region private static readonly log4net.ILog log4net
+        #region private readonly log4net.ILog log4net
         /// <summary>
         /// Log4net Logger
         /// Log4net Logger
         /// </summary>
-        private static readonly log4net.ILog log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog Log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
 
-        #region
+        #region public static T DeserializeXmlFromFile<T>(string filePath)
         public static T DeserializeXmlFromFile<T>(string filePath)
         {
             try
@@ -33,7 +33,7 @@ namespace NetAppCommon.Helpers.Xmls
             }
             catch (Exception e)
             {
-                log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
+                Log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
             }
             return (T)Convert.ChangeType(null, typeof(T));
         }
@@ -76,10 +76,11 @@ namespace NetAppCommon.Helpers.Xmls
             }
             catch (Exception e)
             {
-                log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
+                Log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
             }
             return (T)Convert.ChangeType(null, typeof(T));
         }
         #endregion
     }
+    #endregion
 }

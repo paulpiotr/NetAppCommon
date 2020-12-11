@@ -11,7 +11,7 @@ namespace NetAppCommon.Validation
     /// </summary>
     public class DateYearsRangeAttribute : ValidationAttribute
     {
-        #region private static readonly log4net.ILog log4net
+        #region private readonly log4net.ILog log4net
         /// <summary>
         /// Log4 Net Logger
         /// </summary>

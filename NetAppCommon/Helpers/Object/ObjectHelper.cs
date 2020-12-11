@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -15,12 +15,12 @@ namespace NetAppCommon.Helpers.Object
     /// </summary>
     public class ObjectHelper
     {
-        #region private static readonly log4net.ILog log4net
+        #region private readonly log4net.ILog log4net
         /// <summary>
         /// Log4net Logger
         /// Log4net Logger
         /// </summary>
-        private static readonly log4net.ILog log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog Log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
 
         #region public static string GetValuesToString(object o, string separator = null)
@@ -83,7 +83,7 @@ namespace NetAppCommon.Helpers.Object
             catch (Exception e)
             {
 #if DEBUG
-                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
 #endif
             }
             return null;
@@ -138,7 +138,7 @@ namespace NetAppCommon.Helpers.Object
             catch (Exception e)
             {
 #if DEBUG
-                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
 #endif
             }
             return null;

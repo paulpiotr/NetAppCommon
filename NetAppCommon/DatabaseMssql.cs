@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -14,11 +14,11 @@ namespace NetAppCommon
     /// </summary>
     public class DatabaseMssql
     {
-        #region private static readonly log4net.ILog log4net
+        #region private readonly log4net.ILog log4net
         /// <summary>
         /// Log4 Net Logger
         /// </summary>
-        private static readonly log4net.ILog log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog Log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
 
         #region public static string ParseConnectionString(string connectionString)
@@ -63,7 +63,7 @@ namespace NetAppCommon
                                 }
                                 catch (Exception e)
                                 {
-                                    log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                                    Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
                                 }
                             }
                             //log4net.Debug(connectionString);
@@ -112,7 +112,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
             }
             return connectionString;
         }
@@ -143,7 +143,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
                 return null;
             }
         }
@@ -174,7 +174,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return null;
             }
         }
@@ -206,7 +206,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
                 return null;
             }
         }
@@ -233,7 +233,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return null;
             }
         }
@@ -269,7 +269,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
                 return null;
             }
         }
@@ -300,7 +300,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return null;
             }
         }
@@ -337,7 +337,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
                 return null;
             }
         }
@@ -366,7 +366,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return null;
             }
         }
@@ -402,7 +402,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
                 return null;
             }
         }
@@ -431,7 +431,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return null;
             }
         }
@@ -471,7 +471,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
                 return null;
             }
         }
@@ -504,7 +504,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return null;
             }
         }
@@ -529,7 +529,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
                 return null;
             }
         }
@@ -554,7 +554,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return null;
             }
         }
@@ -589,7 +589,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
                 return null;
             }
         }
@@ -618,7 +618,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return null;
             }
         }
@@ -653,7 +653,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
                 return null;
             }
         }
@@ -682,7 +682,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return null;
             }
         }
@@ -717,7 +717,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
                 return null;
             }
         }
@@ -746,7 +746,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
                 return null;
             }
         }
@@ -777,11 +777,11 @@ namespace NetAppCommon
             }
             catch (SqlException e)
             {
-                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
             }
             catch (Exception e)
             {
-                log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
             }
             finally
             {
@@ -794,7 +794,7 @@ namespace NetAppCommon
                 }
                 catch (Exception e)
                 {
-                    log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                    Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
                 }
             }
             return false;
@@ -822,7 +822,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
             }
             return false;
         }

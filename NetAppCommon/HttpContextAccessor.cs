@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
 
@@ -8,13 +8,7 @@ namespace NetAppCommon
     {
         public static class AppContext
         {
-
-            #region private static readonly log4net.ILog log4net
-            /// <summary>
-            /// Log4 Net Logger
-            /// </summary>
-            private static readonly log4net.ILog log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
-            #endregion
+            private static readonly log4net.ILog Log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
 
             private static IHttpContextAccessor _httpContextAccessor;
 
@@ -40,7 +34,7 @@ namespace NetAppCommon
                 }
                 catch (Exception e)
                 {
-                    log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                    Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
                 }
                 return string.Empty;
             }
