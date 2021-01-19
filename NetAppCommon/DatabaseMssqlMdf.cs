@@ -1,10 +1,10 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 
 namespace NetAppCommon
 {
     public class DatabaseMssqlMdf : Mssql.DatabaseMssqlMdf
     {
-        private static DatabaseMssqlMdf Instance = null;
+        private static DatabaseMssqlMdf _instance = null;
 
         public override string ConnectionString { get => base.ConnectionString; set => base.ConnectionString = value; }
         public override string ConnectionStringName { get => base.ConnectionStringName; set => base.ConnectionStringName = value; }
@@ -27,29 +27,29 @@ namespace NetAppCommon
 
         public static DatabaseMssqlMdf GetInstance()
         {
-            if (Instance == null)
+            if (_instance == null)
             {
-                Instance = new DatabaseMssqlMdf();
+                _instance = new DatabaseMssqlMdf();
             }
-            return Instance;
+            return _instance;
         }
 
         public static DatabaseMssqlMdf GetInstance(string connectionString)
         {
-            if (Instance == null)
+            if (_instance == null)
             {
-                Instance = new DatabaseMssqlMdf(connectionString);
+                _instance = new DatabaseMssqlMdf(connectionString);
             }
-            return Instance;
+            return _instance;
         }
 
         public static DatabaseMssqlMdf GetInstance(string connectionStringName, string settingsJsonFileName)
         {
-            if (Instance == null)
+            if (_instance == null)
             {
-                Instance = new DatabaseMssqlMdf(connectionStringName, settingsJsonFileName);
+                _instance = new DatabaseMssqlMdf(connectionStringName, settingsJsonFileName);
             }
-            return Instance;
+            return _instance;
         }
 
         public async Task<bool> CreateAsync()

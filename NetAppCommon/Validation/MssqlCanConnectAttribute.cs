@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using Microsoft.Data.SqlClient;
@@ -43,6 +43,14 @@ namespace NetAppCommon.Validation
         private bool CheskForConnection { get; set; } = true;
         #endregion
 
+        #region private bool CheskForConnection { get; set; } = true;
+        /// <summary>
+        /// Sprawdź możliwość podłączenia do bazy danych z wpisania parametru Ciąg połączenia do bazy danych Mssql
+        /// Check the possibility of connecting to the database by entering the Mssql database connection string parameter
+        /// </summary>
+        private string ConnectionSettings { get; set; }
+        #endregion
+
         #region private void SetValidationContext(ValidationContext validationContext)
         /// <summary>
         /// Ustaw właściwości klasy walidatora z instancji przekazanego kontekstu
@@ -61,6 +69,14 @@ namespace NetAppCommon.Validation
             catch (Exception)
             {
                 CheskForConnection = false;
+            }
+            try
+            {
+                ConnectionSettings = (string)validationContext.ObjectInstance.GetType().GetMethod("GetConnectionString", BindingFlags.Public | BindingFlags.Instance).Invoke(validationContext.ObjectInstance, new object[] { });
+            }
+            catch (Exception)
+            {
+                ConnectionSettings = null;
             }
         }
         #endregion
@@ -90,6 +106,7 @@ namespace NetAppCommon.Validation
             }
             if (null != value && CheskForConnection == true)
             {
+                value = ConnectionSettings ?? value;
                 SqlConnection sqlConnection = null;
                 try
                 {

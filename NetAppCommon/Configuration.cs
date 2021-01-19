@@ -9,8 +9,8 @@ using static System.Environment;
 namespace NetAppCommon
 {
     /// <summary>
-    /// Klasa wspólna dla parametrów
-    /// Class common to parameters
+    /// Klasa wspólna dla parametrów konfiguracji
+    /// Class common to configuration parameters
     /// </summary>
     public class Configuration
     {
@@ -481,7 +481,7 @@ namespace NetAppCommon
         }
         #endregion
 
-        #region public static void SaveConfigurationToFile<T>(T _object, string appSettingsPath = null)
+        #region public static void SaveToFile<T>(T @object, string appSettingsPath = null)
         /// <summary>
         /// Zapisz kofigurację do pliku
         /// Save configuration to file
@@ -490,7 +490,7 @@ namespace NetAppCommon
         /// Typ obiektu jako parametr typu T
         /// Object type as a parameter of type T
         /// </typeparam>
-        /// <param name="_object">
+        /// <param name="object">
         /// Obiekt typu parametru T
         /// Object of the T parameter type
         /// </param>
@@ -498,7 +498,7 @@ namespace NetAppCommon
         /// Opcjonalnie ścieżka do pliku jako string
         /// Optional file path as string
         /// </param>
-        public static void SaveConfigurationToFile<T>(T _object, string appSettingsPath = null)
+        public static void SaveToFile<T>(T @object, string appSettingsPath = null)
         {
             try
             {
@@ -508,7 +508,7 @@ namespace NetAppCommon
                 }
                 if (null != appSettingsPath && !string.IsNullOrWhiteSpace(appSettingsPath) && File.Exists(appSettingsPath))
                 {
-                    var json = JsonConvert.SerializeObject(_object, Formatting.Indented);
+                    var json = JsonConvert.SerializeObject(@object, Formatting.Indented);
                     if (null != json)
                     {
                         File.WriteAllText(appSettingsPath, json);
@@ -522,7 +522,7 @@ namespace NetAppCommon
         }
         #endregion
 
-        #region public static async Task SaveConfigurationToFileAsync<T>(T _object, string appSettingsPath = null)
+        #region public static async Task SaveToFileAsync<T>(T @object, string appSettingsPath = null)
         /// <summary>
         /// Zapisz kofigurację do pliku asynchronicznie
         /// Save configuration to file asynchronously
@@ -531,7 +531,7 @@ namespace NetAppCommon
         /// Typ obiektu jako parametr typu T
         /// Object type as a parameter of type T
         /// </typeparam>
-        /// <param name="_object">
+        /// <param name="object">
         /// Obiekt typu parametru T
         /// Object of the T parameter type
         /// </param>
@@ -539,7 +539,7 @@ namespace NetAppCommon
         /// Opcjonalnie ścieżka do pliku jako string
         /// Optional file path as string
         /// </param>
-        public static async Task SaveConfigurationToFileAsync<T>(T _object, string appSettingsPath = null)
+        public static async Task SaveToFileAsync<T>(T @object, string appSettingsPath = null)
         {
             try
             {
@@ -551,7 +551,7 @@ namespace NetAppCommon
                     }
                     if (null != appSettingsPath && !string.IsNullOrWhiteSpace(appSettingsPath) && File.Exists(appSettingsPath))
                     {
-                        var json = JsonConvert.SerializeObject(_object, Formatting.Indented);
+                        var json = JsonConvert.SerializeObject(@object, Formatting.Indented);
                         if (null != json)
                         {
                             File.WriteAllText(appSettingsPath, json);

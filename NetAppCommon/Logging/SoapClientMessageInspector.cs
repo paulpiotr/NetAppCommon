@@ -1,9 +1,11 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Reflection;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Dispatcher;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 using Microsoft.Extensions.Logging;
 
@@ -77,10 +79,32 @@ namespace NetAppCommon.Logging
                 log4net.Debug("AfterReceiveReply(ref Message reply, object correlationState)");
                 using (MessageBuffer buffer = reply.CreateBufferedCopy(int.MaxValue))
                 {
-                    XmlDocument document = GetDocument(buffer.CreateMessage());
-                    log4net.Debug(document.OuterXml);
-                    //Logger.LogTrace(document.OuterXml);
-                    reply = buffer.CreateMessage();
+                    /// Override payload
+                    XmlDocument xmlDocument = GetDocument(buffer.CreateMessage());
+                    using (var stringWriter = new StringWriter())
+                    {
+                        using (var xmlWriter = XmlWriter.Create(stringWriter))
+                        {
+                            xmlDocument.WriteTo(xmlWriter);
+                            xmlWriter.Flush();
+                            var pattern = @"http\:\/\/ICASA-GROUP\.WebServices";
+                            var replacement = @"http://ICASA.WebServices";
+                            var stringReplace = Regex.Replace(stringWriter.GetStringBuilder().ToString(), pattern, replacement);
+                            using (var memoryStream = new MemoryStream(Encoding.ASCII.GetBytes(stringReplace)))
+                            {
+                                xmlDocument.Load(memoryStream);
+                            }
+                        }
+                    }
+                    log4net.Debug(xmlDocument.OuterXml);
+                    /// Oryginal
+                    /// Logger.LogTrace(xmlDocument.OuterXml);
+                    /// Oryginal
+                    /// reply = buffer.CreateMessage();
+                    var envelopeReader = XmlReader.Create(new StringReader(xmlDocument.OuterXml));
+                    // Create the message using the reader
+                    var replacedMessage = Message.CreateMessage(envelopeReader, int.MaxValue, reply.Version);
+                    reply = replacedMessage;
                 }
             }
             catch (Exception e)
@@ -113,10 +137,10 @@ namespace NetAppCommon.Logging
                 log4net.Debug("BeforeSendRequest(ref Message message, IClientChannel clientChannel)");
                 using (MessageBuffer buffer = message.CreateBufferedCopy(int.MaxValue))
                 {
-                    XmlDocument document = GetDocument(buffer.CreateMessage());
+                    XmlDocument xmlDocument = GetDocument(buffer.CreateMessage());
                     //Oryginalnie
-                    //Logger.LogTrace(document.OuterXml);
-                    log4net.Debug(document.OuterXml);
+                    //Logger.LogTrace(xmlDocument.OuterXml);
+                    log4net.Debug(xmlDocument.OuterXml);
                     message = buffer.CreateMessage();
                     return null;
                 }
@@ -132,7 +156,7 @@ namespace NetAppCommon.Logging
         #region private XmlDocument GetDocument(Message message)
         /// <summary>
         /// Pobierz treść dokumentu jako obiekt XML
-        /// Get the body of the document as an XML object
+        /// Get the body of the xmlDocument as an XML object
         /// </summary>
         /// <param name="message">
         /// Referencja do wiadomości w żądaniu
@@ -140,13 +164,13 @@ namespace NetAppCommon.Logging
         /// </param>
         /// <returns>
         /// Treść dokumentu jako obiekt XML
-        /// The body of the document as an XML object
+        /// The body of the xmlDocument as an XML object
         /// </returns>
         private XmlDocument GetDocument(Message message)
         {
             try
             {
-                var document = new XmlDocument();
+                var xmlDocument = new XmlDocument();
                 using (var memoryStream = new MemoryStream())
                 {
                     // write message to memory stream
@@ -154,10 +178,10 @@ namespace NetAppCommon.Logging
                     message.WriteMessage(writer);
                     writer.Flush();
                     memoryStream.Position = 0;
-                    // load memory stream into a document
-                    document.Load(memoryStream);
+                    // load memory stream into a xmlDocument
+                    xmlDocument.Load(memoryStream);
                 }
-                return document;
+                return xmlDocument;
             }
             catch (Exception e)
             {

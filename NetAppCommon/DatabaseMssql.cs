@@ -1,5 +1,7 @@
 using System;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
@@ -105,7 +107,11 @@ namespace NetAppCommon
                         var sqlConnectionStringBuilder = new SqlConnectionStringBuilder(connectionString);
                         if (null != sqlConnectionStringBuilder && null != sqlConnectionStringBuilder.AttachDBFilename && !string.IsNullOrWhiteSpace(sqlConnectionStringBuilder.AttachDBFilename))
                         {
-                            connectionString = connectionString.Replace("%AttachDbFilename%", string.Format("{0}{1}", "MSSQLLocalDB", Math.Abs(sqlConnectionStringBuilder.AttachDBFilename.GetHashCode())));
+                            //sqlConnectionStringBuilder.
+                            //Console.WriteLine(sqlConnectionStringBuilder.AttachDBFilename);
+                            var sufix = new Guid(MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(sqlConnectionStringBuilder.AttachDBFilename)));
+                            //connectionString = connectionString.Replace("%AttachDbFilename%", string.Format("{0}{1}", "MSSQLLocalDB", sufix.ToString()));
+                            connectionString = connectionString.Replace("%AttachDbFilename%", string.Format("{0}", sufix.ToString()));
                         }
                     }
                 }
@@ -322,12 +328,12 @@ namespace NetAppCommon
         /// Opcje budowania kontekstu serwera Sql 
         /// Sql Server Context Build Options
         /// </returns>
-        public static DbContextOptions GetSqlServerDbContextOptions<T>(string connectionStringName) where T : DbContext
+        public static DbContextOptions GetSqlServerDbContextOptions<T>(string connectionStringName, string settingsJsonFileName = null) where T : DbContext
         {
             try
             {
                 DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder<T>();
-                var connectionString = GetConnectionString(connectionStringName);
+                var connectionString = GetConnectionString(connectionStringName, settingsJsonFileName);
                 if (null != connectionString && !string.IsNullOrWhiteSpace(connectionString))
                 {
                     dbContextOptionsBuilder.UseSqlServer(connectionString);
@@ -358,11 +364,11 @@ namespace NetAppCommon
         /// Opcje budowania kontekstu serwera Sql 
         /// Sql Server Context Build Options
         /// </returns>
-        public static async Task<DbContextOptions> GetSqlServerDbContextOptionsAsync<T>(string connectionStringName) where T : DbContext
+        public static async Task<DbContextOptions> GetSqlServerDbContextOptionsAsync<T>(string connectionStringName, string settingsJsonFileName = null) where T : DbContext
         {
             try
             {
-                return await Task.Run(() => GetSqlServerDbContextOptions<T>(connectionStringName));
+                return await Task.Run(() => GetSqlServerDbContextOptions<T>(connectionStringName, settingsJsonFileName));
             }
             catch (Exception e)
             {

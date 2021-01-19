@@ -23,33 +23,91 @@ namespace NetAppCommon.Helpers
 
         #region public static async Task RunMigrationAsync<T>(IServiceProvider serviceProvider) where T : DbContext
         /// <summary>
-        /// Uruchom migrację bazy danych asynchronicznie
-        /// Run database migration asynchronously
+        /// 
         /// </summary>
-        /// <param name="serviceProvider">
-        /// serviceProvider jako IServiceProvider
-        /// serviceProvider as IServiceProvider
-        /// </param>
-        public static async Task RunMigrationAsync<T>(IServiceProvider serviceProvider) where T : DbContext
+        /// <typeparam name="T"></typeparam>
+        /// <param name="serviceProvider"></param>
+        /// <returns></returns>
+        public static async Task RunMigrationAsync<TDbContext>(IServiceProvider serviceProvider) where TDbContext : DbContext
         {
             try
             {
                 using (IServiceScope serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
                 {
-                    using (T dbContext = serviceScope.ServiceProvider.GetService<T>())
+                    using (TDbContext context = serviceScope.ServiceProvider.GetService<TDbContext>())
                     {
-                        if (null != dbContext)
+                        await RunMigrationAsync<TDbContext>(context);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+            }
+        }
+        #endregion
+
+        #region public static async Task RunMigrationAsync<T>(T context) where T : DbContext
+        /// <summary>
+        /// Uruchom migrację bazy danych asynchronicznie
+        /// Run database migration asynchronously
+        /// </summary>
+        /// <typeparam name="TDbContext">
+        /// TDbContext : DbContext
+        /// TDbContext : DbContext
+        /// </typeparam>
+        /// <param name="context">
+        /// TDbContext context where TDbContext : DbContext
+        /// TDbContext context where TDbContext : DbContext
+        /// </param>
+        /// <returns>
+        /// async Task
+        /// async Task
+        /// </returns>
+        public static async Task RunMigrationAsync<TDbContext>(TDbContext context) where TDbContext : DbContext
+        {
+            try
+            {
+                //#if DEBUG
+                //                Log4net.Debug($"RunMigrationAsync { context?.Database?.GetDbConnection()?.ConnectionString }");
+                //#endif
+                if (null != context)
+                {
+                    //#if DEBUG
+                    //                    Log4net.Debug($"context { context?.Database?.GetDbConnection()?.ConnectionString }");
+                    //#endif
+                    try
+                    {
+                        //#if DEBUG
+                        //                        Log4net.Debug($"Try MDF Create Async DatabaseMssqlMdf.GetInstance(context?.Database?.GetDbConnection()?.ConnectionString ).CreateAsync()...");
+                        //#endif
+                        await DatabaseMssqlMdf.GetInstance(context?.Database?.GetDbConnection()?.ConnectionString).CreateAsync();
+                        //#if DEBUG
+                        //                        Log4net.Debug($"Ok");
+                        //#endif
+                    }
+                    catch (Exception e)
+                    {
+                        Log4net.Warn(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                    }
+                    if ((await context.Database.GetPendingMigrationsAsync()).Any())
+                    {
+                        //#if DEBUG
+                        //                        Log4net.Debug($"Migrate { context?.Database?.GetDbConnection()?.ConnectionString }");
+                        //#endif
+                        try
                         {
-#if DEBUG 
-                            Log4net.Debug($"Check Migrate { dbContext.Database.GetDbConnection().ConnectionString }");
-#endif
-                            if ((await dbContext.Database.GetPendingMigrationsAsync().ConfigureAwait(false)).Any())
-                            {
-#if DEBUG 
-                                Log4net.Debug($"Migrate { dbContext.Database.GetDbConnection().ConnectionString }");
-#endif
-                                await dbContext.Database.MigrateAsync().ConfigureAwait(false);
-                            }
+                            //#if DEBUG
+                            //                            Log4net.Debug($"Try Migrate Async context.Database.MigrateAsync()...");
+                            //#endif
+                            await context.Database.MigrateAsync();
+                            //#if DEBUG
+                            //                            Log4net.Debug($"Ok");
+                            //#endif
+                        }
+                        catch (Exception e)
+                        {
+                            Log4net.Warn(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
                         }
                     }
                 }
@@ -59,7 +117,7 @@ namespace NetAppCommon.Helpers
                 Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
             }
         }
-#endregion
+        #endregion
     }
-#endregion
+    #endregion
 }

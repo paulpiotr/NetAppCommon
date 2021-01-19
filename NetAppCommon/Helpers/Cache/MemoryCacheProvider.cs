@@ -11,6 +11,10 @@ namespace NetAppCommon.Helpers.Cache
 
         private readonly IMemoryCache _cache;
 
+        private const double MemoryCacheTimeSpan = 1000;
+
+        private readonly TimeSpan _memoryCachetimeSpan = TimeSpan.FromSeconds(MemoryCacheTimeSpan);
+
         private IMemoryCache GetMemoryCache()
         {
             return _cache ?? Cache;
@@ -22,7 +26,7 @@ namespace NetAppCommon.Helpers.Cache
 
         public MemoryCacheProvider(IMemoryCache memoryCache)
         {
-            _cache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
+            _cache ??= memoryCache;
         }
 
         public static MemoryCacheProvider GetInstance(IMemoryCache memoryCache)
@@ -56,7 +60,7 @@ namespace NetAppCommon.Helpers.Cache
             }
             else
             {
-                if (ttl.Timespan == TimeSpan.MaxValue)
+                if (ttl.Timespan == System.TimeSpan.MaxValue)
                 {
                     options.AbsoluteExpiration = DateTimeOffset.MaxValue;
                 }
@@ -76,6 +80,34 @@ namespace NetAppCommon.Helpers.Cache
                 return value;
             }
             return null;
+        }
+
+        public object Get(string key, object @object, double? timeSpan)
+        {
+            (var hit, var value) = TryGet(key);
+            if (hit)
+            {
+                return value;
+            }
+            else
+            {
+                Put(key, @object, TimeSpan.FromMilliseconds(timeSpan ?? MemoryCacheTimeSpan));
+            }
+            return @object;
+        }
+
+        public object Get(string key, object @object, Ttl ttl)
+        {
+            (var hit, var value) = TryGet(key);
+            if (hit)
+            {
+                return value;
+            }
+            else
+            {
+                Put(key, @object, ttl);
+            }
+            return @object;
         }
     }
 }
