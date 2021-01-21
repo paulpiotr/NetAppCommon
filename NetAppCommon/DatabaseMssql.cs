@@ -206,7 +206,7 @@ namespace NetAppCommon
                 var connectionString = GetConnectionString(connectionStringName, settingsJsonFileName);
                 if (null != connectionString && !string.IsNullOrWhiteSpace(connectionString))
                 {
-                    connectionString = ParseConnectionString(EncryptDecrypt.EncryptDecrypt.DecryptString(connectionString, EncryptDecrypt.EncryptDecrypt.GetRsaFileContent()));
+                    connectionString = ParseConnectionString(string.Empty/*EncryptDecrypt.EncryptDecrypt.DecryptString(connectionString, EncryptDecrypt.EncryptDecrypt.GetRsaFileContent())*/);
                 }
                 return connectionString;
             }
@@ -269,7 +269,7 @@ namespace NetAppCommon
                 var connectionString = GetConnectionString(connectionStringName, settingsJsonFileName);
                 if (null != connectionString && !string.IsNullOrWhiteSpace(connectionString))
                 {
-                    connectionString = ParseConnectionString(EncryptDecrypt.EncryptDecrypt.DecryptString(connectionString, EncryptDecrypt.EncryptDecrypt.GetRsaFileContent(rsaFileName)));
+                    connectionString = ParseConnectionString(string.Empty/*EncryptDecrypt.EncryptDecrypt.DecryptString(connectionString, EncryptDecrypt.EncryptDecrypt.GetRsaFileContent(rsaFileName))*/);
                 }
                 return connectionString;
             }
