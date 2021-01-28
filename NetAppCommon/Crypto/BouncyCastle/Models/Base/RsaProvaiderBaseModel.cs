@@ -1,33 +1,77 @@
+#region using
+
 using System;
 using System.IO;
 using System.Reflection;
 using System.Xml.Serialization;
+using log4net;
 using NetAppCommon.Validation;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.OpenSsl;
 
+#endregion
+
+#nullable enable annotations
+
 namespace NetAppCommon.Crypto.BouncyCastle.Models.Base
 {
     public class RsaProvaiderBaseModel
     {
-        #region private readonly log4net.ILog _log4net
+        #region private readonly log4net.ILog _log4Net
+
         /// <summary>
-        /// Referencja klasy Log4NetLogget
-        /// Reference to the Log4NetLogget class
+        ///     Referencja klasy Log4NetLogger
+        ///     Reference to the Log4NetLogger class
         /// </summary>
-        private readonly log4net.ILog _log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
+        private readonly ILog _log4Net =
+            Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
+
         #endregion
+
+        protected string? _asymmetricPrivateKeyFilePath;
+
+        protected string? _asymmetricPublicKeyFilePath;
+
+        [XmlIgnore]
+        [JsonIgnore]
+        [NotRequired]
+        public string? AsymmetricPrivateKeyFilePath
+        {
+            get => _asymmetricPrivateKeyFilePath;
+            set
+            {
+                if (value != _asymmetricPrivateKeyFilePath)
+                {
+                    _asymmetricPrivateKeyFilePath = value;
+                }
+            }
+        }
+
+        [XmlIgnore]
+        [JsonIgnore]
+        [NotRequired]
+        public string? AsymmetricPublicKeyFilePath
+        {
+            get => _asymmetricPublicKeyFilePath;
+            set
+            {
+                if (value != _asymmetricPublicKeyFilePath)
+                {
+                    _asymmetricPublicKeyFilePath = value;
+                }
+            }
+        }
 
         #region protected RsaKeyPairGenerator _rsaKeyPairGenerator; public RsaKeyPairGenerator RsaKeyPairGenerator
 
-        protected RsaKeyPairGenerator _rsaKeyPairGenerator;
+        protected RsaKeyPairGenerator? _rsaKeyPairGenerator;
 
         [JsonIgnore]
         [XmlIgnore]
         [NotRequired]
-        public RsaKeyPairGenerator RsaKeyPairGenerator
+        public RsaKeyPairGenerator? RsaKeyPairGenerator
         {
             get => _rsaKeyPairGenerator;
             set
@@ -43,12 +87,12 @@ namespace NetAppCommon.Crypto.BouncyCastle.Models.Base
 
         #region protected AsymmetricCipherKeyPair _keyPair; public AsymmetricCipherKeyPair KeyPair
 
-        protected AsymmetricCipherKeyPair _keyPair;
+        protected AsymmetricCipherKeyPair? _keyPair;
 
         [JsonIgnore]
         [XmlIgnore]
         [NotRequired]
-        public AsymmetricCipherKeyPair KeyPair
+        public AsymmetricCipherKeyPair? KeyPair
         {
             get
             {
@@ -66,43 +110,46 @@ namespace NetAppCommon.Crypto.BouncyCastle.Models.Base
                 }
             }
         }
+
         #endregion
 
         #region protected AsymmetricKeyParameter _asymmetricPrivateKey; public AsymmetricKeyParameter AsymmetricPrivateKey
 
-        protected AsymmetricKeyParameter _asymmetricPrivateKey;
+        protected AsymmetricKeyParameter? _asymmetricPrivateKey;
 
         [JsonIgnore]
         [XmlIgnore]
         [NotRequired]
-        public AsymmetricKeyParameter AsymmetricPrivateKey
+        public AsymmetricKeyParameter? AsymmetricPrivateKey
         {
             get
             {
-                if (null != KeyPair && null == _asymmetricPrivateKey)
+                if (KeyPair != null && null == _asymmetricPrivateKey)
                 {
                     _asymmetricPrivateKey = KeyPair.Private;
                 }
+
                 return _asymmetricPrivateKey;
             }
             set
             {
-                if (value != _asymmetricPrivateKey)
+                if (!Equals(value, _asymmetricPrivateKey))
                 {
                     _asymmetricPrivateKey = value;
                 }
             }
         }
+
         #endregion
 
         #region protected AsymmetricKeyParameter _asymmetricPublicKey; public AsymmetricKeyParameter AsymmetricPublicKey
 
-        protected AsymmetricKeyParameter _asymmetricPublicKey;
+        protected AsymmetricKeyParameter? _asymmetricPublicKey;
 
         [JsonIgnore]
         [XmlIgnore]
         [NotRequired]
-        public AsymmetricKeyParameter AsymmetricPublicKey
+        public AsymmetricKeyParameter? AsymmetricPublicKey
         {
             get
             {
@@ -110,30 +157,32 @@ namespace NetAppCommon.Crypto.BouncyCastle.Models.Base
                 {
                     _asymmetricPublicKey = KeyPair.Public;
                 }
+
                 return _asymmetricPublicKey;
             }
             set
             {
-                if (value != _asymmetricPublicKey)
+                if (!Equals(value, _asymmetricPublicKey))
                 {
                     _asymmetricPublicKey = value;
                 }
             }
         }
+
         #endregion
 
         #region protected string _asymmetricPrivateKeyAsString; public string AsymmetricPrivateKeyAsString
 
-        protected string _asymmetricPrivateKeyAsString;
+        protected string? _asymmetricPrivateKeyAsString;
 
         [JsonIgnore]
         [XmlIgnore]
         [NotRequired]
-        public string AsymmetricPrivateKeyAsString
+        public string? AsymmetricPrivateKeyAsString
         {
             get
             {
-                if (null == _asymmetricPrivateKeyAsString)
+                if (string.IsNullOrWhiteSpace(_asymmetricPrivateKeyAsString))
                 {
                     try
                     {
@@ -143,21 +192,21 @@ namespace NetAppCommon.Crypto.BouncyCastle.Models.Base
                         }
                         else if (null != AsymmetricPrivateKey)
                         {
-                            using (TextWriter textWriter = new StringWriter())
-                            {
-                                var pemWriter = new PemWriter(textWriter);
-                                pemWriter.WriteObject(AsymmetricPrivateKey);
-                                pemWriter.Writer.Flush();
-                                _asymmetricPrivateKeyAsString = textWriter.ToString();
-                            }
+                            using TextWriter textWriter = new StringWriter();
+                            var pemWriter = new PemWriter(textWriter);
+                            pemWriter.WriteObject(AsymmetricPrivateKey);
+                            pemWriter.Writer.Flush();
+                            _asymmetricPrivateKeyAsString = textWriter.ToString();
                         }
                     }
                     catch (Exception e)
                     {
-                        _log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                        _log4Net.Error(
+                            $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
                     }
                 }
-                return _asymmetricPrivateKeyAsString;
+
+                return _asymmetricPrivateKeyAsString ?? string.Empty;
             }
             set
             {
@@ -167,39 +216,37 @@ namespace NetAppCommon.Crypto.BouncyCastle.Models.Base
                 }
             }
         }
+
         #endregion
 
         #region protected string _asymmetricPublicKeyAsString; public string AsymmetricPublicKeyAsString
 
-        protected string _asymmetricPublicKeyAsString;
+        protected string? _asymmetricPublicKeyAsString;
 
         [JsonIgnore]
         [XmlIgnore]
         [NotRequired]
-        public string AsymmetricPublicKeyAsString
+        public string? AsymmetricPublicKeyAsString
         {
             get
             {
-                if (null == _asymmetricPublicKeyAsString)
+                if (string.IsNullOrWhiteSpace(_asymmetricPublicKeyAsString))
                 {
                     if (null != AsymmetricPublicKeyFilePath && File.Exists(AsymmetricPublicKeyFilePath))
                     {
                         _asymmetricPublicKeyAsString = File.ReadAllText(AsymmetricPublicKeyFilePath);
-                        //Console.WriteLine($"\n\n\n { _asymmetricPublicKeyAsString } \n\n\n");
                     }
                     else if (null != AsymmetricPublicKey)
                     {
-                        using (TextWriter textWriter = new StringWriter())
-                        {
-                            var pemWriter = new PemWriter(textWriter);
-                            pemWriter.WriteObject(AsymmetricPublicKey);
-                            pemWriter.Writer.Flush();
-                            _asymmetricPublicKeyAsString = textWriter.ToString();
-                            //Console.WriteLine($"\n\n\n { _asymmetricPublicKeyAsString } \n\n\n");
-                        }
+                        using TextWriter textWriter = new StringWriter();
+                        var pemWriter = new PemWriter(textWriter);
+                        pemWriter.WriteObject(AsymmetricPublicKey);
+                        pemWriter.Writer.Flush();
+                        _asymmetricPublicKeyAsString = textWriter.ToString();
                     }
                 }
-                return _asymmetricPublicKeyAsString;
+
+                return _asymmetricPublicKeyAsString ?? string.Empty;
             }
             set
             {
@@ -209,40 +256,7 @@ namespace NetAppCommon.Crypto.BouncyCastle.Models.Base
                 }
             }
         }
+
         #endregion
-
-        protected string _asymmetricPrivateKeyFilePath;
-
-        [XmlIgnore]
-        [JsonIgnore]
-        [NotRequired]
-        public string AsymmetricPrivateKeyFilePath
-        {
-            get => _asymmetricPrivateKeyFilePath;
-            set
-            {
-                if (value != _asymmetricPrivateKeyFilePath)
-                {
-                    _asymmetricPrivateKeyFilePath = value;
-                }
-            }
-        }
-
-        protected string _asymmetricPublicKeyFilePath;
-
-        [XmlIgnore]
-        [JsonIgnore]
-        [NotRequired]
-        public string AsymmetricPublicKeyFilePath
-        {
-            get => _asymmetricPublicKeyFilePath;
-            set
-            {
-                if (value != _asymmetricPublicKeyFilePath)
-                {
-                    _asymmetricPublicKeyFilePath = value;
-                }
-            }
-        }
     }
 }

@@ -1,32 +1,40 @@
+#region using
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
+using log4net;
+
+#endregion
 
 namespace NetAppCommon.ObjectMapper.Attributes
 {
     /// <summary>
-    /// Rozszerzenia programowania zorientowanego na aspekty - Atrybut wartości domyślnej pamięci podręcznej
-    /// Aspect Oriented Programming Extensions Memory Cache Default Value Attribute
+    ///     Rozszerzenia programowania zorientowanego na aspekty - Atrybut wartości domyślnej pamięci podręcznej
+    ///     Aspect Oriented Programming Extensions Memory Cache Default Value Attribute
     /// </summary>
     public static class MemoryCacheDefaultValueAttribute
     {
         /// <summary>
-        /// Dictionary to hold type initialization methods' cache
+        ///     Dictionary to hold type initialization methods' cache
         /// </summary>
-        private static readonly Dictionary<Type, Action<object>> TypesInitializers = new Dictionary<Type, Action<object>>();
+        private static readonly Dictionary<Type, Action<object>> TypesInitializers = new();
 
         #region private readonly log4net.ILog log4net
+
         /// <summary>
-        /// Instancja do klasy Log4netLogger
-        /// Instance to Log4netLogger class
+        ///     Instancja do klasy Log4netLogger
+        ///     Instance to Log4netLogger class
         /// </summary>
-        private static readonly log4net.ILog Log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log4net =
+            Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
+
         #endregion
 
         /// <summary>
-        /// Implements precompiled setters with embedded constant values from DefaultValueAttributes
+        ///     Implements precompiled setters with embedded constant values from DefaultValueAttributes
         /// </summary>
         public static void ApplyDefaultValues(this object @this)
         {
@@ -36,23 +44,30 @@ namespace NetAppCommon.ObjectMapper.Attributes
                 if (!TypesInitializers.TryGetValue(@this.GetType(), out Action<object> setter))
                 {
                     // If no initializers are added do nothing
-                    setter = (o) => { };
+                    setter = o => { };
                     // Iterate through each property
                     ParameterExpression parameterExpression = Expression.Parameter(typeof(object), "this");
-                    foreach (PropertyInfo prop in @this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                    foreach (PropertyInfo prop in @this.GetType()
+                        .GetProperties(BindingFlags.Public | BindingFlags.Instance))
                     {
                         Expression expressionConvert;
                         if (prop.CanWrite &&
-                            prop.GetCustomAttributes(typeof(DefaultValueAttribute), false) is DefaultValueAttribute[] attr &&
+                            prop.GetCustomAttributes(typeof(DefaultValueAttribute), false) is DefaultValueAttribute[]
+                                attr &&
                             attr.Length > 0)
                         {
-                            expressionConvert = Expression.Convert(Expression.Constant(attr[0].Value), prop.PropertyType);
-                            Expression expressionCall = Expression.Call(Expression.TypeAs(parameterExpression, @this.GetType()), prop.GetSetMethod(), expressionConvert);
-                            var expressionLambda = Expression.Lambda<Action<object>>(expressionCall, parameterExpression);
+                            expressionConvert =
+                                Expression.Convert(Expression.Constant(attr[0].Value), prop.PropertyType);
+                            Expression expressionCall =
+                                Expression.Call(Expression.TypeAs(parameterExpression, @this.GetType()),
+                                    prop.GetSetMethod(), expressionConvert);
+                            var expressionLambda =
+                                Expression.Lambda<Action<object>>(expressionCall, parameterExpression);
                             // Add this action to multicast delegate
                             setter += expressionLambda.Compile();
                         }
                     }
+
                     if (null != setter)
                     {
                         try
@@ -75,7 +90,7 @@ namespace NetAppCommon.ObjectMapper.Attributes
         }
 
         /// <summary>
-        /// Implements cache of ResetValue delegates
+        ///     Implements cache of ResetValue delegates
         /// </summary>
         public static void ResetDefaultValues(this object @this)
         {
@@ -86,7 +101,7 @@ namespace NetAppCommon.ObjectMapper.Attributes
                 {
                     // Init delegate with empty body,
                     // If no initializers are added do nothing
-                    setter = (o) => { };
+                    setter = o => { };
                     // Go throu each property and compile Reset delegates
                     foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(@this))
                     {
@@ -96,9 +111,11 @@ namespace NetAppCommon.ObjectMapper.Attributes
                             setter += prop.ResetValue;
                         }
                     }
+
                     // Save in the type cache
                     TypesInitializers.Add(@this.GetType(), setter);
                 }
+
                 // Initialize member properties
                 setter(@this);
             }

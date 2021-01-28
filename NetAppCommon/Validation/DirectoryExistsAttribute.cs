@@ -1,29 +1,40 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿#region using
+
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Reflection;
+using log4net;
+
+#endregion
 
 namespace NetAppCommon.Validation
 {
     #region public class InListOfStringAttribute : ValidationAttribute
+
     /// <summary>
-    /// Sprawdź, czy wartość występuje w podanej liści argumentów rozdzielonych separatorem ',', ';'
-    /// Sprawdź, czy wartość ceny w podanej liści argumentów rozdzielonych separatorem ',', ';'
+    ///     Sprawdź, czy wartość występuje w podanej liści argumentów rozdzielonych separatorem ',', ';'
+    ///     Sprawdź, czy wartość ceny w podanej liści argumentów rozdzielonych separatorem ',', ';'
     /// </summary>
     public class DirectoryExistsAttribute : ValidationAttribute
     {
         #region private readonly log4net.ILog log4net
+
         /// <summary>
-        /// Log4 Net Logger
+        ///     Log4 Net Logger
         /// </summary>
-        private readonly log4net.ILog log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
+        private readonly ILog log4net =
+            Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
+
         #endregion
 
         #region public new string ErrorMessage { get; set; }
+
         /// <summary>
-        /// Treść informacji o błędzie
-        /// The content of the error information
+        ///     Treść informacji o błędzie
+        ///     The content of the error information
         /// </summary>
         public new string ErrorMessage { get; set; }
+
         #endregion
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
@@ -34,17 +45,19 @@ namespace NetAppCommon.Validation
                 {
                     return ValidationResult.Success;
                 }
+
                 if (null != ErrorMessage)
                 {
                     return new ValidationResult(string.Format(ErrorMessage, value));
                 }
-                else
-                {
-                    return new ValidationResult(string.Format("Katalog {0} nie istnieje lub nie masz do niego uprawnień!", (string)value));
-                }
+
+                return new ValidationResult(string.Format("Katalog {0} nie istnieje lub nie masz do niego uprawnień!",
+                    (string)value));
             }
+
             return ValidationResult.Success;
         }
     }
+
     #endregion
 }

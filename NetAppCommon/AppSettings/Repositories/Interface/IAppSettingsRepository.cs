@@ -1,5 +1,9 @@
+#region using
+
 using System.Threading.Tasks;
 using NetAppCommon.AppSettings.Models.Base;
+
+#endregion
 
 namespace NetAppCommon.AppSettings.Repositories.Interface
 {

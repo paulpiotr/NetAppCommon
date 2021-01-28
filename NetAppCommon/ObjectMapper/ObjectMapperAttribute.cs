@@ -1,16 +1,31 @@
+#region using
+
 using System;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+#endregion
+
 namespace NetAppCommon.ObjectMapper.Attributes
 {
     [AttributeUsage(AttributeTargets.All)]
     public sealed class ObjectMapperAttribute : Attribute
     {
-
         private string _assemblyNameSource;
+
+        private string[] _destinationMap;
+
+        private string _propertyNameSource;
+
+        public ObjectMapperAttribute(string assemblyNameSource, string propertyNameSource,
+            params string[] destinationMap)
+        {
+            AssemblyNameSource = assemblyNameSource;
+            PropertyNameSource = propertyNameSource;
+            DestinationMap = destinationMap;
+        }
 
         public string AssemblyNameSource
         {
@@ -24,8 +39,6 @@ namespace NetAppCommon.ObjectMapper.Attributes
             }
         }
 
-        private string _propertyNameSource;
-
         public string PropertyNameSource
         {
             get => _propertyNameSource;
@@ -37,8 +50,6 @@ namespace NetAppCommon.ObjectMapper.Attributes
                 }
             }
         }
-
-        private string[] _destinationMap;
 
         public string[] DestinationMap
         {
@@ -52,13 +63,6 @@ namespace NetAppCommon.ObjectMapper.Attributes
             }
         }
 
-        public ObjectMapperAttribute(string assemblyNameSource, string propertyNameSource, params string[] destinationMap)
-        {
-            AssemblyNameSource = assemblyNameSource;
-            PropertyNameSource = propertyNameSource;
-            DestinationMap = destinationMap;
-        }
-
         public static object GetCustomAttribute(object @object, string propertyName)
         {
             try
@@ -66,7 +70,8 @@ namespace NetAppCommon.ObjectMapper.Attributes
                 PropertyInfo objectPropertyInfo = @object?.GetType()?.GetProperty(propertyName);
                 if (null != objectPropertyInfo)
                 {
-                    var objectAttribute = (ObjectMapperAttribute)GetCustomAttribute(objectPropertyInfo, typeof(ObjectMapperAttribute));
+                    var objectAttribute =
+                        (ObjectMapperAttribute)GetCustomAttribute(objectPropertyInfo, typeof(ObjectMapperAttribute));
                     if (null != objectAttribute)
                     {
                         return objectAttribute;
@@ -77,6 +82,7 @@ namespace NetAppCommon.ObjectMapper.Attributes
             {
                 Console.WriteLine(e);
             }
+
             return null;
         }
 
@@ -87,7 +93,8 @@ namespace NetAppCommon.ObjectMapper.Attributes
                 PropertyInfo objectPropertyInfo = @object?.GetType()?.GetProperty(propertyName);
                 if (null != objectPropertyInfo)
                 {
-                    var objectAttribute = (ObjectMapperAttribute)GetCustomAttribute(objectPropertyInfo, typeof(ObjectMapperAttribute));
+                    var objectAttribute =
+                        (ObjectMapperAttribute)GetCustomAttribute(objectPropertyInfo, typeof(ObjectMapperAttribute));
                     if (null != objectAttribute)
                     {
                         return objectAttribute?.GetType()?.GetProperty(attributeName)?.GetValue(objectAttribute);
@@ -98,10 +105,12 @@ namespace NetAppCommon.ObjectMapper.Attributes
             {
                 Console.WriteLine(e);
             }
+
             return null;
         }
 
-        public static TDestination SimpleJsonMap<TSource, TDestination>(TSource source, TDestination destination = null) where TDestination : class, new()
+        public static TDestination SimpleJsonMap<TSource, TDestination>(TSource source, TDestination destination = null)
+            where TDestination : class, new()
         {
             try
             {
@@ -109,18 +118,22 @@ namespace NetAppCommon.ObjectMapper.Attributes
                 var jsonSource = JsonConvert.SerializeObject(source);
                 source.GetType().GetProperties().ToList().ForEach(sourceProperty =>
                 {
-                    var assemblyNameSource = (string)GetCustomAttributeValue(source, sourceProperty.Name, "AssemblyNameSource");
-                    var propertyNameSource = (string)GetCustomAttributeValue(source, sourceProperty.Name, "PropertyNameSource");
+                    var assemblyNameSource =
+                        (string)GetCustomAttributeValue(source, sourceProperty.Name, "AssemblyNameSource");
+                    var propertyNameSource =
+                        (string)GetCustomAttributeValue(source, sourceProperty.Name, "PropertyNameSource");
                     if (null != assemblyNameSource && source.GetType().Name == assemblyNameSource &&
-                    null != propertyNameSource)
+                        null != propertyNameSource)
                     {
-                        var destinationMap = (string[])GetCustomAttributeValue(source, sourceProperty.Name, "DestinationMap");
+                        var destinationMap =
+                            (string[])GetCustomAttributeValue(source, sourceProperty.Name, "DestinationMap");
                         destinationMap.ToList().ForEach(item =>
                         {
                             var destinationMapObject = JObject.Parse(item.ToString());
                             var assemblyNameDestination = destinationMapObject.Value<string>("AssemblyNameDestination");
                             var propertyNameDestination = destinationMapObject.Value<string>("PropertyNameDestination");
-                            if (null != assemblyNameDestination && null != propertyNameDestination && assemblyNameDestination == destination.GetType().Name)
+                            if (null != assemblyNameDestination && null != propertyNameDestination &&
+                                assemblyNameDestination == destination.GetType().Name)
                             {
                                 //Console.WriteLine($"assemblyNameSource { assemblyNameSource } propertyNameSource {propertyNameSource} assemblyNameDestination { assemblyNameDestination } propertyNameDestination: { propertyNameDestination }");
                                 jsonSource = jsonSource.Replace(propertyNameSource, propertyNameDestination);
@@ -135,8 +148,8 @@ namespace NetAppCommon.ObjectMapper.Attributes
             {
                 Console.WriteLine(e);
             }
+
             return destination;
         }
-
     }
 }

@@ -1,6 +1,10 @@
+#region using
+
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NetAppCommon.BasicAuthentication.Models;
+
+#endregion
 
 namespace NetAppCommon.BasicAuthentication.Services.Interface
 {

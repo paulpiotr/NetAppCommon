@@ -1,3 +1,5 @@
+#region using
+
 using System;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -6,16 +8,19 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NetAppCommon.BasicAuthentication.Models;
 using NetAppCommon.BasicAuthentication.Services.Interface;
 
+#endregion
+
 namespace NetAppCommon.Helpers.BasicAuthentication
 {
     /// <summary>
-    /// https://jasonwatmore.com/post/2019/10/21/aspnet-core-3-basic-authentication-tutorial-with-example-api#basic-authentication-handler-cs
+    ///     https://jasonwatmore.com/post/2019/10/21/aspnet-core-3-basic-authentication-tutorial-with-example-api#basic-authentication-handler-cs
     /// </summary>
     public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
@@ -36,15 +41,17 @@ namespace NetAppCommon.Helpers.BasicAuthentication
         {
             // skip authentication if endpoint has [AllowAnonymous] attribute
             //var endpoint = Context.GetEndpoint();
-            Microsoft.AspNetCore.Http.Endpoint endpoint = (Context.Features.Get<IEndpointFeature>()?.Endpoint);
+            Endpoint endpoint = Context.Features.Get<IEndpointFeature>()?.Endpoint;
             if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
             {
                 return AuthenticateResult.NoResult();
             }
+
             if (!Request.Headers.ContainsKey("Authorization"))
             {
                 return AuthenticateResult.Fail("Missing Authorization Header");
             }
+
             User user = null;
             try
             {
@@ -64,9 +71,10 @@ namespace NetAppCommon.Helpers.BasicAuthentication
             {
                 return AuthenticateResult.Fail("Invalid Username or Password");
             }
-            Claim[] claims = new[] {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Username),
+
+            Claim[] claims =
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), new Claim(ClaimTypes.Name, user.Username)
             };
             var identity = new ClaimsIdentity(claims, Scheme.Name);
             var principal = new ClaimsPrincipal(identity);

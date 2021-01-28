@@ -1,14 +1,14 @@
+#region using
+
 using System.Threading.Tasks;
+
+#endregion
 
 namespace NetAppCommon
 {
     public class DatabaseMssqlMdf : Mssql.DatabaseMssqlMdf
     {
-        private static DatabaseMssqlMdf _instance = null;
-
-        public override string ConnectionString { get => base.ConnectionString; set => base.ConnectionString = value; }
-        public override string ConnectionStringName { get => base.ConnectionStringName; set => base.ConnectionStringName = value; }
-        public override string SettingsJsonFileName { get => base.SettingsJsonFileName; set => base.SettingsJsonFileName = value; }
+        private static DatabaseMssqlMdf _instance;
 
         public DatabaseMssqlMdf()
         {
@@ -25,12 +25,27 @@ namespace NetAppCommon
             SettingsJsonFileName = settingsJsonFileName;
         }
 
+        public override string ConnectionString { get => base.ConnectionString; set => base.ConnectionString = value; }
+
+        public override string ConnectionStringName
+        {
+            get => base.ConnectionStringName;
+            set => base.ConnectionStringName = value;
+        }
+
+        public override string SettingsJsonFileName
+        {
+            get => base.SettingsJsonFileName;
+            set => base.SettingsJsonFileName = value;
+        }
+
         public static DatabaseMssqlMdf GetInstance()
         {
             if (_instance == null)
             {
                 _instance = new DatabaseMssqlMdf();
             }
+
             return _instance;
         }
 
@@ -40,6 +55,7 @@ namespace NetAppCommon
             {
                 _instance = new DatabaseMssqlMdf(connectionString);
             }
+
             return _instance;
         }
 
@@ -49,25 +65,20 @@ namespace NetAppCommon
             {
                 _instance = new DatabaseMssqlMdf(connectionStringName, settingsJsonFileName);
             }
+
             return _instance;
         }
 
-        public async Task<bool> CreateAsync()
-        {
-            return await Task.Run(() =>
-             {
-                 return base.Create(ConnectionString, ConnectionStringName, SettingsJsonFileName);
-             });
-        }
+        public async Task<bool> CreateAsync() =>
+            await Task.Run(() =>
+            {
+                return base.Create(ConnectionString, ConnectionStringName, SettingsJsonFileName);
+            });
 
-        public bool Create()
-        {
-            return base.Create(ConnectionString, ConnectionStringName, SettingsJsonFileName);
-        }
+        public bool Create() => base.Create(ConnectionString, ConnectionStringName, SettingsJsonFileName);
 
-        public override bool Create(string connectionString = null, string connectionStringName = null, string settingsJsonFileName = null)
-        {
-            return base.Create(connectionString, connectionStringName, settingsJsonFileName);
-        }
+        public override bool Create(string connectionString = null, string connectionStringName = null,
+            string settingsJsonFileName = null) =>
+            base.Create(connectionString, connectionStringName, settingsJsonFileName);
     }
 }

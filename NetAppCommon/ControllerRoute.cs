@@ -1,116 +1,140 @@
+#region using
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using log4net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using NetAppCommon.Models;
 
+#endregion
+
 namespace NetAppCommon
 {
     #region public class ControllerRoute
+
     /// <summary>
-    /// Pomocnik tras routingów kontrolera
-    /// Controller Routing Helper
+    ///     Pomocnik tras routingów kontrolera
+    ///     Controller Routing Helper
     /// </summary>
     public class ControllerRoute
     {
         #region private readonly log4net.ILog log4net...
+
         /// <summary>
-        /// Log4 Net Logger
+        ///     Log4 Net Logger
         /// </summary>
-        private static readonly log4net.ILog Log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log4net =
+            Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
+
         #endregion
 
         #region public static List<ControllerRoutingActions> GetRouteAction...
+
         /// <summary>
-        /// Pobierz listę akcji (tras) dostępnych dla kontrolera
-        /// Get the list of actions (routes) available for the controller
+        ///     Pobierz listę akcji (tras) dostępnych dla kontrolera
+        ///     Get the list of actions (routes) available for the controller
         /// </summary>
         /// <param name="provider">
-        /// Dostawca kolekcji deskryptorów akcji provider jako IActionDescriptorCollectionProvider
-        /// Provider's action descriptor collection provider as IActionDescriptorCollectionProvider
+        ///     Dostawca kolekcji deskryptorów akcji provider jako IActionDescriptorCollectionProvider
+        ///     Provider's action descriptor collection provider as IActionDescriptorCollectionProvider
         /// </param>
         /// <param name="controllerName">
-        /// Nazwa kontrolera controllerName jako string
-        /// The name of controller controllerName as a string
+        ///     Nazwa kontrolera controllerName jako string
+        ///     The name of controller controllerName as a string
         /// </param>
         /// <param name="Url">
-        /// url jako IUrlHelper
-        /// url as IUrlHelper
+        ///     url jako IUrlHelper
+        ///     url as IUrlHelper
         /// </param>
         /// <param name="controllerBase">
-        /// controllerBase jako ControllerBase
-        /// controllerBase as ControllerBase
+        ///     controllerBase jako ControllerBase
+        ///     controllerBase as ControllerBase
         /// </param>
         /// <returns>
-        /// Lista dostępnych tras jako List dla Route
-        /// List of available routes as List for Route
+        ///     Lista dostępnych tras jako List dla Route
+        ///     List of available routes as List for Route
         /// </returns>
-        public static List<ControllerRoutingActions> GetRouteAction(IActionDescriptorCollectionProvider provider, string controllerName, IUrlHelper url, ControllerBase controllerBase)
+        public static List<ControllerRoutingActions> GetRouteAction(IActionDescriptorCollectionProvider provider,
+            string controllerName, IUrlHelper url, ControllerBase controllerBase)
         {
             try
             {
                 var controllerRoutingActionsList = new List<ControllerRoutingActions>();
-                provider.ActionDescriptors.Items.ToList().Where(w => w.RouteValues["Controller"] == controllerName).ToList().ForEach(actionDescriptorItem =>
-                {
-                    var routeParameters = new Dictionary<string, string>();
-                    actionDescriptorItem.Parameters.ToList().ForEach(parameter =>
+                provider.ActionDescriptors.Items.ToList().Where(w => w.RouteValues["Controller"] == controllerName)
+                    .ToList().ForEach(actionDescriptorItem =>
                     {
-                        routeParameters.Add(parameter.Name, parameter.ParameterType.Name);
+                        var routeParameters = new Dictionary<string, string>();
+                        actionDescriptorItem.Parameters.ToList().ForEach(parameter =>
+                        {
+                            routeParameters.Add(parameter.Name, parameter.ParameterType.Name);
+                        });
+                        var routeUrlAction = null != actionDescriptorItem.AttributeRouteInfo.Template &&
+                                             !string.IsNullOrWhiteSpace(
+                                                 actionDescriptorItem.AttributeRouteInfo.Template)
+                            ? actionDescriptorItem.AttributeRouteInfo.Template
+                            : url.Action(actionDescriptorItem.RouteValues["Action"],
+                                actionDescriptorItem.RouteValues["Controller"]);
+                        var controllerRoutingAction = new ControllerRoutingActions
+                        {
+                            RouteId = actionDescriptorItem.Id,
+                            RouteController = actionDescriptorItem.RouteValues["Controller"],
+                            RouteAction = actionDescriptorItem.RouteValues["Action"],
+                            RouteUrlAction = routeUrlAction,
+                            RouteUrlAbsoluteAction =
+                                string.Format("{0}://{1}/{2}", controllerBase.Request.Scheme,
+                                    controllerBase.Request.Host, routeUrlAction),
+                            RouteParameters = routeParameters,
+                            RouteAttributeInfoTemplate = actionDescriptorItem.AttributeRouteInfo.Template
+                        };
+                        controllerRoutingActionsList.Add(controllerRoutingAction);
                     });
-                    var routeUrlAction = null != actionDescriptorItem.AttributeRouteInfo.Template && !string.IsNullOrWhiteSpace(actionDescriptorItem.AttributeRouteInfo.Template)
-                        ? actionDescriptorItem.AttributeRouteInfo.Template
-                        : url.Action(actionDescriptorItem.RouteValues["Action"], actionDescriptorItem.RouteValues["Controller"]);
-                    var controllerRoutingAction = new ControllerRoutingActions
-                    {
-                        RouteId = actionDescriptorItem.Id,
-                        RouteController = actionDescriptorItem.RouteValues["Controller"],
-                        RouteAction = actionDescriptorItem.RouteValues["Action"],
-                        RouteUrlAction = routeUrlAction,
-                        RouteUrlAbsoluteAction = string.Format("{0}://{1}/{2}", controllerBase.Request.Scheme, controllerBase.Request.Host, routeUrlAction),
-                        RouteParameters = routeParameters,
-                        RouteAttributeInfoTemplate = actionDescriptorItem.AttributeRouteInfo.Template,
-                    };
-                    controllerRoutingActionsList.Add(controllerRoutingAction);
-                });
                 return controllerRoutingActionsList;
             }
             catch (Exception e)
             {
-                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                Log4net.Error(
+                    string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
+                        e.StackTrace), e);
             }
+
             return null;
         }
+
         #endregion
 
         #region public static async Task<List<ControllerRoutingActions>> GetRouteActionAsync...
+
         /// <summary>
-        /// Pobierz listę akcji (tras) dostępnych dla kontrolera asynchronicznie
-        /// Get the list of actions (routes) available for the controller asynchronously
+        ///     Pobierz listę akcji (tras) dostępnych dla kontrolera asynchronicznie
+        ///     Get the list of actions (routes) available for the controller asynchronously
         /// </summary>
         /// <param name="provider">
-        /// Dostawca kolekcji deskryptorów akcji provider jako IActionDescriptorCollectionProvider
-        /// Provider's action descriptor collection provider as IActionDescriptorCollectionProvider
+        ///     Dostawca kolekcji deskryptorów akcji provider jako IActionDescriptorCollectionProvider
+        ///     Provider's action descriptor collection provider as IActionDescriptorCollectionProvider
         /// </param>
         /// <param name="controllerName">
-        /// Nazwa kontrolera controllerName jako string
-        /// The name of controller controllerName as a string
+        ///     Nazwa kontrolera controllerName jako string
+        ///     The name of controller controllerName as a string
         /// </param>
         /// <param name="Url">
-        /// url jako IUrlHelper
-        /// url as IUrlHelper
+        ///     url jako IUrlHelper
+        ///     url as IUrlHelper
         /// </param>
         /// <param name="controllerBase">
-        /// controllerBase jako ControllerBase
-        /// controllerBase as ControllerBase
+        ///     controllerBase jako ControllerBase
+        ///     controllerBase as ControllerBase
         /// </param>
         /// <returns>
-        /// Lista dostępnych tras jako List dla Route
-        /// List of available routes as List for Route
+        ///     Lista dostępnych tras jako List dla Route
+        ///     List of available routes as List for Route
         /// </returns>
-        public static async Task<List<ControllerRoutingActions>> GetRouteActionAsync(IActionDescriptorCollectionProvider provider, string controllerName, IUrlHelper url, ControllerBase controllerBase)
+        public static async Task<List<ControllerRoutingActions>> GetRouteActionAsync(
+            IActionDescriptorCollectionProvider provider, string controllerName, IUrlHelper url,
+            ControllerBase controllerBase)
         {
             try
             {
@@ -120,97 +144,103 @@ namespace NetAppCommon
             {
                 await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
             }
+
             return null;
         }
+
         #endregion
 
         #region public static KendoGrid<List<ControllerRoutingActions>> GetRouteActionForKendoGrid...
+
         /// <summary>
-        /// Pobierz listę akcji (tras) dostępnych dla kontrolera i zwróć listę dla widoku Kendo
-        /// Get the list of actions (routes) available for the controller and return the list for the Kendo view
+        ///     Pobierz listę akcji (tras) dostępnych dla kontrolera i zwróć listę dla widoku Kendo
+        ///     Get the list of actions (routes) available for the controller and return the list for the Kendo view
         /// </summary>
         /// <param name="provider">
-        /// Dostawca kolekcji deskryptorów akcji provider jako IActionDescriptorCollectionProvider
-        /// Provider's action descriptor collection provider as IActionDescriptorCollectionProvider
+        ///     Dostawca kolekcji deskryptorów akcji provider jako IActionDescriptorCollectionProvider
+        ///     Provider's action descriptor collection provider as IActionDescriptorCollectionProvider
         /// </param>
         /// <param name="controllerName">
-        /// Nazwa kontrolera controllerName jako string
-        /// The name of controller controllerName as a string
+        ///     Nazwa kontrolera controllerName jako string
+        ///     The name of controller controllerName as a string
         /// </param>
         /// <param name="Url">
-        /// url jako IUrlHelper
-        /// url as IUrlHelper
+        ///     url jako IUrlHelper
+        ///     url as IUrlHelper
         /// </param>
         /// <param name="controllerBase">
-        /// controllerBase jako ControllerBase
-        /// controllerBase as ControllerBase
+        ///     controllerBase jako ControllerBase
+        ///     controllerBase as ControllerBase
         /// </param>
         /// <returns>
-        /// Lista dostępnych tras routingu jako List dla KendoGrid
-        /// List of available routing routes as List for KendoGrid
+        ///     Lista dostępnych tras routingu jako List dla KendoGrid
+        ///     List of available routing routes as List for KendoGrid
         /// </returns>
-        public static KendoGrid<List<ControllerRoutingActions>> GetRouteActionForKendoGrid(IActionDescriptorCollectionProvider provider, string controllerName, IUrlHelper url, ControllerBase controllerBase)
+        public static KendoGrid<List<ControllerRoutingActions>> GetRouteActionForKendoGrid(
+            IActionDescriptorCollectionProvider provider, string controllerName, IUrlHelper url,
+            ControllerBase controllerBase)
         {
             try
             {
                 List<ControllerRoutingActions> routes = GetRouteAction(provider, controllerName, url, controllerBase);
                 if (null != routes && routes.Count > 0)
                 {
-                    return new KendoGrid<List<ControllerRoutingActions>>
-                    {
-                        Total = routes.Count,
-                        Data = routes,
-                    };
+                    return new KendoGrid<List<ControllerRoutingActions>> { Total = routes.Count, Data = routes };
                 }
             }
             catch (Exception e)
             {
-                Log4net.Error(string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                Log4net.Error(
+                    string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
+                        e.StackTrace), e);
             }
+
             return null;
         }
+
         #endregion
 
         #region public static async Task<KendoGrid<List<Route>>> GetRouteActionForKendoGridAsync...
+
         /// <summary>
-        /// Pobierz listę akcji (tras) dostępnych dla kontrolera i zwróć listę dla widoku Kendo
-        /// Get the list of actions (routes) available for the controller and return the list for the Kendo view
+        ///     Pobierz listę akcji (tras) dostępnych dla kontrolera i zwróć listę dla widoku Kendo
+        ///     Get the list of actions (routes) available for the controller and return the list for the Kendo view
         /// </summary>
         /// <param name="provider">
-        /// Dostawca kolekcji deskryptorów akcji provider jako IActionDescriptorCollectionProvider
-        /// Provider's action descriptor collection provider as IActionDescriptorCollectionProvider
+        ///     Dostawca kolekcji deskryptorów akcji provider jako IActionDescriptorCollectionProvider
+        ///     Provider's action descriptor collection provider as IActionDescriptorCollectionProvider
         /// </param>
         /// <param name="controllerName">
-        /// Nazwa kontrolera controllerName jako string
-        /// The name of controller controllerName as a string
+        ///     Nazwa kontrolera controllerName jako string
+        ///     The name of controller controllerName as a string
         /// </param>
         /// <param name="Url">
-        /// url jako IUrlHelper
-        /// url as IUrlHelper
+        ///     url jako IUrlHelper
+        ///     url as IUrlHelper
         /// </param>
         /// <param name="controllerBase">
-        /// controllerBase jako ControllerBase
-        /// controllerBase as ControllerBase
+        ///     controllerBase jako ControllerBase
+        ///     controllerBase as ControllerBase
         /// </param>
         /// <returns>
-        /// Lista dostępnych tras routingu jako List dla KendoGrid
-        /// List of available routing routes as List for KendoGrid
+        ///     Lista dostępnych tras routingu jako List dla KendoGrid
+        ///     List of available routing routes as List for KendoGrid
         /// </returns>
-        public static async Task<KendoGrid<List<ControllerRoutingActions>>> GetRouteActionForKendoGridAsync(IActionDescriptorCollectionProvider provider, string controllerName, IUrlHelper url, ControllerBase controllerBase)
+        public static async Task<KendoGrid<List<ControllerRoutingActions>>> GetRouteActionForKendoGridAsync(
+            IActionDescriptorCollectionProvider provider, string controllerName, IUrlHelper url,
+            ControllerBase controllerBase)
         {
             try
             {
                 return await Task.Run(async () =>
                 {
-                    List<ControllerRoutingActions> routes = await GetRouteActionAsync(provider, controllerName, url, controllerBase);
+                    List<ControllerRoutingActions> routes =
+                        await GetRouteActionAsync(provider, controllerName, url, controllerBase);
                     if (null != routes && routes.Count > 0)
                     {
-                        return new KendoGrid<List<ControllerRoutingActions>>
-                        {
-                            Total = routes.Count,
-                            Data = routes,
-                        };
+                        return new KendoGrid<List<ControllerRoutingActions>> { Total = routes.Count, Data = routes };
                     }
+
                     return null;
                 });
             }
@@ -218,9 +248,12 @@ namespace NetAppCommon
             {
                 await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
             }
+
             return null;
         }
+
         #endregion
     }
+
     #endregion
 }

@@ -1,3 +1,5 @@
+#region using
+
 using System;
 using System.IO;
 using System.Reflection;
@@ -7,70 +9,83 @@ using System.ServiceModel.Dispatcher;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using log4net;
 using Microsoft.Extensions.Logging;
+
+#endregion
 
 namespace NetAppCommon.Logging
 {
     #region public class SoapClientMessageInspector : IClientMessageInspector
+
     /// <summary>
-    /// Inspektor wiadomości klienta SOAP
-    /// Soap Client Message Inspector
+    ///     Inspektor wiadomości klienta SOAP
+    ///     Soap Client Message Inspector
     /// </summary>
     public class SoapClientMessageInspector : IClientMessageInspector
     {
         #region private readonly log4net.ILog log4net
-        /// <summary>
-        /// 
-        /// </summary>
-        private readonly log4net.ILog log4net = Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod().DeclaringType);
-        #endregion
 
-        # region public ILogger<SoapClientMessageInspector> Logger { get; }
         /// <summary>
-        /// Interfejs ILogger typu SoapClientMessageInspector
-        /// ILogger interface of type SoapClientMessageInspector
         /// </summary>
-        public ILogger<SoapClientMessageInspector> Logger { get; }
+        private readonly ILog log4net =
+            Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
+
         #endregion
 
         #region public SoapClientMessageInspector()
+
         /// <summary>
-        /// Konstruktor bez parametrów
-        /// Constructor with no parameters
+        ///     Konstruktor bez parametrów
+        ///     Constructor with no parameters
         /// </summary>
         public SoapClientMessageInspector()
         {
             //Logger = (ILogger<SoapClientMessageInspector>)log4net.Logger;
         }
+
         #endregion
 
         #region public SoapClientMessageInspector(ILogger<SoapClientMessageInspector> logger)
+
         /// <summary>
-        /// Konstruktor z parametrem ILogger
-        /// Constructor with the ILogger parameter
+        ///     Konstruktor z parametrem ILogger
+        ///     Constructor with the ILogger parameter
         /// </summary>
         /// <param name="logger">
-        /// Interfejs ILogger typu SoapClientMessageInspector
-        /// ILogger interface of type SoapClientMessageInspector
+        ///     Interfejs ILogger typu SoapClientMessageInspector
+        ///     ILogger interface of type SoapClientMessageInspector
         /// </param>
         public SoapClientMessageInspector(ILogger<SoapClientMessageInspector> logger)
         {
-            Logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
+
+        #endregion
+
+        # region public ILogger<SoapClientMessageInspector> Logger { get; }
+
+        /// <summary>
+        ///     Interfejs ILogger typu SoapClientMessageInspector
+        ///     ILogger interface of type SoapClientMessageInspector
+        /// </summary>
+        public ILogger<SoapClientMessageInspector> Logger { get; }
+
         #endregion
 
         #region public void AfterReceiveReply(ref Message reply, object correlationState)
+
         /// <summary>
-        /// Po otrzymaniu odpowiedzi
-        /// After Receive Reply
+        ///     Po otrzymaniu odpowiedzi
+        ///     After Receive Reply
         /// </summary>
         /// <param name="reply">
-        /// Referencja do wiadomości odpowiedzi jako Message
-        /// A reference to the reply message as Message
+        ///     Referencja do wiadomości odpowiedzi jako Message
+        ///     A reference to the reply message as Message
         /// </param>
         /// <param name="correlationState">
-        /// Stan korelacji jako obiekt
-        /// Correlation state as an object
+        ///     Stan korelacji jako obiekt
+        ///     Correlation state as an object
         /// </param>
         public void AfterReceiveReply(ref Message reply, object correlationState)
         {
@@ -89,13 +104,15 @@ namespace NetAppCommon.Logging
                             xmlWriter.Flush();
                             var pattern = @"http\:\/\/ICASA-GROUP\.WebServices";
                             var replacement = @"http://ICASA.WebServices";
-                            var stringReplace = Regex.Replace(stringWriter.GetStringBuilder().ToString(), pattern, replacement);
+                            var stringReplace = Regex.Replace(stringWriter.GetStringBuilder().ToString(), pattern,
+                                replacement);
                             using (var memoryStream = new MemoryStream(Encoding.ASCII.GetBytes(stringReplace)))
                             {
                                 xmlDocument.Load(memoryStream);
                             }
                         }
                     }
+
                     log4net.Debug(xmlDocument.OuterXml);
                     /// Oryginal
                     /// Logger.LogTrace(xmlDocument.OuterXml);
@@ -112,23 +129,25 @@ namespace NetAppCommon.Logging
                 log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
             }
         }
+
         #endregion
 
         #region public object BeforeSendRequest(ref Message message, IClientChannel clientChannel)
+
         /// <summary>
-        /// Przed wysłaniem
+        ///     Przed wysłaniem
         /// </summary>
         /// <param name="message">
-        /// Referencja do wiadomości w żądaniu
-        /// Reference to the message in the request
+        ///     Referencja do wiadomości w żądaniu
+        ///     Reference to the message in the request
         /// </param>
         /// <param name="clientChannel">
-        /// Kanał wymiany
-        /// Exchange channel
+        ///     Kanał wymiany
+        ///     Exchange channel
         /// </param>
         /// <returns>
-        /// null
-        /// mull
+        ///     null
+        ///     mull
         /// </returns>
         public object BeforeSendRequest(ref Message message, IClientChannel clientChannel)
         {
@@ -149,22 +168,25 @@ namespace NetAppCommon.Logging
             {
                 log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
             }
+
             return null;
         }
+
         #endregion
 
         #region private XmlDocument GetDocument(Message message)
+
         /// <summary>
-        /// Pobierz treść dokumentu jako obiekt XML
-        /// Get the body of the xmlDocument as an XML object
+        ///     Pobierz treść dokumentu jako obiekt XML
+        ///     Get the body of the xmlDocument as an XML object
         /// </summary>
         /// <param name="message">
-        /// Referencja do wiadomości w żądaniu
-        /// Reference to the message in the request
+        ///     Referencja do wiadomości w żądaniu
+        ///     Reference to the message in the request
         /// </param>
         /// <returns>
-        /// Treść dokumentu jako obiekt XML
-        /// The body of the xmlDocument as an XML object
+        ///     Treść dokumentu jako obiekt XML
+        ///     The body of the xmlDocument as an XML object
         /// </returns>
         private XmlDocument GetDocument(Message message)
         {
@@ -181,15 +203,19 @@ namespace NetAppCommon.Logging
                     // load memory stream into a xmlDocument
                     xmlDocument.Load(memoryStream);
                 }
+
                 return xmlDocument;
             }
             catch (Exception e)
             {
                 log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
             }
+
             return null;
         }
+
         #endregion
     }
+
     #endregion
 }

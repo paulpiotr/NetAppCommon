@@ -1,9 +1,9 @@
 ﻿namespace NetAppCommon.Models
 {
     /// <summary>
-    /// Model danych tworzących połączenie do bazy danych
+    ///     Model danych tworzących połączenie do bazy danych
     /// </summary>
-    public partial class MssqlConnectionConfig
+    public class MssqlConnectionConfig
     {
         ///Data Source
         ///Server
