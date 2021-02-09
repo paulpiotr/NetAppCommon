@@ -6,7 +6,6 @@ using System.Reflection;
 using log4net;
 using NetAppCommon.AppSettings.Models.Base;
 using NetAppCommon.Helpers.Cache;
-// ReSharper disable All
 
 #endregion
 
@@ -22,61 +21,111 @@ namespace NetAppCommon.AppSettings.Models
     /// </summary>
     public sealed class AppSettingsModel : AppSettingsBaseModel
     {
-        ///Important !!!
-
         #region public AppSettingsModel()
 
+        /// <summary>
+        ///     Ważne - konstruktor
+        ///     Important - the constructor
+        /// </summary>
         public AppSettingsModel()
         {
             try
             {
-                var memoryCacheProvider = MemoryCacheProvider.GetInstance();
-                var filePath = memoryCacheProvider.Get("NetAppCommon.AppSettings.Models.FilePath");
-                if (null == filePath)
+                if (null != BaseDirectory && null != UserProfileDirectory)
                 {
-                    var pathAppsettingsSetup = Path.Combine(BaseDirectory, "appsettings.setup.json");
-                    var pathAppsettingsBase = Path.Combine(BaseDirectory, FileName);
-                    var pathAppsettingsUserProfile = Path.Combine(UserProfileDirectory, FileName);
-                    if (
-                        File.Exists(pathAppsettingsSetup) && File.Exists(pathAppsettingsBase) && File.Exists(pathAppsettingsUserProfile)
-                    )
+                    var memoryCacheProvider = MemoryCacheProvider.GetInstance();
+                    object filePath = memoryCacheProvider.Get("NetAppCommon.AppSettings.Models.FilePath");
+                    if (null == filePath)
                     {
-                        if (File.GetLastWriteTime(pathAppsettingsSetup) >
-                            File.GetLastWriteTime(pathAppsettingsUserProfile))
+                        var pathAppSettingsSetup = Path.Combine(BaseDirectory, "appsettings.setup.json");
+                        var pathAppSettingsBase = Path.Combine(BaseDirectory, FileName);
+                        var pathAppSettingsBaseUser = Path.Combine(UserProfileDirectory, FileName);
+                        if (
+                            File.Exists(pathAppSettingsSetup)
+                            &&
+                            File.Exists(pathAppSettingsBase)
+                            //&&
+                            //File.Exists(pathAppSettingsBaseUser)
+                        )
                         {
-                            try
+                            if (File.GetLastWriteTime(pathAppSettingsSetup) >
+                                File.GetLastWriteTime(pathAppSettingsBaseUser))
                             {
-                                var appsettingsSetup = new AppSettingsModel(pathAppsettingsSetup);
-                                var appsettingsBase = new AppSettingsModel(pathAppsettingsBase);
-                                var appsettingsUserProfile = new AppSettingsModel(pathAppsettingsUserProfile);
-                                appsettingsBase.ConnectionString = appsettingsSetup.ConnectionString ??
-                                                                   appsettingsBase.ConnectionString;
-                                appsettingsBase.AppSettingsRepository.Save(appsettingsBase);
-                                appsettingsUserProfile.ConnectionString = appsettingsSetup.ConnectionString ??
-                                                                          appsettingsUserProfile.ConnectionString;
-                                appsettingsUserProfile.AppSettingsRepository.Save(appsettingsUserProfile);
+                                try
+                                {
+                                    var appsettingsSetup = new AppSettingsModel(pathAppSettingsSetup);
+                                    var appsettingsBase = new AppSettingsModel(pathAppSettingsBase);
+                                    var appsettingsBaseUser = new AppSettingsModel(pathAppSettingsBaseUser);
+
+                                    appsettingsBase.ConnectionString = appsettingsSetup.ConnectionString ??
+                                                                       appsettingsBase.ConnectionString;
+
+                                    appsettingsBase.LastInstallDate =
+                                        appsettingsSetup.AppSettingsRepository?.GetValue<string>(appsettingsSetup,
+                                            nameof(LastInstallDate));
+
+                                    appsettingsBase.ProductCode =
+                                        appsettingsSetup.AppSettingsRepository?.GetValue<string>(appsettingsSetup,
+                                            nameof(ProductCode));
+
+                                    appsettingsBase.ProductVersion =
+                                        appsettingsSetup.AppSettingsRepository?.GetValue<string>(appsettingsSetup,
+                                            nameof(ProductVersion));
+
+                                    appsettingsBase.UpgradeCode =
+                                        appsettingsSetup.AppSettingsRepository?.GetValue<string>(appsettingsSetup,
+                                            nameof(UpgradeCode));
+
+                                    //appsettingsBaseappsettingsBase.AppSettingsRepository?.Save(appsettingsBase);
+                                    appsettingsBase.AppSettingsRepository?.MergeAndSave(appsettingsBase);
+
+                                    appsettingsBaseUser.ConnectionString = appsettingsSetup.ConnectionString ??
+                                                                           appsettingsBaseUser.ConnectionString;
+
+                                    appsettingsBaseUser.LastInstallDate =
+                                        appsettingsSetup.AppSettingsRepository?.GetValue<string>(appsettingsSetup,
+                                            nameof(LastInstallDate));
+
+                                    appsettingsBaseUser.ProductCode =
+                                        appsettingsSetup.AppSettingsRepository?.GetValue<string>(appsettingsSetup,
+                                            nameof(ProductCode));
+
+                                    appsettingsBaseUser.ProductVersion =
+                                        appsettingsSetup.AppSettingsRepository?.GetValue<string>(appsettingsSetup,
+                                            nameof(ProductVersion));
+
+                                    appsettingsBaseUser.UpgradeCode =
+                                        appsettingsSetup.AppSettingsRepository?.GetValue<string>(appsettingsSetup,
+                                            nameof(UpgradeCode));
+
+                                    //appsettingsBaseUser.AppSettingsRepository?.Save(appsettingsBaseUser);
+                                    appsettingsBaseUser.AppSettingsRepository?.MergeAndSave(appsettingsBaseUser);
 #if DEBUG
-                                _log4Net.Debug(
-                                    $"NetAppCommon.AppSettings.Models appsettingsSetup {pathAppsettingsSetup} {File.GetLastWriteTime(pathAppsettingsSetup)} {appsettingsSetup.ConnectionString}");
-                                _log4Net.Debug(
-                                    $"NetAppCommon.AppSettings.Models appsettingsBase {pathAppsettingsBase} {File.GetLastWriteTime(pathAppsettingsBase)} {appsettingsBase.ConnectionString}");
-                                _log4Net.Debug(
-                                    $"NetAppCommon.AppSettings.Models appsettingsUserProfile {pathAppsettingsUserProfile} {File.GetLastWriteTime(pathAppsettingsUserProfile)} {appsettingsUserProfile.ConnectionString}");
+                                    _log4Net.Debug(
+                                        $"NetAppCommon.AppSettings.Models appsettingsSetup {pathAppSettingsSetup} {File.GetLastWriteTime(pathAppSettingsSetup)} {appsettingsSetup.ConnectionString}");
+                                    _log4Net.Debug(
+                                        $"NetAppCommon.AppSettings.Models appsettingsBase {pathAppSettingsBase} {File.GetLastWriteTime(pathAppSettingsBase)} {appsettingsBase.ConnectionString}");
+                                    _log4Net.Debug(
+                                        $"NetAppCommon.AppSettings.Models appsettingsBaseUser {pathAppSettingsBaseUser} {File.GetLastWriteTime(pathAppSettingsBaseUser)} {appsettingsBaseUser.ConnectionString}");
 #endif
-                            }
-                            catch (Exception e)
-                            {
-                                _log4Net.Error(
-                                    $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
+                                    File.Delete(pathAppSettingsSetup);
+                                }
+                                catch (Exception e)
+                                {
+                                    _log4Net.Error(
+                                        $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n",
+                                        e);
+                                }
                             }
                         }
+
+                        AppSettingsRepository?.MergeAndCopyToUserDirectory(this);
+                        memoryCacheProvider.Put("NetAppCommon.AppSettings.Models.FilePath", FilePath,
+                            TimeSpan.FromDays(1));
                     }
 
-                    AppSettingsRepository.MergeAndCopyToUserDirectory(this);
-                    memoryCacheProvider.Put("NetAppCommon.AppSettings.Models.FilePath", FilePath, TimeSpan.FromDays(1));
+                    FilePath = (string)(filePath ?? Path.Combine(UserProfileDirectory, FileName));
                 }
-
-                FilePath = (string)(filePath ?? Path.Combine(UserProfileDirectory, FileName));
             }
             catch (Exception e)
             {
@@ -87,13 +136,11 @@ namespace NetAppCommon.AppSettings.Models
 
         #endregion
 
-        ///Important !!!
-
         #region public static new AppSettingsModel GetInstance()
 
         /// <summary>
-        ///     Pobierz statyczną referencję do instancji AppSettingsBaseModel
-        ///     Get a static reference to the AppSettingsBaseModel instance
+        ///     Ważne - Pobierz statyczną referencję do instancji AppSettingsBaseModel
+        ///     Important - Get a static reference to the AppSettingsBaseModel instance
         /// </summary>
         /// <returns>
         ///     Statyczna referencja do instancji AppSettingsBaseModel
@@ -103,10 +150,16 @@ namespace NetAppCommon.AppSettings.Models
 
         #endregion
 
-        ///Important !!!
-
         #region public AppSettingsModel(string filePath)
 
+        /// <summary>
+        ///     Ważne - konstruktor
+        ///     Important - the constructor
+        /// </summary>
+        /// <param name="filePath">
+        ///     Ścieżka do pliku konfiguracji jako string
+        ///     Path to the configuration file as a string
+        /// </param>
         public AppSettingsModel(string filePath)
         {
             if (File.Exists(filePath))
@@ -118,13 +171,11 @@ namespace NetAppCommon.AppSettings.Models
 
         #endregion
 
-        ///Important !!!
-
         #region public static new AppSettingsModel GetInstance()
 
         /// <summary>
-        ///     Pobierz statyczną referencję do instancji AppSettingsBaseModel
-        ///     Get a static reference to the AppSettingsBaseModel instance
+        ///     Ważne - Pobierz statyczną referencję do instancji AppSettingsBaseModel
+        ///     Important - Get a static reference to the AppSettingsBaseModel instance
         /// </summary>
         /// <returns>
         ///     Statyczna referencja do instancji AppSettingsBaseModel
@@ -155,7 +206,7 @@ namespace NetAppCommon.AppSettings.Models
 
         private new string _fileName = Filename;
 
-        public sealed override string FileName
+        public override string FileName
         {
             get => _fileName;
             protected set
@@ -163,7 +214,7 @@ namespace NetAppCommon.AppSettings.Models
                 if (value != _fileName)
                 {
                     _fileName = value;
-                    OnPropertyChanged("FileName");
+                    OnPropertyChanged(nameof(FileName));
                 }
             }
         }
@@ -188,7 +239,118 @@ namespace NetAppCommon.AppSettings.Models
                 if (value != _connectionStringName)
                 {
                     _connectionStringName = value;
-                    OnPropertyChanged("ConnectionStringName");
+                    OnPropertyChanged(nameof(ConnectionStringName));
+                }
+            }
+        }
+
+        #endregion
+
+        #region private string _lastInstallDate; public string LastInstallDate
+
+        private string? _lastInstallDate;
+
+        public string? LastInstallDate
+        {
+            get
+            {
+                if (null == _lastInstallDate)
+                {
+                    _lastInstallDate = AppSettingsRepository?.GetValue<string>(this, nameof(LastInstallDate));
+                }
+
+                return _lastInstallDate;
+            }
+            set
+            {
+                if (value != _lastInstallDate)
+                {
+                    _lastInstallDate = value;
+                    OnPropertyChanged(nameof(LastInstallDate));
+                }
+            }
+        }
+
+        #endregion
+
+        #region private string _productCode; public string ProductCode
+
+        private string? _productCode;
+
+        public string? ProductCode
+        {
+            get
+            {
+                if (null == _productCode)
+                {
+                    _productCode = AppSettingsRepository?.GetValue<string>(this,
+                        nameof(ProductCode));
+                }
+
+                return _productCode;
+            }
+            set
+            {
+                if (value != _productCode)
+                {
+                    _productCode = value;
+                    OnPropertyChanged(nameof(ProductCode));
+                }
+            }
+        }
+
+        #endregion
+
+        #region private string _productVersion; public string ProductVersion
+
+        private string? _productVersion;
+
+        public string? ProductVersion
+        {
+            get
+            {
+                if (null == _productVersion)
+                {
+                    _productVersion = AppSettingsRepository?.GetValue<string>(this,
+                        nameof(ProductVersion));
+                }
+
+                return _productVersion;
+            }
+            set
+            {
+                if (value != _productVersion)
+                {
+                    _productVersion = value;
+                    OnPropertyChanged(nameof(ProductVersion));
+                }
+            }
+        }
+
+        #endregion
+
+        #region private string _upgradeCode; public string UpgradeCode
+
+        private string? _upgradeCode;
+
+        public string? UpgradeCode
+        {
+            get
+            {
+                if (null == _upgradeCode)
+                {
+                    _upgradeCode = AppSettingsRepository?.GetValue<string>(this,
+                        nameof(UpgradeCode));
+                }
+
+                return _upgradeCode;
+            }
+            set
+            {
+                if (value != _upgradeCode)
+                {
+                    _upgradeCode = value;
+                    OnPropertyChanged(nameof(UpgradeCode));
                 }
             }
         }

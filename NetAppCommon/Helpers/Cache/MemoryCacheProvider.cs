@@ -35,7 +35,7 @@ namespace NetAppCommon.Helpers.Cache
 
         public (bool hit, object value) TryGet(string key)
         {
-            var cacheHit = GetMemoryCache().TryGetValue(key, out var value);
+            var cacheHit = GetMemoryCache().TryGetValue(key, out object value);
             return (cacheHit, value);
         }
 
@@ -66,7 +66,7 @@ namespace NetAppCommon.Helpers.Cache
 
         public object Get(string key)
         {
-            (bool hit, object value) = TryGet(key);
+            (var hit, object value) = TryGet(key);
             if (hit)
             {
                 return value;
@@ -77,7 +77,7 @@ namespace NetAppCommon.Helpers.Cache
 
         public object Get(string key, object @object, double? timeSpan)
         {
-            (bool hit, object value) = TryGet(key);
+            (var hit, object value) = TryGet(key);
             if (hit)
             {
                 return value;
@@ -89,7 +89,7 @@ namespace NetAppCommon.Helpers.Cache
 
         public object Get(string key, object @object, Ttl ttl)
         {
-            (bool hit, object value) = TryGet(key);
+            (var hit, object value) = TryGet(key);
             if (hit)
             {
                 return value;

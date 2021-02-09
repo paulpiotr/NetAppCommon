@@ -15,7 +15,7 @@ using static System.String;
 
 #endregion
 
-namespace NetAppCommon.AppSettings.Repositories
+namespace NetAppCommon.AppSettings.Repositories.Base
 {
     #region public class AppSettingsRepositoryBase<TAppSettings> : IAppSettingsRepository<TAppSettings> where TAppSettings : AppSettingsBaseModel, new()
 
@@ -69,7 +69,7 @@ namespace NetAppCommon.AppSettings.Repositories
                     if (null != originalObject && null != appSettingsObject)
                     {
                         originalObject.Merge(appSettingsObject,
-                            new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Union });
+                            new JsonMergeSettings {MergeArrayHandling = MergeArrayHandling.Union});
                         FileHelper.GetInstance().TimeoutAction(() =>
                         {
                             File.WriteAllText(filePath, originalObject.ToString());
@@ -202,9 +202,10 @@ namespace NetAppCommon.AppSettings.Repositories
                 var destFileName = Path.Combine(appSettings.UserProfileDirectory, fileName);
                 if (File.Exists(sourceFileName) && !File.Exists(destFileName))
                 {
-                    if (!string.IsNullOrWhiteSpace(destFileName) && !Directory.Exists(Path.GetDirectoryName(destFileName)))
+                    if (!IsNullOrWhiteSpace(destFileName) && !Directory.Exists(Path.GetDirectoryName(destFileName)))
                     {
-                        Directory.CreateDirectory(Path.GetDirectoryName(destFileName) ?? throw new InvalidOperationException());
+                        Directory.CreateDirectory(Path.GetDirectoryName(destFileName) ??
+                                                  throw new InvalidOperationException());
                     }
 
                     File.Copy(sourceFileName, destFileName);
@@ -276,7 +277,8 @@ namespace NetAppCommon.AppSettings.Repositories
                     {
                         if (!Directory.Exists(Path.GetDirectoryName(destFileName)))
                         {
-                            Directory.CreateDirectory(Path.GetDirectoryName(destFileName) ?? throw new InvalidOperationException());
+                            Directory.CreateDirectory(Path.GetDirectoryName(destFileName) ??
+                                                      throw new InvalidOperationException());
                         }
 
                         if (!File.Exists(destFileName))
@@ -553,5 +555,6 @@ namespace NetAppCommon.AppSettings.Repositories
 
         #endregion
     }
+
     #endregion
 }

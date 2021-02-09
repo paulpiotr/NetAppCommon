@@ -108,7 +108,8 @@ namespace NetAppCommon.Helpers
                             $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
                     }
 
-                    if ((await (context.Database ?? throw new InvalidOperationException()).GetPendingMigrationsAsync()).Any())
+                    if ((await (context.Database ?? throw new InvalidOperationException()).GetPendingMigrationsAsync())
+                        .Any())
                     {
                         //#if DEBUG
                         //                        Log4net.Debug($"Migrate { context?.Database?.GetDbConnection()?.ConnectionString }");

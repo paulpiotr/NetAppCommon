@@ -100,6 +100,7 @@ namespace NetAppCommon.Crypto.BouncyCastle.Models.Base
                 {
                     _keyPair = RsaKeyPairGenerator.GenerateKeyPair();
                 }
+
                 return _keyPair;
             }
             set

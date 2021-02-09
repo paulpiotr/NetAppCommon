@@ -11,7 +11,7 @@ using System.Xml.Serialization;
 using log4net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using NetAppCommon.AppSettings.Repositories;
+using NetAppCommon.AppSettings.Repositories.Base;
 using NetAppCommon.Crypto.AesCryptography.Services;
 using NetAppCommon.Crypto.BouncyCastle.Models.Base;
 using NetAppCommon.Crypto.BouncyCastle.Services;
@@ -869,7 +869,7 @@ namespace NetAppCommon.AppSettings.Models.Base
                     if (!string.IsNullOrWhiteSpace(ConnectionStringName) &&
                         null != _connectionString && !string.IsNullOrWhiteSpace(_connectionString))
                     {
-                        ConnectionStrings = new Dictionary<string, string> { { ConnectionStringName, _connectionString } };
+                        ConnectionStrings = new Dictionary<string, string> {{ConnectionStringName, _connectionString}};
                     }
                 }
             }
@@ -890,9 +890,10 @@ namespace NetAppCommon.AppSettings.Models.Base
         {
             get
             {
-                if (null != ConnectionStringName && !string.IsNullOrWhiteSpace(ConnectionStringName) && null != ConnectionString && !string.IsNullOrWhiteSpace(ConnectionString))
+                if (null != ConnectionStringName && !string.IsNullOrWhiteSpace(ConnectionStringName) &&
+                    null != ConnectionString && !string.IsNullOrWhiteSpace(ConnectionString))
                 {
-                    _connectionStrings = new Dictionary<string, string> { { ConnectionStringName, ConnectionString } };
+                    _connectionStrings = new Dictionary<string, string> {{ConnectionStringName, ConnectionString}};
                 }
 
                 return _connectionStrings;

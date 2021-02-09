@@ -185,7 +185,7 @@ namespace NetAppCommon
                 List<ControllerRoutingActions> routes = GetRouteAction(provider, controllerName, url, controllerBase);
                 if (null != routes && routes.Count > 0)
                 {
-                    return new KendoGrid<List<ControllerRoutingActions>> { Total = routes.Count, Data = routes };
+                    return new KendoGrid<List<ControllerRoutingActions>> {Total = routes.Count, Data = routes};
                 }
             }
             catch (Exception e)
@@ -238,7 +238,7 @@ namespace NetAppCommon
                         await GetRouteActionAsync(provider, controllerName, url, controllerBase);
                     if (null != routes && routes.Count > 0)
                     {
-                        return new KendoGrid<List<ControllerRoutingActions>> { Total = routes.Count, Data = routes };
+                        return new KendoGrid<List<ControllerRoutingActions>> {Total = routes.Count, Data = routes};
                     }
 
                     return null;

@@ -676,7 +676,7 @@ namespace NetAppCommon
                 DbContextOptions dbContextOptions = GetSqlServerDbContextOptions<T>(connectionStringName);
                 if (null != dbContextOptions)
                 {
-                    object[] vs = { GetSqlServerDbContextOptions<T>(connectionStringName) };
+                    object[] vs = {GetSqlServerDbContextOptions<T>(connectionStringName)};
                     return (T)Activator.CreateInstance(typeof(T), vs);
                 }
 
@@ -745,7 +745,7 @@ namespace NetAppCommon
                 DbContextOptions dbContextOptions = GetDecryptSqlServerDbContextOptions<T>(connectionStringName);
                 if (null != dbContextOptions)
                 {
-                    object[] vs = { GetDecryptSqlServerDbContextOptions<T>(connectionStringName) };
+                    object[] vs = {GetDecryptSqlServerDbContextOptions<T>(connectionStringName)};
                     return (T)Activator.CreateInstance(typeof(T), vs);
                 }
 
@@ -815,7 +815,7 @@ namespace NetAppCommon
                     GetDecryptSqlServerDbContextOptions<T>(connectionStringName, rsaFileName);
                 if (null != dbContextOptions)
                 {
-                    object[] vs = { dbContextOptions };
+                    object[] vs = {dbContextOptions};
                     return (T)Activator.CreateInstance(typeof(T), vs);
                 }
 

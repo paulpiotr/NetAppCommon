@@ -1,6 +1,7 @@
 #region using
 
 using NetAppCommon.AppSettings.Models;
+using NetAppCommon.AppSettings.Repositories.Base;
 
 #endregion
 

@@ -238,7 +238,7 @@ namespace NetAppCommon.Crypto.BouncyCastle.Services
             {
                 asymmetricPrivateKeyFilePath ??= AsymmetricPrivateKeyFilePath;
                 if (null != asymmetricPrivateKeyFilePath && (checkIfExists == false ||
-                     (!File.Exists(asymmetricPrivateKeyFilePath))))
+                                                             !File.Exists(asymmetricPrivateKeyFilePath)))
                 {
                     var directory = Path.GetDirectoryName(asymmetricPrivateKeyFilePath);
                     if (null != directory && !Directory.Exists(directory))
@@ -263,7 +263,7 @@ namespace NetAppCommon.Crypto.BouncyCastle.Services
             {
                 asymmetricPublicKeyFilePath ??= AsymmetricPublicKeyFilePath;
                 if (null != asymmetricPublicKeyFilePath && (checkIfExists == false ||
-                     (!File.Exists(asymmetricPublicKeyFilePath))))
+                                                            !File.Exists(asymmetricPublicKeyFilePath)))
                 {
                     var directory = Path.GetDirectoryName(asymmetricPublicKeyFilePath);
                     if (null != directory && !Directory.Exists(directory))
@@ -300,10 +300,10 @@ namespace NetAppCommon.Crypto.BouncyCastle.Services
                         var bytesToDecrypt = Convert.FromBase64String(text);
                         var stringReader = new StringReader(publicKey);
                         var pemReader = new PemReader(stringReader);
-                        var @object = pemReader.ReadObject();
+                        object @object = pemReader.ReadObject();
                         if (@object is { } o)
                         {
-                            var asymmetricKeyParameter = (AsymmetricKeyParameter)@o;
+                            var asymmetricKeyParameter = (AsymmetricKeyParameter)o;
                             //Pkcs1Encoding.StrictLengthEnabled = false;
                             var pkcs1Encoding = new Pkcs1Encoding(new RsaEngine());
                             pkcs1Encoding.Init(false, asymmetricKeyParameter);
@@ -334,7 +334,7 @@ namespace NetAppCommon.Crypto.BouncyCastle.Services
                         var bytesToDecrypt = Convert.FromBase64String(text);
                         var stringReader = new StringReader(privateKey);
                         var pemReader = new PemReader(stringReader);
-                        var @object = pemReader.ReadObject();
+                        object @object = pemReader.ReadObject();
                         if (@object is { } o)
                         {
                             var asymmetricCipherKeyPair = (AsymmetricCipherKeyPair)o;
@@ -343,7 +343,6 @@ namespace NetAppCommon.Crypto.BouncyCastle.Services
                             pkcs1Encoding.Init(false, asymmetricCipherKeyPair.Public);
                             return Encoding.UTF8.GetString(pkcs1Encoding.ProcessBlock(bytesToDecrypt, 0,
                                 bytesToDecrypt.Length));
-
                         }
                     }
                 }
@@ -369,7 +368,7 @@ namespace NetAppCommon.Crypto.BouncyCastle.Services
                         var bytesToEncrypt = Encoding.UTF8.GetBytes(text);
                         var stringReader = new StringReader(privateKey);
                         var pemReader = new PemReader(stringReader);
-                        var @object = pemReader.ReadObject();
+                        object @object = pemReader.ReadObject();
                         var asymmetricCipherKeyPair = (AsymmetricCipherKeyPair)@object;
                         //Pkcs1Encoding.StrictLengthEnabled = false;
                         var encryptEngine = new Pkcs1Encoding(new RsaEngine());

@@ -43,7 +43,7 @@ namespace NetAppCommon.Validation
         {
             try
             {
-                char[] delimiterChars = { ',', ';' };
+                char[] delimiterChars = {',', ';'};
                 ListOfAttributes = new List<string>(separatedListOfAttributes.Split(delimiterChars))
                     .Select(x => x.Trim()).ToList();
             }
@@ -75,7 +75,7 @@ namespace NetAppCommon.Validation
         {
             try
             {
-                char[] delimiterChars = { ',', ';' };
+                char[] delimiterChars = {',', ';'};
                 ListOfAttributes = new List<string>(separatedListOfAttributes.Split(delimiterChars))
                     .Select(x => x.Trim()).ToList();
                 ErrorMessage = errorMessage;

@@ -24,7 +24,7 @@ namespace NetAppCommon.Helpers.Lists
 
         #endregion
 
-        public char[] DelimiterChars { get; set; } = { ',', ';' };
+        public char[] DelimiterChars { get; set; } = {',', ';'};
 
         public static ListsHelper GetInstance() => new();
 
