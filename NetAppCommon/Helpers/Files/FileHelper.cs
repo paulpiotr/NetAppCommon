@@ -92,8 +92,9 @@ namespace NetAppCommon.Helpers.Files
             {
 #if DEBUG
                 Log4net.Error(
-                    string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
-                        e.StackTrace), e);
+                    $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
+#else
+                Console.WriteLine(e);
 #endif
             }
 
@@ -149,8 +150,9 @@ namespace NetAppCommon.Helpers.Files
             {
 #if DEBUG
                 Log4net.Error(
-                    string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
-                        e.StackTrace), e);
+                    $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
+#else
+                Console.WriteLine(e);
 #endif
             }
 

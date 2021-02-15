@@ -1,6 +1,7 @@
 #region using
 
 using System;
+using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -55,7 +56,7 @@ namespace NetAppCommon
                     MatchCollection matchCollection = new Regex(@"%.*?%").Matches(connectionString);
                     foreach (Match match in matchCollection)
                     {
-                        if (null != match.Value && !string.IsNullOrWhiteSpace(match.Value))
+                        if (!string.IsNullOrWhiteSpace(match.Value))
                         {
                             var stringType = match.Value.Replace("%", string.Empty);
                             //log4net.Debug(match.Value);
@@ -79,8 +80,8 @@ namespace NetAppCommon
                                 catch (Exception e)
                                 {
                                     Log4net.Error(
-                                        string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(),
-                                            e.InnerException?.GetType(), e.Message, e.StackTrace), e);
+                                        $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n",
+                                        e);
                                 }
                             }
 
@@ -126,29 +127,30 @@ namespace NetAppCommon
                     if (connectionString.Contains("%Assembly.GetEntryAssembly().GetName().Name%"))
                     {
                         connectionString = connectionString.Replace("%Assembly.GetEntryAssembly().GetName().Name%",
-                            Assembly.GetEntryAssembly().GetName().Name);
+                            Assembly.GetEntryAssembly()?.GetName().Name);
                     }
 
                     if (connectionString.Contains("%System.Reflection.Assembly.GetEntryAssembly().GetName().Name%"))
                     {
                         connectionString = connectionString.Replace(
                             "%System.Reflection.Assembly.GetEntryAssembly().GetName().Name%",
-                            Assembly.GetEntryAssembly().GetName().Name);
+                            Assembly.GetEntryAssembly()?.GetName().Name);
                     }
 
                     if (connectionString.Contains("%AttachDbFilename%"))
                     {
                         var sqlConnectionStringBuilder = new SqlConnectionStringBuilder(connectionString);
-                        if (null != sqlConnectionStringBuilder && null != sqlConnectionStringBuilder.AttachDBFilename &&
+                        if (null != sqlConnectionStringBuilder.AttachDBFilename &&
                             !string.IsNullOrWhiteSpace(sqlConnectionStringBuilder.AttachDBFilename))
                         {
-                            //sqlConnectionStringBuilder.
-                            //Console.WriteLine(sqlConnectionStringBuilder.AttachDBFilename);
-                            var sufix = new Guid(MD5.Create()
-                                .ComputeHash(Encoding.ASCII.GetBytes(sqlConnectionStringBuilder.AttachDBFilename)));
-                            //connectionString = connectionString.Replace("%AttachDbFilename%", string.Format("{0}{1}", "MSSQLLocalDB", sufix.ToString()));
+                            var stringBuilder = new StringBuilder();
+                            stringBuilder.Append(Path.GetFileName(sqlConnectionStringBuilder.AttachDBFilename)
+                                .Replace(Path.GetExtension(sqlConnectionStringBuilder.AttachDBFilename), string.Empty));
+                            stringBuilder.Append("-");
+                            stringBuilder.Append(new Guid(MD5.Create()
+                                .ComputeHash(Encoding.ASCII.GetBytes(sqlConnectionStringBuilder.AttachDBFilename))));
                             connectionString = connectionString.Replace("%AttachDbFilename%",
-                                string.Format("{0}", sufix.ToString()));
+                                stringBuilder.ToString().ToLower());
                         }
                     }
                 }
@@ -156,8 +158,7 @@ namespace NetAppCommon
             catch (Exception e)
             {
                 Log4net.Error(
-                    string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
-                        e.StackTrace), e);
+                    $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
             }
 
             return connectionString;
@@ -193,8 +194,7 @@ namespace NetAppCommon
             catch (Exception e)
             {
                 Log4net.Error(
-                    string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
-                        e.StackTrace), e);
+                    $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
                 return null;
             }
         }

@@ -36,5 +36,13 @@ namespace NetAppCommon.AppSettings.Repositories.Interface
         public TValue GetValue<TValue>(string filePath, string key);
 
         public Task<TValue> GetValueAsync<TValue>(string filePath, string key);
+
+        public bool MssqlCanConnect(string connectionString);
+
+        public Task<bool> MssqlCanConnectAsync(string connectionString);
+
+        public bool MssqlCheckConnectionString(string connectionString);
+
+        public Task<bool> MssqlCheckConnectionStringAsync(string connectionString);
     }
 }

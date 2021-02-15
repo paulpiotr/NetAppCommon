@@ -44,21 +44,61 @@ namespace NetAppCommon.AppSettings.Models
                             File.Exists(pathAppSettingsSetup)
                             &&
                             File.Exists(pathAppSettingsBase)
-                            //&&
-                            //File.Exists(pathAppSettingsBaseUser)
                         )
                         {
-                            if (File.GetLastWriteTime(pathAppSettingsSetup) >
-                                File.GetLastWriteTime(pathAppSettingsBaseUser))
+                            if (File.GetLastWriteTime(pathAppSettingsSetup) >=
+                                File.GetLastWriteTime(pathAppSettingsBaseUser) ||
+                                !File.Exists(pathAppSettingsBaseUser)
+                            )
                             {
                                 try
                                 {
                                     var appsettingsSetup = new AppSettingsModel(pathAppSettingsSetup);
                                     var appsettingsBase = new AppSettingsModel(pathAppSettingsBase);
                                     var appsettingsBaseUser = new AppSettingsModel(pathAppSettingsBaseUser);
+                                    string connectionString;
+                                    // Setup
+                                    if (appsettingsSetup.AppSettingsRepository != null &&
+                                        appsettingsSetup.AppSettingsRepository.MssqlCheckConnectionString(
+                                            appsettingsSetup.GetConnectionString()))
+                                    {
+                                        connectionString = appsettingsSetup.GetConnectionString();
+#if DEBUG
+                                        _log4Net.Debug($"Apply appsettingsSetup {connectionString}");
+#endif
+                                    }
+                                    // User
+                                    else if (null != appsettingsBaseUser.AppSettingsRepository &&
+                                             appsettingsBaseUser.AppSettingsRepository.MssqlCheckConnectionString(
+                                                 appsettingsBaseUser
+                                                     .GetConnectionString()))
+                                    {
+                                        connectionString = appsettingsBaseUser.GetConnectionString();
+#if DEBUG
+                                        _log4Net.Debug($"Apply appsettingsBaseUser {connectionString}");
+#endif
+                                    }
+                                    // Base
+                                    else if (appsettingsBase.AppSettingsRepository != null &&
+                                             appsettingsBase.AppSettingsRepository.MssqlCheckConnectionString(
+                                                 appsettingsBase.GetConnectionString()))
+                                    {
+                                        connectionString = appsettingsBase.GetConnectionString();
+#if DEBUG
+                                        _log4Net.Debug($"Apply appsettingsBase {connectionString}");
+#endif
+                                    }
+                                    // Default
+                                    else
+                                    {
+                                        connectionString =
+                                            @"Data Source=(LocalDB)\MSSQLLocalDB; AttachDbFilename=%Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)%\MSSQLLocalDB\MSSQLLocalDB.mdf; Database=%AttachDbFilename%; MultipleActiveResultSets=true; Integrated Security=SSPI; Trusted_Connection=Yes; Max Pool Size=65536; Pooling=True";
+#if DEBUG
+                                        _log4Net.Debug($"Apply default {connectionString}");
+#endif
+                                    }
 
-                                    appsettingsBase.ConnectionString = appsettingsSetup.ConnectionString ??
-                                                                       appsettingsBase.ConnectionString;
+                                    appsettingsBase.ConnectionString = connectionString;
 
                                     appsettingsBase.LastInstallDate =
                                         appsettingsSetup.AppSettingsRepository?.GetValue<string>(appsettingsSetup,
@@ -76,11 +116,9 @@ namespace NetAppCommon.AppSettings.Models
                                         appsettingsSetup.AppSettingsRepository?.GetValue<string>(appsettingsSetup,
                                             nameof(UpgradeCode));
 
-                                    //appsettingsBaseappsettingsBase.AppSettingsRepository?.Save(appsettingsBase);
                                     appsettingsBase.AppSettingsRepository?.MergeAndSave(appsettingsBase);
 
-                                    appsettingsBaseUser.ConnectionString = appsettingsSetup.ConnectionString ??
-                                                                           appsettingsBaseUser.ConnectionString;
+                                    appsettingsBaseUser.ConnectionString = connectionString;
 
                                     appsettingsBaseUser.LastInstallDate =
                                         appsettingsSetup.AppSettingsRepository?.GetValue<string>(appsettingsSetup,
@@ -98,16 +136,8 @@ namespace NetAppCommon.AppSettings.Models
                                         appsettingsSetup.AppSettingsRepository?.GetValue<string>(appsettingsSetup,
                                             nameof(UpgradeCode));
 
-                                    //appsettingsBaseUser.AppSettingsRepository?.Save(appsettingsBaseUser);
                                     appsettingsBaseUser.AppSettingsRepository?.MergeAndSave(appsettingsBaseUser);
-#if DEBUG
-                                    _log4Net.Debug(
-                                        $"NetAppCommon.AppSettings.Models appsettingsSetup {pathAppSettingsSetup} {File.GetLastWriteTime(pathAppSettingsSetup)} {appsettingsSetup.ConnectionString}");
-                                    _log4Net.Debug(
-                                        $"NetAppCommon.AppSettings.Models appsettingsBase {pathAppSettingsBase} {File.GetLastWriteTime(pathAppSettingsBase)} {appsettingsBase.ConnectionString}");
-                                    _log4Net.Debug(
-                                        $"NetAppCommon.AppSettings.Models appsettingsBaseUser {pathAppSettingsBaseUser} {File.GetLastWriteTime(pathAppSettingsBaseUser)} {appsettingsBaseUser.ConnectionString}");
-#endif
+
                                     File.Delete(pathAppSettingsSetup);
                                 }
                                 catch (Exception e)

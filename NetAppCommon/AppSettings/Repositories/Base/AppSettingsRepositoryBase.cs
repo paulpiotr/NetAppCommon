@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using log4net;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using NetAppCommon.AppSettings.Models.Base;
 using NetAppCommon.AppSettings.Repositories.Interface;
@@ -30,11 +31,11 @@ namespace NetAppCommon.AppSettings.Repositories.Base
     public class AppSettingsRepositoryBase<TAppSettings> : IAppSettingsRepository<TAppSettings>
         where TAppSettings : AppSettingsBaseModel, new()
     {
-        #region private readonly log4net.ILog _log4Net
+        #region private readonly log4net.ILog log4net
 
         /// <summary>
-        ///     Referencja klasy Log4NetLogger
-        ///     Reference to the Log4NetLogger class
+        ///     Instancja do klasy Log4netLogger
+        ///     Instance to Log4netLogger class
         /// </summary>
         private readonly ILog _log4Net =
             Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
@@ -199,7 +200,7 @@ namespace NetAppCommon.AppSettings.Repositories.Base
                 appSettings ??= new TAppSettings();
                 var fileName = appSettings.GetFileName();
                 var sourceFileName = appSettings.GetFilePath();
-                var destFileName = Path.Combine(appSettings.UserProfileDirectory, fileName);
+                var destFileName = Path.Combine(appSettings.UserProfileDirectory ?? Empty, fileName);
                 if (File.Exists(sourceFileName) && !File.Exists(destFileName))
                 {
                     if (!IsNullOrWhiteSpace(destFileName) && !Directory.Exists(Path.GetDirectoryName(destFileName)))
@@ -271,7 +272,7 @@ namespace NetAppCommon.AppSettings.Repositories.Base
                 {
                     var fileName = appSettings.GetFileName();
                     var sourceFileName = appSettings.GetFilePath();
-                    var destFileName = Path.Combine(appSettings.UserProfileDirectory, fileName);
+                    var destFileName = Path.Combine(appSettings.UserProfileDirectory ?? Empty, fileName);
                     if (File.Exists(sourceFileName) /*&& !File.Exists(destFileName)*/ &&
                         Directory.Exists(appSettings.UserProfileDirectory))
                     {
@@ -513,6 +514,133 @@ namespace NetAppCommon.AppSettings.Repositories.Base
         /// </returns>
         public virtual async Task<TValue> GetValueAsync<TValue>(string filePath, string key) =>
             await Task.Run(() => GetValue<TValue>(filePath, key));
+
+        #endregion
+
+        #region public bool MssqlCanConnect(string connectionString)
+
+        /// <summary>
+        ///     Sprawdź, czy można połączyćsięz bazą danych Mssql
+        ///     Verify that you can connect to the Mssql database
+        /// </summary>
+        /// <param name="connectionString">
+        ///     Ciąg połączenia do bazy danych Mssql jako string
+        ///     The connection string to the Mssql database as a string
+        /// </param>
+        /// <returns>
+        ///     Prawda jeśli udało się połączyć z bazą danych Mssql, przeciwnie fałsz
+        ///     True if successful when connecting to the Mssql database, otherwise false
+        /// </returns>
+        public bool MssqlCanConnect(string connectionString)
+        {
+            SqlConnection sqlConnection = null;
+            try
+            {
+                using (sqlConnection = new SqlConnection(connectionString))
+                {
+                    sqlConnection.Open();
+                    return true;
+                }
+            }
+            catch (SqlException e)
+            {
+                _log4Net.Error(
+                    $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
+            }
+            catch (Exception e)
+            {
+                _log4Net.Error(
+                    $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
+            }
+            finally
+            {
+                try
+                {
+                    sqlConnection?.Close();
+                }
+                catch (Exception e)
+                {
+                    _log4Net.Error(
+                        $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
+                }
+            }
+
+            return false;
+        }
+
+        #endregion
+
+        #region public static async Task<bool> CanConnectAsync(string connectionString)
+
+        /// <summary>
+        ///     Sprawdź, czy można połączyćsięz bazą danych Mssql asynchronicznie
+        ///     Verify that you can connect to the Mssql database asynchronously
+        /// </summary>
+        /// <param name="connectionString">
+        ///     Ciąg połączenia do bazy danych Mssql jako string
+        ///     The connection string to the Mssql database as a string
+        /// </param>
+        /// <returns>
+        ///     Prawda jeśli udało się połączyć z bazą danych Mssql, przeciwnie fałsz
+        ///     True if successful when connecting to the Mssql database, otherwise false
+        /// </returns>
+        public async Task<bool> MssqlCanConnectAsync(string connectionString) =>
+            await Task.Run(() => MssqlCanConnect(connectionString));
+
+        #endregion
+
+        #region public bool MssqlCheckConnectionString(string connectionString)
+
+        /// <summary>
+        ///     Sprawdź połączenie z bazą danych na podstawie Connection String
+        ///     Check the database connection against the connection String
+        /// </summary>
+        /// <param name="connectionString">
+        ///     Ciąg połączenia do bazy danych Mssql jako string
+        ///     The connection string to the Mssql database as a string
+        /// </param>
+        /// <returns>
+        ///     Prawda, jeśli warunki zostaną spełnione, przeciwnie false
+        ///     True if the conditions are met, otherwise false
+        /// </returns>
+        public bool MssqlCheckConnectionString(string connectionString)
+        {
+            try
+            {
+                var sqlConnectionStringBuilder = new SqlConnectionStringBuilder(connectionString);
+                return !IsNullOrWhiteSpace(sqlConnectionStringBuilder.AttachDBFilename) ||
+                       (!IsNullOrWhiteSpace(sqlConnectionStringBuilder.DataSource) &&
+                        !IsNullOrWhiteSpace(sqlConnectionStringBuilder.InitialCatalog) &&
+                        !IsNullOrWhiteSpace(sqlConnectionStringBuilder.UserID) &&
+                        !IsNullOrWhiteSpace(sqlConnectionStringBuilder.Password));
+            }
+            catch (Exception e)
+            {
+                _log4Net.Error(
+                    $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
+            }
+
+            return false;
+        }
+
+        #endregion
+
+        #region public async Task<bool> MssqlCheckConnectionStringAsync(string connectionString)
+
+        /// <summary>
+        ///     Sprawdź połączenie z bazą danych na podstawie Connection String asynchronicznie
+        ///     Check the database connection against the connection String asynchronously
+        /// </summary>
+        /// <param name="connectionString">
+        ///     Ciąg połączenia do bazy danych Mssql jako string
+        ///     The connection string to the Mssql database as a string
+        /// </param>
+        /// <returns>
+        ///     Prawda, jeśli warunki zostaną spełnione, przeciwnie false
+        ///     True if the conditions are met, otherwise false
+        /// </returns>
+        public async Task<bool> MssqlCheckConnectionStringAsync(string connectionString) =>
+            await Task.Run(() => MssqlCheckConnectionString(connectionString));
 
         #endregion
 

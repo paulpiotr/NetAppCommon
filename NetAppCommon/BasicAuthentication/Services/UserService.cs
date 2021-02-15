@@ -15,7 +15,7 @@ namespace NetAppCommon.BasicAuthentication.Services
     {
         private readonly List<User> _users = new()
         {
-            new User()
+            new User
             {
                 Id = 1,
                 FirstName = "Test",
