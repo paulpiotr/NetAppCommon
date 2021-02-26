@@ -25,7 +25,7 @@ namespace NetAppCommon
         #region private readonly log4net.ILog log4net
 
         /// <summary>
-        ///     Log4 Net Logger
+        ///     private readonly ILog _log4Net
         /// </summary>
         private static readonly ILog Log4net =
             Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
@@ -84,8 +84,6 @@ namespace NetAppCommon
                                         e);
                                 }
                             }
-
-                            //log4net.Debug(connectionString);
                         }
                     }
 
@@ -144,13 +142,15 @@ namespace NetAppCommon
                             !string.IsNullOrWhiteSpace(sqlConnectionStringBuilder.AttachDBFilename))
                         {
                             var stringBuilder = new StringBuilder();
-                            stringBuilder.Append(Path.GetFileName(sqlConnectionStringBuilder.AttachDBFilename)
-                                .Replace(Path.GetExtension(sqlConnectionStringBuilder.AttachDBFilename), string.Empty));
+                            var prefix = Path.GetFileName(sqlConnectionStringBuilder.AttachDBFilename)
+                                .Replace(Path.GetExtension(sqlConnectionStringBuilder.AttachDBFilename), string.Empty);
+                            stringBuilder.Append(!string.IsNullOrWhiteSpace(prefix) ? prefix : "MSSQLLocalDB");
                             stringBuilder.Append("-");
                             stringBuilder.Append(new Guid(MD5.Create()
                                 .ComputeHash(Encoding.ASCII.GetBytes(sqlConnectionStringBuilder.AttachDBFilename))));
+                            var attachDbFilename = Regex.Replace(stringBuilder.ToString().ToLower(), "[^A-Za-z0-9]", string.Empty);
                             connectionString = connectionString.Replace("%AttachDbFilename%",
-                                stringBuilder.ToString().ToLower());
+                                attachDbFilename);
                         }
                     }
                 }

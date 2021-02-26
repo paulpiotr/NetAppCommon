@@ -42,6 +42,84 @@ namespace NetAppCommon.AppSettings.Repositories.Base
 
         #endregion
 
+        #region public virtual void MergeAndSave(string sourceFilePath, string destFilePath)
+        /// <summary>
+        ///     Połącz ustawienia z pliku źródłowego source FilePath i z pliku docelowego dest FilePath i zapisz do pliku dolelowego
+        ///     Combine settings from source FilePath and destination dest FilePath and save to target file
+        /// </summary>
+        /// <param name="sourceFilePath">
+        ///     Ścieżka do pliku źródłowego jako string
+        ///     The path to the source file as a string
+        /// </param>
+        /// <param name="destFilePath">
+        ///     Ścieżka do pliku docelowego jako string
+        ///     Path to target file as a string
+        /// </param>
+        public virtual void MergeAndSave(string sourceFilePath, string destFilePath)
+        {
+            try
+            {
+                JObject sourceJObject = null;
+                JObject destJObject = null;
+                if (!IsNullOrWhiteSpace(sourceFilePath) && File.Exists(sourceFilePath))
+                {
+                    FileHelper.GetInstance().TimeoutAction(() =>
+                    {
+                        sourceJObject = JObject.Parse(File.ReadAllText(sourceFilePath));
+                        return true;
+                    }, sourceFilePath);
+                }
+
+                if (!IsNullOrWhiteSpace(destFilePath) && File.Exists(destFilePath))
+                {
+                    FileHelper.GetInstance().TimeoutAction(() =>
+                    {
+                        destJObject = JObject.Parse(File.ReadAllText(destFilePath));
+                        return true;
+                    }, destFilePath);
+                }
+
+                if (null != sourceJObject && null != destJObject)
+                {
+                    destJObject.Merge(sourceJObject, new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Union });
+                    FileHelper.GetInstance().TimeoutAction(() =>
+                    {
+                        File.WriteAllText(destFilePath, destJObject.ToString());
+                        return true;
+                    }, destFilePath);
+                }
+            }
+            catch (Exception e)
+            {
+                _log4Net.Error(
+                    $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
+            }
+
+        }
+        #endregion
+
+        #region public virtual Task MergeAndSaveAsync(string sourceFilePath, string destFilePath)
+        /// <summary>
+        ///     Połącz ustawienia z pliku źródłowego source FilePath i z pliku docelowego dest FilePath i zapisz do pliku dolelowego asynchronicznie
+        ///     Combine settings from source FilePath and destination dest FilePath and save to target file asynchronously
+        /// </summary>
+        /// <param name="sourceFilePath">
+        ///     Ścieżka do pliku źródłowego jako string
+        ///     The path to the source file as a string
+        /// </param>
+        /// <param name="destFilePath">
+        ///     Ścieżka do pliku docelowego jako string
+        ///     Path to target file as a string
+        /// </param>
+        public virtual Task MergeAndSaveAsync(string sourceFilePath, string destFilePath)
+        {
+            return Task.Run(() =>
+            {
+                MergeAndSaveAsync(sourceFilePath, destFilePath);
+            });
+        }
+        #endregion
+
         #region public virtual TAppSettings MergeAndSave(TAppSettings appSettings = null)
 
         /// <summary>
@@ -64,19 +142,21 @@ namespace NetAppCommon.AppSettings.Repositories.Base
                 var filePath = appSettings.FilePath;
                 if (!IsNullOrWhiteSpace(filePath) && File.Exists(filePath))
                 {
-                    var originalObject = JObject.Parse(File.ReadAllText(filePath));
-                    var appSettingsObject =
-                        JObject.Parse(JsonConvert.SerializeObject(appSettings, Formatting.Indented));
-                    if (null != originalObject && null != appSettingsObject)
+                    FileHelper.GetInstance().TimeoutAction(() =>
                     {
-                        originalObject.Merge(appSettingsObject,
-                            new JsonMergeSettings {MergeArrayHandling = MergeArrayHandling.Union});
-                        FileHelper.GetInstance().TimeoutAction(() =>
+                        var originalObject = JObject.Parse(File.ReadAllText(filePath));
+                        var appSettingsObject =
+                            JObject.Parse(JsonConvert.SerializeObject(appSettings, Formatting.Indented));
+                        if (null != originalObject && null != appSettingsObject)
                         {
+                            originalObject.Merge(appSettingsObject,
+                                new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Union });
+
                             File.WriteAllText(filePath, originalObject.ToString());
-                            return true;
-                        }, filePath);
-                    }
+
+                        }
+                        return true;
+                    }, filePath);
                 }
             }
             catch (Exception e)
@@ -135,19 +215,14 @@ namespace NetAppCommon.AppSettings.Repositories.Base
                     if (null != json)
                     {
                         var path = filePath;
-                        var json1 = json;
+                        var contents = json;
                         FileHelper.GetInstance().TimeoutAction(() =>
                         {
-                            File.WriteAllText(path, json1);
+                            File.WriteAllText(path, contents);
                             return true;
                         }, filePath);
                     }
-
-                    json = null;
                 }
-
-                filePath = null;
-                appSettings = null;
             }
             catch (Exception e)
             {
@@ -267,19 +342,19 @@ namespace NetAppCommon.AppSettings.Repositories.Base
             {
                 appSettings ??= new TAppSettings();
                 // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                if (null != appSettings.GetFileName() && null != appSettings.GetFileName() &&
+                if (null != appSettings.GetFileName() &&
                     null != appSettings.UserProfileDirectory)
                 {
                     var fileName = appSettings.GetFileName();
                     var sourceFileName = appSettings.GetFilePath();
                     var destFileName = Path.Combine(appSettings.UserProfileDirectory ?? Empty, fileName);
-                    if (File.Exists(sourceFileName) /*&& !File.Exists(destFileName)*/ &&
+                    if (File.Exists(sourceFileName) &&
                         Directory.Exists(appSettings.UserProfileDirectory))
                     {
-                        if (!Directory.Exists(Path.GetDirectoryName(destFileName)))
+                        var destFileDirectory = Path.GetDirectoryName(destFileName);
+                        if (null != destFileDirectory && !Directory.Exists(destFileDirectory))
                         {
-                            Directory.CreateDirectory(Path.GetDirectoryName(destFileName) ??
-                                                      throw new InvalidOperationException());
+                            Directory.CreateDirectory(destFileDirectory);
                         }
 
                         if (!File.Exists(destFileName))

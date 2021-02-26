@@ -25,12 +25,67 @@ namespace NetAppCommon
         #region private readonly log4net.ILog log4net...
 
         /// <summary>
-        ///     Log4 Net Logger
+        ///     private readonly ILog _log4Net
         /// </summary>
         private static readonly ILog Log4net =
             Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
 
         #endregion
+
+        public static void GetA(Assembly assembly, IActionDescriptorCollectionProvider provider,
+            IUrlHelper url)
+        {
+            try
+            {
+                var controllerRoutingActionsList = new List<ControllerRoutingActions>();
+                provider.ActionDescriptors.Items.ToList().OrderBy(o => o.DisplayName)/*.ThenBy(o => o.RouteValues["Action"])*/.ToList().ForEach(actionDescriptorItem =>
+                {
+                    var routeParameters = new Dictionary<string, string>();
+                    actionDescriptorItem.Parameters.ToList().ForEach(parameter =>
+                    {
+                        routeParameters.Add(parameter.Name, parameter.ParameterType.Name);
+                    });
+                    var routeUrlAction = string.Empty;
+                    try
+                    {
+                        routeUrlAction = null != actionDescriptorItem.AttributeRouteInfo?.Template! &&
+                                             !string.IsNullOrWhiteSpace(
+                                                 actionDescriptorItem.AttributeRouteInfo?.Template!)
+                            ? actionDescriptorItem.AttributeRouteInfo?.Template!
+                            : url.Action(actionDescriptorItem.RouteValues["Action"],
+                                actionDescriptorItem.RouteValues["Controller"]);
+                    }
+                    catch (Exception e)
+                    {
+                        Log4net.Error(
+                            $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
+                    }
+
+                    var controllerRoutingAction = new ControllerRoutingActions
+                    {
+                        RouteId = actionDescriptorItem.Id,
+                        RouteController = actionDescriptorItem.RouteValues["Controller"],
+                        RouteAction = actionDescriptorItem.RouteValues["Action"],
+                        RouteUrlAction = routeUrlAction,
+                        RouteUrlAbsoluteAction =
+                            //$"{controllerBase.Request.Scheme}://{controllerBase.Request.Host}/{routeUrlAction}",
+                            string.Empty,
+                        RouteParameters = routeParameters,
+                        RouteAttributeInfoTemplate = actionDescriptorItem.AttributeRouteInfo?.Template!
+                    };
+                    controllerRoutingActionsList.Add(controllerRoutingAction);
+                });
+                foreach (ControllerRoutingActions controllerRoutingAction in controllerRoutingActionsList)
+                {
+                    Console.WriteLine($"{controllerRoutingAction.RouteController} / {controllerRoutingAction.RouteUrlAction}");
+                }
+            }
+            catch (Exception e)
+            {
+                Log4net.Error(
+                    $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
+            }
+        }
 
         #region public static List<ControllerRoutingActions> GetRouteAction...
 
@@ -85,8 +140,7 @@ namespace NetAppCommon
                             RouteAction = actionDescriptorItem.RouteValues["Action"],
                             RouteUrlAction = routeUrlAction,
                             RouteUrlAbsoluteAction =
-                                string.Format("{0}://{1}/{2}", controllerBase.Request.Scheme,
-                                    controllerBase.Request.Host, routeUrlAction),
+                                $"{controllerBase.Request.Scheme}://{controllerBase.Request.Host}/{routeUrlAction}",
                             RouteParameters = routeParameters,
                             RouteAttributeInfoTemplate = actionDescriptorItem.AttributeRouteInfo.Template
                         };
@@ -97,8 +151,7 @@ namespace NetAppCommon
             catch (Exception e)
             {
                 Log4net.Error(
-                    string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
-                        e.StackTrace), e);
+                    $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
             }
 
             return null;
@@ -142,7 +195,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => Log4net.Error($"{e.Message}, {e.StackTrace}.", e));
             }
 
             return null;
@@ -191,8 +244,7 @@ namespace NetAppCommon
             catch (Exception e)
             {
                 Log4net.Error(
-                    string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
-                        e.StackTrace), e);
+                    $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
             }
 
             return null;
@@ -246,7 +298,7 @@ namespace NetAppCommon
             }
             catch (Exception e)
             {
-                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+                await Task.Run(() => Log4net.Error($"{e.Message}, {e.StackTrace}.", e));
             }
 
             return null;

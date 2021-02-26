@@ -16,8 +16,8 @@ namespace NetAppCommon.Mssql
         #region private readonly log4net.ILog log4net
 
         /// <summary>
-        ///     Log4 Net Logger
-        ///     Log4 Net Logger
+        ///     private readonly ILog _log4Net
+        ///     private readonly ILog _log4Net
         /// </summary>
         private readonly ILog _log4Net =
             Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
@@ -65,11 +65,6 @@ namespace NetAppCommon.Mssql
                 {
                     var sqlConnectionStringBuilder = new SqlConnectionStringBuilder(ConnectionString);
                     AttachDBFilename = sqlConnectionStringBuilder.AttachDBFilename;
-
-                    //#if DEBUG
-                    //                    _log4Net.Debug($"AttachDBFilename { AttachDBFilename }, InitialCatalog { InitialCatalog }, LogAttachDBFilename { LogAttachDBFilename }, LogInitialCatalog { LogInitialCatalog }");
-                    //#endif
-
                     if (null != AttachDBFilename && !string.IsNullOrWhiteSpace(AttachDBFilename))
                     {
                         InitialCatalog = sqlConnectionStringBuilder.InitialCatalog;
@@ -78,9 +73,6 @@ namespace NetAppCommon.Mssql
                                 Path.GetFileName(AttachDBFilename)
                                     .Replace(Path.GetExtension(Path.GetFileName(AttachDBFilename)), string.Empty)));
                         LogInitialCatalog ??= string.Format("{0}_log", InitialCatalog);
-                        //#if DEBUG
-                        //                        _log4Net.Debug($"AttachDBFilename { AttachDBFilename }, InitialCatalog { InitialCatalog }, LogAttachDBFilename { LogAttachDBFilename }, LogInitialCatalog { LogInitialCatalog }");
-                        //#endif
                         if (
                             null != sqlConnectionStringBuilder &&
                             null != AttachDBFilename && !string.IsNullOrWhiteSpace(AttachDBFilename) &&
@@ -90,26 +82,24 @@ namespace NetAppCommon.Mssql
                             null != LogInitialCatalog && !string.IsNullOrWhiteSpace(LogInitialCatalog)
                         )
                         {
-                            CreateScript = "" +
-                                           $"BEGIN TRY EXEC sp_detach_db {InitialCatalog}; END TRY BEGIN CATCH SELECT ERROR_NUMBER() AS ErrorNumber, ERROR_MESSAGE() AS ErrorMessage; END CATCH;" +
-                                           $"BEGIN TRY CREATE DATABASE {InitialCatalog} ON PRIMARY " +
-                                           "(" +
-                                           $"NAME = '{InitialCatalog}', " +
-                                           $"FILENAME = '{AttachDBFilename}', " +
-                                           $"SIZE = {Size ?? "8MB"}, " +
-                                           $"MAXSIZE = {MaxSize ?? "131072MB"}, " +
-                                           $"FILEGROWTH = {FileGrowTh ?? "1%"}" +
-                                           ") " +
-                                           "LOG ON" +
-                                           "(" +
-                                           $"NAME = '{LogInitialCatalog}', " +
-                                           $"FILENAME = '{LogAttachDBFilename}', " +
-                                           $"SIZE = {LogSize ?? "8MB"}, " +
-                                           $"MAXSIZE = {LogMaxSize ?? "8192MB"}, " +
-                                           $"FILEGROWTH = {LogFileGrowTh ?? "1%"}" +
-                                           ") END TRY BEGIN CATCH SELECT ERROR_NUMBER() AS ErrorNumber, ERROR_MESSAGE() AS ErrorMessage; END CATCH;";
+                            var mdfCreateDatabaseScriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "scripts", "Db", "Mssql", "MdfCreateDatabaseScript.sql");
+                            if (File.Exists(mdfCreateDatabaseScriptPath))
+                            {
+                                CreateScript = File.ReadAllText(mdfCreateDatabaseScriptPath)
+                                    .Replace("%InitialCatalog%", InitialCatalog)
+                                    .Replace("%AttachDBFilename%", AttachDBFilename)
+                                    .Replace("%Size%", Size ?? "8MB")
+                                    .Replace("%MaxSize%", MaxSize ?? "131072MB")
+                                    .Replace("%FileGrowTh%", FileGrowTh ?? "1 %")
+                                    .Replace("%LogInitialCatalog%", LogInitialCatalog)
+                                    .Replace("%LogAttachDBFilename%", LogAttachDBFilename)
+                                    .Replace("%LogSize%", LogSize ?? "8MB")
+                                    .Replace("%LogMaxSize%", LogMaxSize ?? "8192MB")
+                                    .Replace("%LogFileGrowTh%", LogFileGrowTh ?? "1 %")
+                                ;
+                            }
 #if DEBUG
-                            _log4Net.Debug($"CreateScript {CreateScript}");
+                            _log4Net.Debug($"CreateScript{Environment.NewLine}{CreateScript}{Environment.NewLine}");
 #endif
                             return CreateScript;
                         }
@@ -141,48 +131,52 @@ namespace NetAppCommon.Mssql
 #endif
                         Directory.CreateDirectory(Path.GetDirectoryName(AttachDBFilename));
                     }
-
-                    if (
-                        Directory.Exists(Path.GetDirectoryName(AttachDBFilename)) &&
+                    if (Directory.Exists(Path.GetDirectoryName(AttachDBFilename)) &&
                         !File.Exists(AttachDBFilename)
-                    )
+                        )
                     {
-                        var sqlConnectionStringBuilder = new SqlConnectionStringBuilder(ConnectionString);
-                        SqlConnection sqlConnection = null;
-                        SqlCommand sqlCommand = null;
-                        if (null != sqlConnectionStringBuilder)
+                        lock (string.Intern(AttachDBFilename))
                         {
-                            sqlConnection =
-                                new SqlConnection(
-                                    $"Data Source={sqlConnectionStringBuilder.DataSource}; Integrated Security={sqlConnectionStringBuilder.IntegratedSecurity}");
-                            sqlCommand = new SqlCommand(CreateScript, sqlConnection);
-                        }
-
-                        try
-                        {
-                            if (null != sqlConnection && null != sqlCommand)
-                            {
-                                sqlConnection.Open();
-                                sqlCommand.ExecuteNonQuery();
 #if DEBUG
-                                _log4Net.Debug($"Sql command execute non query {CreateScript} OK");
+                            _log4Net.Debug($"lock (string.Intern({AttachDBFilename}))");
 #endif
-                                return true;
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            _log4Net.Error(
-                                string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(),
-                                    e.Message, e.StackTrace), e);
-                        }
-                        finally
-                        {
-                            if (null != sqlConnection && sqlConnection.State == ConnectionState.Open)
+                            var sqlConnectionStringBuilder = new SqlConnectionStringBuilder(ConnectionString);
+                            SqlConnection sqlConnection = null;
+                            SqlCommand sqlCommand = null;
+                            if (null != sqlConnectionStringBuilder)
                             {
-                                sqlConnection.Close();
+                                sqlConnection =
+                                    new SqlConnection(
+                                        $"Data Source={sqlConnectionStringBuilder.DataSource}; Integrated Security={sqlConnectionStringBuilder.IntegratedSecurity}");
+                                sqlCommand = new SqlCommand(CreateScript, sqlConnection);
+                            }
+                            try
+                            {
+                                if (null != sqlConnection && null != sqlCommand)
+                                {
+                                    sqlConnection.Open();
+                                    sqlCommand.ExecuteNonQuery();
+#if DEBUG
+                                    _log4Net.Debug($"Sql command execute non query {Environment.NewLine}{CreateScript}{Environment.NewLine}OK");
+#endif
+                                    return true;
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                _log4Net.Error(
+                                    string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(),
+                                        e.Message, e.StackTrace), e);
+                            }
+                            finally
+                            {
+                                if (null != sqlConnection && sqlConnection.State == ConnectionState.Open)
+                                {
+                                    sqlConnection.Close();
+                                }
                             }
                         }
+                        return true;
                     }
                 }
             }

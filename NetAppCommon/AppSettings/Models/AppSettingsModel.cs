@@ -31,136 +31,102 @@ namespace NetAppCommon.AppSettings.Models
         {
             try
             {
-                if (null != BaseDirectory && null != UserProfileDirectory)
+                var memoryCacheProvider = MemoryCacheProvider.GetInstance();
+                var filePathKey = $"{MethodBase.GetCurrentMethod()?.DeclaringType?.FullName}.FilePath";
+                var filePath = (object)memoryCacheProvider.Get(filePathKey);
+                if (null == filePath)
                 {
-                    var memoryCacheProvider = MemoryCacheProvider.GetInstance();
-                    object filePath = memoryCacheProvider.Get("NetAppCommon.AppSettings.Models.FilePath");
-                    if (null == filePath)
+                    var appSettingsSetupFilePath = Path.Combine(BaseDirectory!, SetupFileName!);
+                    var appSettingsUserFilePath = Path.Combine(UserProfileDirectory!, FileName!);
+                    var appSettingsFilePath = FilePath;
+                    var appSettingsSetupConnectionString =
+                        new AppSettingsModel(appSettingsSetupFilePath!).GetConnectionString();
+                    var appSettingsUserConnectionString =
+                        new AppSettingsModel(appSettingsUserFilePath!).GetConnectionString();
+                    var appSettingsConnectionString =
+                        new AppSettingsModel(appSettingsFilePath!).GetConnectionString();
+
+                    if (!string.IsNullOrWhiteSpace(appSettingsUserFilePath) && !File.Exists(appSettingsUserFilePath))
                     {
-                        var pathAppSettingsSetup = Path.Combine(BaseDirectory, "appsettings.setup.json");
-                        var pathAppSettingsBase = Path.Combine(BaseDirectory, FileName);
-                        var pathAppSettingsBaseUser = Path.Combine(UserProfileDirectory, FileName);
-                        if (
-                            File.Exists(pathAppSettingsSetup)
-                            &&
-                            File.Exists(pathAppSettingsBase)
-                        )
-                        {
-                            if (File.GetLastWriteTime(pathAppSettingsSetup) >=
-                                File.GetLastWriteTime(pathAppSettingsBaseUser) ||
-                                !File.Exists(pathAppSettingsBaseUser)
-                            )
-                            {
-                                try
-                                {
-                                    var appsettingsSetup = new AppSettingsModel(pathAppSettingsSetup);
-                                    var appsettingsBase = new AppSettingsModel(pathAppSettingsBase);
-                                    var appsettingsBaseUser = new AppSettingsModel(pathAppSettingsBaseUser);
-                                    string connectionString;
-                                    // Setup
-                                    if (appsettingsSetup.AppSettingsRepository != null &&
-                                        appsettingsSetup.AppSettingsRepository.MssqlCheckConnectionString(
-                                            appsettingsSetup.GetConnectionString()))
-                                    {
-                                        connectionString = appsettingsSetup.GetConnectionString();
-#if DEBUG
-                                        _log4Net.Debug($"Apply appsettingsSetup {connectionString}");
-#endif
-                                    }
-                                    // User
-                                    else if (null != appsettingsBaseUser.AppSettingsRepository &&
-                                             appsettingsBaseUser.AppSettingsRepository.MssqlCheckConnectionString(
-                                                 appsettingsBaseUser
-                                                     .GetConnectionString()))
-                                    {
-                                        connectionString = appsettingsBaseUser.GetConnectionString();
-#if DEBUG
-                                        _log4Net.Debug($"Apply appsettingsBaseUser {connectionString}");
-#endif
-                                    }
-                                    // Base
-                                    else if (appsettingsBase.AppSettingsRepository != null &&
-                                             appsettingsBase.AppSettingsRepository.MssqlCheckConnectionString(
-                                                 appsettingsBase.GetConnectionString()))
-                                    {
-                                        connectionString = appsettingsBase.GetConnectionString();
-#if DEBUG
-                                        _log4Net.Debug($"Apply appsettingsBase {connectionString}");
-#endif
-                                    }
-                                    // Default
-                                    else
-                                    {
-                                        connectionString =
-                                            @"Data Source=(LocalDB)\MSSQLLocalDB; AttachDbFilename=%Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)%\MSSQLLocalDB\MSSQLLocalDB.mdf; Database=%AttachDbFilename%; MultipleActiveResultSets=true; Integrated Security=SSPI; Trusted_Connection=Yes; Max Pool Size=65536; Pooling=True";
-#if DEBUG
-                                        _log4Net.Debug($"Apply default {connectionString}");
-#endif
-                                    }
-
-                                    appsettingsBase.ConnectionString = connectionString;
-
-                                    appsettingsBase.LastInstallDate =
-                                        appsettingsSetup.AppSettingsRepository?.GetValue<string>(appsettingsSetup,
-                                            nameof(LastInstallDate));
-
-                                    appsettingsBase.ProductCode =
-                                        appsettingsSetup.AppSettingsRepository?.GetValue<string>(appsettingsSetup,
-                                            nameof(ProductCode));
-
-                                    appsettingsBase.ProductVersion =
-                                        appsettingsSetup.AppSettingsRepository?.GetValue<string>(appsettingsSetup,
-                                            nameof(ProductVersion));
-
-                                    appsettingsBase.UpgradeCode =
-                                        appsettingsSetup.AppSettingsRepository?.GetValue<string>(appsettingsSetup,
-                                            nameof(UpgradeCode));
-
-                                    appsettingsBase.AppSettingsRepository?.MergeAndSave(appsettingsBase);
-
-                                    appsettingsBaseUser.ConnectionString = connectionString;
-
-                                    appsettingsBaseUser.LastInstallDate =
-                                        appsettingsSetup.AppSettingsRepository?.GetValue<string>(appsettingsSetup,
-                                            nameof(LastInstallDate));
-
-                                    appsettingsBaseUser.ProductCode =
-                                        appsettingsSetup.AppSettingsRepository?.GetValue<string>(appsettingsSetup,
-                                            nameof(ProductCode));
-
-                                    appsettingsBaseUser.ProductVersion =
-                                        appsettingsSetup.AppSettingsRepository?.GetValue<string>(appsettingsSetup,
-                                            nameof(ProductVersion));
-
-                                    appsettingsBaseUser.UpgradeCode =
-                                        appsettingsSetup.AppSettingsRepository?.GetValue<string>(appsettingsSetup,
-                                            nameof(UpgradeCode));
-
-                                    appsettingsBaseUser.AppSettingsRepository?.MergeAndSave(appsettingsBaseUser);
-
-                                    File.Delete(pathAppSettingsSetup);
-                                }
-                                catch (Exception e)
-                                {
-                                    _log4Net.Error(
-                                        $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n",
-                                        e);
-                                }
-                            }
-                        }
-
-                        AppSettingsRepository?.MergeAndCopyToUserDirectory(this);
-                        memoryCacheProvider.Put("NetAppCommon.AppSettings.Models.FilePath", FilePath,
-                            TimeSpan.FromDays(1));
+                        AppSettingsRepository?.CopyToUserDirectory(this);
                     }
 
-                    FilePath = (string)(filePath ?? Path.Combine(UserProfileDirectory, FileName));
+                    try
+                    {
+                        AppSettingsRepository?.MergeAndSave(appSettingsSetupFilePath, appSettingsUserFilePath);
+                    }
+                    catch (Exception e)
+                    {
+                        _log4Net.Error($"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n",
+                            e);
+                    }
+
+                    try
+                    {
+                        if (File.Exists(appSettingsSetupFilePath))
+                        {
+                            File.Delete(appSettingsSetupFilePath);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        _log4Net.Error($"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n",
+                            e);
+                    }
+
+                    try
+                    {
+                        AppSettingsRepository?.MergeAndSave(appSettingsUserFilePath, appSettingsFilePath);
+                    }
+                    catch (Exception e)
+                    {
+                        _log4Net.Error($"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n",
+                            e);
+                    }
+
+                    try
+                    {
+                        AppSettingsRepository?.MergeAndSave(appSettingsFilePath, appSettingsUserFilePath);
+                    }
+                    catch (Exception e)
+                    {
+                        _log4Net.Error($"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n",
+                            e);
+                    }
+
+                    FilePath = File.Exists(appSettingsUserFilePath) ? appSettingsUserFilePath : FilePath;
+
+                    if (null != AppSettingsRepository)
+                    {
+                        if (!string.IsNullOrWhiteSpace(appSettingsSetupConnectionString) &&
+                            AppSettingsRepository.MssqlCheckConnectionString(appSettingsSetupConnectionString))
+                        {
+                            ConnectionString = appSettingsSetupConnectionString;
+                            AppSettingsRepository?.SaveAsync(this);
+                        }
+                        else if (!string.IsNullOrWhiteSpace(appSettingsUserConnectionString) && AppSettingsRepository.MssqlCheckConnectionString(appSettingsUserConnectionString))
+                        {
+                            ConnectionString = appSettingsUserConnectionString;
+                            AppSettingsRepository?.SaveAsync(this);
+                        }
+                        else if(!string.IsNullOrWhiteSpace(appSettingsConnectionString) && AppSettingsRepository.MssqlCheckConnectionString(appSettingsConnectionString))
+                        {
+                            ConnectionString = appSettingsConnectionString;
+                            AppSettingsRepository?.SaveAsync(this);
+                        }
+                    }
+
+                    memoryCacheProvider.Put(filePathKey, FilePath, TimeSpan.FromDays(1));
+                }
+
+                if (null != UserProfileDirectory && null != FileName)
+                {
+                    FilePath = (string)(filePath ?? Path.Combine(UserProfileDirectory!, FileName!));
                 }
             }
             catch (Exception e)
             {
-                _log4Net.Error(
-                    $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
+                _log4Net.Error($"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
             }
         }
 
@@ -234,9 +200,9 @@ namespace NetAppCommon.AppSettings.Models
         private const string Filename = "appsettings.json";
 #endif
 
-        private new string _fileName = Filename;
+        private new string? _fileName = Filename;
 
-        public override string FileName
+        public override string? FileName
         {
             get => _fileName;
             protected set
@@ -245,6 +211,31 @@ namespace NetAppCommon.AppSettings.Models
                 {
                     _fileName = value;
                     OnPropertyChanged(nameof(FileName));
+                }
+            }
+        }
+
+        #endregion
+
+        #region private new string? _setupFileName = Setupfilename; public override string? SetupFileName
+
+#if DEBUG
+        private const string Setupfilename = "appsettings.setup.json";
+#else
+        private const string Setupfilename = "appsettings.setup.json";
+#endif
+
+        private new string? _setupFileName = Setupfilename;
+
+        public override string? SetupFileName
+        {
+            get => _setupFileName;
+            protected set
+            {
+                if (value != _setupFileName)
+                {
+                    _setupFileName = value;
+                    OnPropertyChanged("SetupFileName");
                 }
             }
         }

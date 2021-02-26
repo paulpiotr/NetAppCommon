@@ -109,9 +109,12 @@ namespace NetAppCommon.Crypto.BouncyCastle.Services
         {
             try
             {
-                using var rsa = new RSACryptoServiceProvider(dwKeySize);
-                RsaKeyPairGenerator = new RsaKeyPairGenerator();
-                RsaKeyPairGenerator.Init(new KeyGenerationParameters(new SecureRandom(), dwKeySize));
+                lock (string.Intern(MethodBase.GetCurrentMethod()?.DeclaringType?.FullName))
+                {
+                    using var rsa = new RSACryptoServiceProvider(dwKeySize);
+                    RsaKeyPairGenerator = new RsaKeyPairGenerator();
+                    RsaKeyPairGenerator.Init(new KeyGenerationParameters(new SecureRandom(), dwKeySize));
+                }
             }
             catch (Exception e)
             {
@@ -300,7 +303,7 @@ namespace NetAppCommon.Crypto.BouncyCastle.Services
                         var bytesToDecrypt = Convert.FromBase64String(text);
                         var stringReader = new StringReader(publicKey);
                         var pemReader = new PemReader(stringReader);
-                        object @object = pemReader.ReadObject();
+                        var @object = (object)pemReader.ReadObject();
                         if (@object is { } o)
                         {
                             var asymmetricKeyParameter = (AsymmetricKeyParameter)o;

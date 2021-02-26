@@ -13,6 +13,10 @@ namespace NetAppCommon.AppSettings.Repositories.Interface
 
         public Task<TAppSettings> SaveAsync(TAppSettings appSettings = null);
 
+        public void MergeAndSave(string sourceFilePath, string destFilePath);
+
+        public Task MergeAndSaveAsync(string sourceFilePath, string destFilePath);
+
         public TAppSettings MergeAndSave(TAppSettings appSettings = null);
 
         public Task<TAppSettings> MergeAndSaveAsync(TAppSettings appSettings = null);

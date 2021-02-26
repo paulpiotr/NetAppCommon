@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Xml.Serialization;
 using log4net;
@@ -34,6 +35,25 @@ namespace NetAppCommon.AppSettings.Models.Base
     [NotMapped]
     public class AppSettingsBaseModel : RsaProvaiderBaseModel
     {
+        public AppSettingsBaseModel()
+        {
+
+        }
+        public AppSettingsBaseModel(string filePath)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(filePath))
+                {
+                    _filePath = filePath;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+
         #region private readonly log4net.ILog log4net
 
         /// <summary>
@@ -345,7 +365,7 @@ namespace NetAppCommon.AppSettings.Models.Base
         public new string AsymmetricPrivateKeyFilePath
         {
             get =>
-                _asymmetricPrivateKeyFilePath ??= Path.Combine(UserProfileDirectory, ".ssh", "id_rsa");
+                _asymmetricPrivateKeyFilePath ??= Path.Combine(UserProfileDirectory!, ".ssh", "id_rsa");
             set
             {
                 if (value != _asymmetricPrivateKeyFilePath)
@@ -367,7 +387,7 @@ namespace NetAppCommon.AppSettings.Models.Base
         public new string AsymmetricPublicKeyFilePath
         {
             get =>
-                _asymmetricPublicKeyFilePath ??= Path.Combine(UserProfileDirectory, ".ssh", "id_rsa.pub");
+                _asymmetricPublicKeyFilePath ??= Path.Combine(UserProfileDirectory!, ".ssh", "id_rsa.pub");
             set
             {
                 if (value != _asymmetricPublicKeyFilePath)
@@ -389,6 +409,9 @@ namespace NetAppCommon.AppSettings.Models.Base
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
+        [Display(Name = "Główny katalog programu",
+            Prompt = "Wpisz lub wybierz główny katalog programu",
+            Description = "Główny katalog programu")]
         public virtual string? BaseDirectory
         {
             get
@@ -438,8 +461,7 @@ namespace NetAppCommon.AppSettings.Models.Base
                         _userProfileDirectory = GetFolderPath(SpecialFolder.UserProfile);
                         if (Directory.Exists(_userProfileDirectory))
                         {
-                            _userProfileDirectory = Path.Combine(GetFolderPath(SpecialFolder.UserProfile),
-                                Assembly.GetExecutingAssembly().GetName().Name);
+                            _userProfileDirectory = Path.Combine(_userProfileDirectory, Assembly.GetExecutingAssembly().GetName().Name);
                             if (!Directory.Exists(_userProfileDirectory))
                             {
                                 Directory.CreateDirectory(_userProfileDirectory);
@@ -493,6 +515,31 @@ namespace NetAppCommon.AppSettings.Models.Base
 
         #endregion
 
+        #region protected string _setupFileName; public virtual string SetupFileName
+
+        protected string? _setupFileName;
+
+        /// <summary>
+        ///     Nazwa pliku z ustawieniami startowymi aplikacji
+        ///     The name of the application startup settings file
+        /// </summary>
+        [XmlIgnore]
+        [JsonIgnore]
+        public virtual string? SetupFileName
+        {
+            get => _setupFileName;
+            protected set
+            {
+                if (value != _setupFileName)
+                {
+                    _setupFileName = value;
+                    OnPropertyChanged("SetupFileName");
+                }
+            }
+        }
+
+        #endregion
+
         #region protected string _filePath; public virtual string FilePath
 
         protected string? _filePath;
@@ -503,6 +550,9 @@ namespace NetAppCommon.AppSettings.Models.Base
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
+        [Display(Name = "Absolutna ścieżka do pliku konfiguracji ustawień programu",
+            Prompt = "Wybierz lub wpisz absolutną ścieżkę do pliku konfiguracji ustawień programu",
+            Description = "Absolutna ścieżka do pliku konfiguracji ustawień programu")]
         public virtual string? FilePath
         {
             get
@@ -723,13 +773,12 @@ namespace NetAppCommon.AppSettings.Models.Base
                 try
                 {
                     _useGlobalDatabaseConnectionSettings ??=
-                        AppSettingsRepository.GetValue<bool>(this, "UseGlobalDatabaseConnectionSettings");
+                        AppSettingsRepository?.GetValue<bool>(this, "UseGlobalDatabaseConnectionSettings");
                 }
                 catch (Exception e)
                 {
                     _log4Net.Error(
-                        string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
-                            e.StackTrace), e);
+                        $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
                 }
 
                 return _useGlobalDatabaseConnectionSettings != null && (bool)_useGlobalDatabaseConnectionSettings;
@@ -828,7 +877,7 @@ namespace NetAppCommon.AppSettings.Models.Base
                     {
                         _connectionString = AppSettingsRepository?.GetValue<string>(this,
                             $"{nameof(ConnectionStrings)}:{ConnectionStringName}");
-                        //if (string.IsNullOrWhiteSpace(_connectionString))
+                        //if (string.IsNullOrWhiteSpace(_connectionString) || (null != AppSettingsRepository && !AppSettingsRepository.MssqlCheckConnectionString(_connectionString)))
                         //{
                         //    _connectionString =
                         //        @"Data Source=(LocalDB)\MSSQLLocalDB; AttachDbFilename=%Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)%\MSSQLLocalDB\MSSQLLocalDB.mdf; Database=%AttachDbFilename%; MultipleActiveResultSets=true; Integrated Security=SSPI; Trusted_Connection=Yes; Max Pool Size=65536; Pooling=True";
