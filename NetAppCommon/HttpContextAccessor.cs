@@ -14,7 +14,7 @@ namespace NetAppCommon
         public static class AppContext
         {
             private static readonly ILog Log4net =
-                Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
+                Log4NetLogger.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
 
             private static IHttpContextAccessor _httpContextAccessor;
 

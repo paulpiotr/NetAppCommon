@@ -29,7 +29,7 @@ namespace NetAppCommon.ObjectMapper.Attributes
         ///     Instance to Log4netLogger class
         /// </summary>
         private static readonly ILog Log4net =
-            Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
+            Log4NetLogger.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
 
         #endregion
 

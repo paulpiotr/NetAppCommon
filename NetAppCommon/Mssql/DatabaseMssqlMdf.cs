@@ -20,7 +20,7 @@ namespace NetAppCommon.Mssql
         ///     private readonly ILog _log4Net
         /// </summary>
         private readonly ILog _log4Net =
-            Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
+            Log4NetLogger.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
 
         #endregion
 

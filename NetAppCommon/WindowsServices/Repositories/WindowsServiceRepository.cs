@@ -20,7 +20,7 @@ namespace NetAppCommon.WindowsServices.Repositories
         ///     Instance to Log4netLogger class
         /// </summary>
         private readonly ILog _log4Net =
-            Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
+            Log4NetLogger.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
 
         /// <summary>
         /// Pobierz dane o usłudze windows według nazwy serwisu lub/i nazwy wyświetlanej serwisu

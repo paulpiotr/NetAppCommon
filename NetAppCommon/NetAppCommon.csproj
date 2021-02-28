@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.12" />
+    <PackageReference Include="log4net-loggly" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.3" />
@@ -28,6 +30,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="log4net.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="scripts\Db\Mssql\MdfCreateDatabaseScript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -46,12 +51,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Log4netLogger\Log4netLogger.csproj" />
+    <Folder Include="Resources\" />
   </ItemGroup>
 
   <Target Name="SetEnvConfig" BeforeTargets="Compile">
-    <Copy SourceFiles="..\..\.env\log4net.debug.config" DestinationFiles="log4net.config" OverwriteReadOnlyFiles="true" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
-    <Copy SourceFiles="..\..\.env\log4net.release.config" DestinationFiles="log4net.config" OverwriteReadOnlyFiles="true" Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " />
+    <Copy SourceFiles="Resources\log4net.debug.config" DestinationFiles="log4net.config" OverwriteReadOnlyFiles="true" Condition=" Exists('Resources\log4net.debug.config') AND '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " ContinueOnError="true" />
+    <Copy SourceFiles="Resources\log4net.release.config" DestinationFiles="log4net.config" OverwriteReadOnlyFiles="true" Condition=" Exists('Resources\log4net.debug.config') AND '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " ContinueOnError="true" />
+    <Copy SourceFiles="..\..\.env\log4net.debug.config" DestinationFiles="log4net.config" OverwriteReadOnlyFiles="true" Condition=" Exists('..\..\.env\log4net.debug.config') AND '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " ContinueOnError="true" />
+    <Copy SourceFiles="..\..\.env\log4net.release.config" DestinationFiles="log4net.config" OverwriteReadOnlyFiles="true" Condition=" Exists('..\..\.env\log4net.debug.config') AND '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " ContinueOnError="true" />
   </Target>
 
 </Project>

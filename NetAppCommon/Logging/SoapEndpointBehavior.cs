@@ -26,7 +26,7 @@ namespace NetAppCommon.Logging
         ///     Log4net Logger
         /// </summary>
         private readonly ILog log4net =
-            Log4netLogger.Log4netLogger.GetLog4netInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
+            Log4NetLogger.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
 
         #endregion
 
