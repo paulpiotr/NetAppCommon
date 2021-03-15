@@ -42,10 +42,10 @@ namespace NetAppCommon.Helpers
         {
             try
             {
-                using (IServiceScope serviceScope =
+                using (var serviceScope =
                     serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
                 {
-                    using (TDbContext context = serviceScope.ServiceProvider.GetService<TDbContext>())
+                    using (var context = serviceScope.ServiceProvider.GetService<TDbContext>())
                     {
                         await RunMigrationAsync(context);
                     }

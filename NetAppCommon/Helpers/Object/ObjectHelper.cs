@@ -2,12 +2,12 @@
 
 using System;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using log4net;
+using Enumerable = System.Linq.Enumerable;
 
 #endregion
 
@@ -57,7 +57,7 @@ namespace NetAppCommon.Helpers.Object
                 if (null != o)
                 {
                     var stringBuilder = new StringBuilder();
-                    foreach (PropertyInfo propertyInfo in o.GetType().GetProperties().OrderBy(x => x.Name))
+                    foreach (var propertyInfo in Enumerable.OrderBy(o.GetType().GetProperties(), x => x.Name))
                     {
                         switch (propertyInfo.PropertyType.ToString())
                         {
@@ -68,14 +68,14 @@ namespace NetAppCommon.Helpers.Object
                                 break;
                             case "Decimal":
                             case "System.Decimal":
-                                var decimalValue = (decimal)(propertyInfo.GetValue(o, null) ?? 0);
+                                var decimalValue = (decimal) (propertyInfo.GetValue(o, null) ?? 0);
                                 stringBuilder.Append(propertyInfo.Name).Append(separator)
                                     .Append(decimalValue.ToString("N", CultureInfo.InvariantCulture)).Append(separator);
                                 //log4net.Debug($"{ propertyInfo.PropertyType } { propertyInfo.GetValue(o, null) ?? string.Empty } { decimalValue } { decimalValue.ToString("N", CultureInfo.InvariantCulture) } ");
                                 break;
                             case "Double":
                             case "System.Double":
-                                var doubleValue = (double)(propertyInfo.GetValue(o, null) ?? 0);
+                                var doubleValue = (double) (propertyInfo.GetValue(o, null) ?? 0);
                                 stringBuilder.Append(propertyInfo.Name).Append(separator)
                                     .Append(doubleValue.ToString("N", CultureInfo.InvariantCulture)).Append(separator);
                                 //log4net.Debug($"{ propertyInfo.PropertyType } { propertyInfo.GetValue(o, null) ?? string.Empty } { doubleValue } { doubleValue.ToString("N", CultureInfo.InvariantCulture) }");
@@ -130,11 +130,10 @@ namespace NetAppCommon.Helpers.Object
         ///     Wartości właściwości obiektu rozdzielone separatorem jako string
         ///     Object property values separated by a separator as a string
         /// </returns>
-        public static async Task<string> GetValuesToStringAsync(object o, string separator = null) =>
-            await Task.Run(() =>
-            {
-                return GetValuesToString(o, separator);
-            });
+        public static async Task<string> GetValuesToStringAsync(object o, string separator = null)
+        {
+            return await Task.Run(() => { return GetValuesToString(o, separator); });
+        }
 
         #endregion
 
@@ -174,10 +173,15 @@ namespace NetAppCommon.Helpers.Object
 
         #endregion
 
-        public static Guid ConvertObjectValuesToMD5HashGuid(object o, string separator = null) =>
-            new(MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(GetValuesToString(o, separator))));
+        public static Guid ConvertObjectValuesToMD5HashGuid(object o, string separator = null)
+        {
+            return new(MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(GetValuesToString(o, separator))));
+        }
 
-        public static Guid GuidFromString(string s) => new(MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(s)));
+        public static Guid GuidFromString(string s)
+        {
+            return new(MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(s)));
+        }
 
         #region public async Task<string> ConvertObjectValuesToMD5HashAsync(object o, string separator = null)
 
@@ -193,11 +197,10 @@ namespace NetAppCommon.Helpers.Object
         ///     Skrót MD5 wartości właściwości obiektu jako string
         ///     MD5 hash of the object property value as a string
         /// </returns>
-        public static async Task<string> ConvertObjectValuesToMD5HashAsync(object o, string separator = null) =>
-            await Task.Run(() =>
-            {
-                return ConvertObjectValuesToMD5Hash(o, separator);
-            });
+        public static async Task<string> ConvertObjectValuesToMD5HashAsync(object o, string separator = null)
+        {
+            return await Task.Run(() => { return ConvertObjectValuesToMD5Hash(o, separator); });
+        }
 
         #endregion
     }

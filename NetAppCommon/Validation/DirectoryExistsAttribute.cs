@@ -41,7 +41,7 @@ namespace NetAppCommon.Validation
         {
             if (null != value)
             {
-                if (Directory.Exists((string)value))
+                if (Directory.Exists((string) value))
                 {
                     return ValidationResult.Success;
                 }
@@ -52,7 +52,7 @@ namespace NetAppCommon.Validation
                 }
 
                 return new ValidationResult(string.Format("Katalog {0} nie istnieje lub nie masz do niego uprawnień!",
-                    (string)value));
+                    (string) value));
             }
 
             return ValidationResult.Success;

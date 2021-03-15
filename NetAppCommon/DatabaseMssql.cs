@@ -53,7 +53,7 @@ namespace NetAppCommon
                 {
                     //log4net.Debug(connectionString);
                     //Regex regex = new Regex(@"%.*?%");
-                    MatchCollection matchCollection = new Regex(@"%.*?%").Matches(connectionString);
+                    var matchCollection = new Regex(@"%.*?%").Matches(connectionString);
                     foreach (Match match in matchCollection)
                     {
                         if (!string.IsNullOrWhiteSpace(match.Value))
@@ -148,7 +148,8 @@ namespace NetAppCommon
                             stringBuilder.Append("-");
                             stringBuilder.Append(new Guid(MD5.Create()
                                 .ComputeHash(Encoding.ASCII.GetBytes(sqlConnectionStringBuilder.AttachDBFilename))));
-                            var attachDbFilename = Regex.Replace(stringBuilder.ToString().ToLower(), "[^A-Za-z0-9]", string.Empty);
+                            var attachDbFilename = Regex.Replace(stringBuilder.ToString().ToLower(), "[^A-Za-z0-9]",
+                                string.Empty);
                             connectionString = connectionString.Replace("%AttachDbFilename%",
                                 attachDbFilename);
                         }
@@ -409,7 +410,7 @@ namespace NetAppCommon
                 if (null != connectionString && !string.IsNullOrWhiteSpace(connectionString))
                 {
                     dbContextOptionsBuilder.UseSqlServer(connectionString);
-                    return (DbContextOptions<T>)dbContextOptionsBuilder.Options;
+                    return (DbContextOptions<T>) dbContextOptionsBuilder.Options;
                 }
 
                 return null;
@@ -479,7 +480,7 @@ namespace NetAppCommon
                 if (null != connectionString && !string.IsNullOrWhiteSpace(connectionString))
                 {
                     dbContextOptionsBuilder.UseSqlServer(connectionString);
-                    return (DbContextOptions<T>)dbContextOptionsBuilder.Options;
+                    return (DbContextOptions<T>) dbContextOptionsBuilder.Options;
                 }
 
                 return null;
@@ -553,7 +554,7 @@ namespace NetAppCommon
                 if (null != connectionString && !string.IsNullOrWhiteSpace(connectionString))
                 {
                     dbContextOptionsBuilder.UseSqlServer(connectionString);
-                    return (DbContextOptions<T>)dbContextOptionsBuilder.Options;
+                    return (DbContextOptions<T>) dbContextOptionsBuilder.Options;
                 }
 
                 return null;
@@ -617,7 +618,7 @@ namespace NetAppCommon
         {
             try
             {
-                return (T)Activator.CreateInstance(typeof(T));
+                return (T) Activator.CreateInstance(typeof(T));
             }
             catch (Exception e)
             {
@@ -673,11 +674,11 @@ namespace NetAppCommon
         {
             try
             {
-                DbContextOptions dbContextOptions = GetSqlServerDbContextOptions<T>(connectionStringName);
+                var dbContextOptions = GetSqlServerDbContextOptions<T>(connectionStringName);
                 if (null != dbContextOptions)
                 {
                     object[] vs = {GetSqlServerDbContextOptions<T>(connectionStringName)};
-                    return (T)Activator.CreateInstance(typeof(T), vs);
+                    return (T) Activator.CreateInstance(typeof(T), vs);
                 }
 
                 return null;
@@ -742,11 +743,11 @@ namespace NetAppCommon
         {
             try
             {
-                DbContextOptions dbContextOptions = GetDecryptSqlServerDbContextOptions<T>(connectionStringName);
+                var dbContextOptions = GetDecryptSqlServerDbContextOptions<T>(connectionStringName);
                 if (null != dbContextOptions)
                 {
                     object[] vs = {GetDecryptSqlServerDbContextOptions<T>(connectionStringName)};
-                    return (T)Activator.CreateInstance(typeof(T), vs);
+                    return (T) Activator.CreateInstance(typeof(T), vs);
                 }
 
                 return null;
@@ -811,12 +812,12 @@ namespace NetAppCommon
         {
             try
             {
-                DbContextOptions dbContextOptions =
+                var dbContextOptions =
                     GetDecryptSqlServerDbContextOptions<T>(connectionStringName, rsaFileName);
                 if (null != dbContextOptions)
                 {
                     object[] vs = {dbContextOptions};
-                    return (T)Activator.CreateInstance(typeof(T), vs);
+                    return (T) Activator.CreateInstance(typeof(T), vs);
                 }
 
                 return null;

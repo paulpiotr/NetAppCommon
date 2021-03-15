@@ -1,15 +1,17 @@
+#region using
+
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.ServiceProcess;
-using System.Text;
 using System.Threading.Tasks;
 using log4net;
 using NetAppCommon.WindowsServices.Models;
 using NetAppCommon.WindowsServices.Repositories.Interface;
+
+#endregion
 
 namespace NetAppCommon.WindowsServices.Repositories
 {
@@ -23,20 +25,20 @@ namespace NetAppCommon.WindowsServices.Repositories
             Log4NetLogger.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
 
         /// <summary>
-        /// Pobierz dane o usłudze windows według nazwy serwisu lub/i nazwy wyświetlanej serwisu
-        /// Get windows service data by service name and / or service display name
+        ///     Pobierz dane o usłudze windows według nazwy serwisu lub/i nazwy wyświetlanej serwisu
+        ///     Get windows service data by service name and / or service display name
         /// </summary>
         /// <param name="serviceName">
-        /// Nazwa serwisu jako string
-        /// Service name as a string
+        ///     Nazwa serwisu jako string
+        ///     Service name as a string
         /// </param>
         /// <param name="serviceDisplayName">
-        /// Opcjonalnie wyświetlana nazwa serwisu jako string
-        /// Optionally display the servis name as a string
+        ///     Opcjonalnie wyświetlana nazwa serwisu jako string
+        ///     Optionally display the servis name as a string
         /// </param>
         /// <returns>
-        /// Dane o usłudze jako WindowsServiceModel lub null
-        /// Service data as WindowsServiceModel or null
+        ///     Dane o usłudze jako WindowsServiceModel lub null
+        ///     Service data as WindowsServiceModel or null
         /// </returns>
         public WindowsServiceModel GetWindowsService(string serviceName, string serviceDisplayName = null)
         {
@@ -44,10 +46,14 @@ namespace NetAppCommon.WindowsServices.Repositories
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && !string.IsNullOrWhiteSpace(serviceName))
                 {
-                    ServiceController serviceController = ServiceController.GetServices().Where(x => x.ServiceName.Contains(serviceName) || x.DisplayName.Contains(serviceDisplayName ?? serviceName)).FirstOrDefault();
+                    var serviceController = ServiceController.GetServices().Where(x =>
+                        x.ServiceName.Contains(serviceName) ||
+                        x.DisplayName.Contains(serviceDisplayName ?? serviceName)).FirstOrDefault();
                     if (null != serviceController)
                     {
-                        Process process = Process.GetProcesses().Where(w => w.ProcessName.Contains(serviceController.ServiceName) || w.ProcessName.Contains(serviceController.DisplayName)).FirstOrDefault();
+                        var process = Process.GetProcesses().Where(w =>
+                            w.ProcessName.Contains(serviceController.ServiceName) ||
+                            w.ProcessName.Contains(serviceController.DisplayName)).FirstOrDefault();
                         if (null != process)
                         {
                             return new WindowsServiceModel(serviceController, process);
@@ -65,54 +71,53 @@ namespace NetAppCommon.WindowsServices.Repositories
         }
 
         /// <summary>
-        /// Pobierz dane o usłudze windows według nazwy serwisu lub/i nazwy wyświetlanej serwisu asynchronicznie
-        /// Get windows service data by service name and / or service display name asynchronously
+        ///     Pobierz dane o usłudze windows według nazwy serwisu lub/i nazwy wyświetlanej serwisu asynchronicznie
+        ///     Get windows service data by service name and / or service display name asynchronously
         /// </summary>
         /// <param name="serviceName">
-        /// Nazwa serwisu jako string
-        /// Service name as a string
+        ///     Nazwa serwisu jako string
+        ///     Service name as a string
         /// </param>
         /// <param name="serviceDisplayName">
-        /// Opcjonalnie wyświetlana nazwa serwisu jako string
-        /// Optionally display the servis name as a string
+        ///     Opcjonalnie wyświetlana nazwa serwisu jako string
+        ///     Optionally display the servis name as a string
         /// </param>
         /// <returns>
-        /// Dane o usłudze jako WindowsServiceModel lub null
-        /// Service data as WindowsServiceModel or null
+        ///     Dane o usłudze jako WindowsServiceModel lub null
+        ///     Service data as WindowsServiceModel or null
         /// </returns>
-        public async Task<WindowsServiceModel> GetWindowsServiceAsync(string serviceName, string serviceDisplayName = null)
+        public async Task<WindowsServiceModel> GetWindowsServiceAsync(string serviceName,
+            string serviceDisplayName = null)
         {
-            return await Task.Run(() =>
-            {
-                return GetWindowsService(serviceName, serviceDisplayName);
-            });
+            return await Task.Run(() => { return GetWindowsService(serviceName, serviceDisplayName); });
         }
 
         /// <summary>
-        /// Czy czas rozpoczęcia bieżącego procesu jest większy niż czas rozpoczęcia procesu usługi
-        /// Whether the current process's start time is greater than the service process's start time
+        ///     Czy czas rozpoczęcia bieżącego procesu jest większy niż czas rozpoczęcia procesu usługi
+        ///     Whether the current process's start time is greater than the service process's start time
         /// </summary>
         /// <param name="currentProcess">
-        /// Bieżący proces jako Process
-        /// Current process as Process
+        ///     Bieżący proces jako Process
+        ///     Current process as Process
         /// </param>
         /// <param name="serviceName">
-        /// Nazwa serwisu jako string
-        /// Service name as a string
+        ///     Nazwa serwisu jako string
+        ///     Service name as a string
         /// </param>
         /// <param name="serviceDisplayName">
-        /// Opcjonalnie wyświetlana nazwa serwisu jako string
-        /// Optionally display the servis name as a string
+        ///     Opcjonalnie wyświetlana nazwa serwisu jako string
+        ///     Optionally display the servis name as a string
         /// </param>
         /// <returns>
-        /// bool
-        /// bool
+        ///     bool
+        ///     bool
         /// </returns>
-        public bool IsWhetherStartTimeCurrentProcessIsGreaterAsStartTimeServiceProcess(Process currentProcess, string serviceName, string serviceDisplayName = null)
+        public bool IsWhetherStartTimeCurrentProcessIsGreaterAsStartTimeServiceProcess(Process currentProcess,
+            string serviceName, string serviceDisplayName = null)
         {
             try
             {
-                WindowsServiceModel windowsServiceModel = GetWindowsService(serviceName, serviceDisplayName);
+                var windowsServiceModel = GetWindowsService(serviceName, serviceDisplayName);
                 if (null != currentProcess && null != windowsServiceModel)
                 {
 //#if DEBUG
@@ -131,70 +136,90 @@ namespace NetAppCommon.WindowsServices.Repositories
         }
 
         /// <summary>
-        /// Czy czas rozpoczęcia bieżącego procesu jest większy niż czas rozpoczęcia procesu usługi asynchronicznie
-        /// Whether the current process's start time is greater than the service process's start time asynchronously
+        ///     Czy czas rozpoczęcia bieżącego procesu jest większy niż czas rozpoczęcia procesu usługi asynchronicznie
+        ///     Whether the current process's start time is greater than the service process's start time asynchronously
         /// </summary>
         /// <param name="currentProcess">
-        /// Bieżący proces jako Process
-        /// Current process as Process
+        ///     Bieżący proces jako Process
+        ///     Current process as Process
         /// </param>
         /// <param name="serviceName">
-        /// Nazwa serwisu jako string
-        /// Service name as a string
+        ///     Nazwa serwisu jako string
+        ///     Service name as a string
         /// </param>
         /// <param name="serviceDisplayName">
-        /// Opcjonalnie wyświetlana nazwa serwisu jako string
-        /// Optionally display the servis name as a string
+        ///     Opcjonalnie wyświetlana nazwa serwisu jako string
+        ///     Optionally display the servis name as a string
         /// </param>
         /// <returns>
-        /// bool
-        /// bool
+        ///     bool
+        ///     bool
         /// </returns>
-        public async Task<bool> IsWhetherStartTimeCurrentProcessIsGreaterAsStartTimeServiceProcessAsync(Process currentProcess, string serviceName, string serviceDisplayName = null) => await Task.Run(() => { return IsWhetherStartTimeCurrentProcessIsGreaterAsStartTimeServiceProcess(currentProcess, serviceName, serviceDisplayName); });
+        public async Task<bool> IsWhetherStartTimeCurrentProcessIsGreaterAsStartTimeServiceProcessAsync(
+            Process currentProcess, string serviceName, string serviceDisplayName = null)
+        {
+            return await Task.Run(() =>
+            {
+                return IsWhetherStartTimeCurrentProcessIsGreaterAsStartTimeServiceProcess(currentProcess,
+                    serviceName, serviceDisplayName);
+            });
+        }
 
         /// <summary>
-        /// Czy czas rozpoczęcia bieżącego procesu jest mniejszy niż czas rozpoczęcia procesu usługi
-        /// Whether the current process's start time is less than the service's process start time
+        ///     Czy czas rozpoczęcia bieżącego procesu jest mniejszy niż czas rozpoczęcia procesu usługi
+        ///     Whether the current process's start time is less than the service's process start time
         /// </summary>
         /// <param name="currentProcess">
-        /// Bieżący proces jako Process
-        /// Current process as Process
+        ///     Bieżący proces jako Process
+        ///     Current process as Process
         /// </param>
         /// <param name="serviceName">
-        /// Nazwa serwisu jako string
-        /// Service name as a string
+        ///     Nazwa serwisu jako string
+        ///     Service name as a string
         /// </param>
         /// <param name="serviceDisplayName">
-        /// Opcjonalnie wyświetlana nazwa serwisu jako string
-        /// Optionally display the servis name as a string
+        ///     Opcjonalnie wyświetlana nazwa serwisu jako string
+        ///     Optionally display the servis name as a string
         /// </param>
         /// <returns>
-        /// bool
-        /// bool
+        ///     bool
+        ///     bool
         /// </returns>
-        public bool IsWhetherStartTimeCurrentProcessIsLessAsStartTimeServiceProcess(Process currentProcess, string serviceName, string serviceDisplayName = null) => !IsWhetherStartTimeCurrentProcessIsGreaterAsStartTimeServiceProcess(currentProcess, serviceName, serviceDisplayName);
+        public bool IsWhetherStartTimeCurrentProcessIsLessAsStartTimeServiceProcess(Process currentProcess,
+            string serviceName, string serviceDisplayName = null)
+        {
+            return !IsWhetherStartTimeCurrentProcessIsGreaterAsStartTimeServiceProcess(currentProcess, serviceName,
+                serviceDisplayName);
+        }
 
         /// <summary>
-        /// Czy czas rozpoczęcia bieżącego procesu jest mniejszy niż czas rozpoczęcia procesu usługi
-        /// Whether the current process's start time is less than the service's process start time
+        ///     Czy czas rozpoczęcia bieżącego procesu jest mniejszy niż czas rozpoczęcia procesu usługi
+        ///     Whether the current process's start time is less than the service's process start time
         /// </summary>
         /// <param name="currentProcess">
-        /// Bieżący proces jako Process
-        /// Current process as Process
+        ///     Bieżący proces jako Process
+        ///     Current process as Process
         /// </param>
         /// <param name="serviceName">
-        /// Nazwa serwisu jako string
-        /// Service name as a string
+        ///     Nazwa serwisu jako string
+        ///     Service name as a string
         /// </param>
         /// <param name="serviceDisplayName">
-        /// Opcjonalnie wyświetlana nazwa serwisu jako string
-        /// Optionally display the servis name as a string
+        ///     Opcjonalnie wyświetlana nazwa serwisu jako string
+        ///     Optionally display the servis name as a string
         /// </param>
         /// <returns>
-        /// bool
-        /// bool
+        ///     bool
+        ///     bool
         /// </returns>
-        public async Task<bool> IsWhetherStartTimeCurrentProcessIsLessAsStartTimeServiceProcessAsync(Process currentProcess, string serviceName, string serviceDisplayName = null) => await Task.Run(() => { return IsWhetherStartTimeCurrentProcessIsLessAsStartTimeServiceProcess(currentProcess, serviceName, serviceDisplayName); });
-
+        public async Task<bool> IsWhetherStartTimeCurrentProcessIsLessAsStartTimeServiceProcessAsync(
+            Process currentProcess, string serviceName, string serviceDisplayName = null)
+        {
+            return await Task.Run(() =>
+            {
+                return IsWhetherStartTimeCurrentProcessIsLessAsStartTimeServiceProcess(currentProcess, serviceName,
+                    serviceDisplayName);
+            });
+        }
     }
 }

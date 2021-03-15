@@ -104,9 +104,11 @@ namespace NetAppCommon.Logging
         ///     Środowisko wykonawcze klienta jako ClientRuntime
         ///     Client Runtime as ClientRuntime
         /// </param>
-        public void ApplyClientBehavior(ServiceEndpoint endpoint, ClientRuntime clientRuntime) =>
+        public void ApplyClientBehavior(ServiceEndpoint endpoint, ClientRuntime clientRuntime)
+        {
             //log4net.Debug("ApplyClientBehavior(ServiceEndpoint endpoint, ClientRuntime clientRuntime)");
             clientRuntime.ClientMessageInspectors.Add(SoapClientMessageInspector);
+        }
 
         #endregion
 

@@ -33,7 +33,7 @@ namespace NetAppCommon.AppSettings.Models
             {
                 var memoryCacheProvider = MemoryCacheProvider.GetInstance();
                 var filePathKey = $"{MethodBase.GetCurrentMethod()?.DeclaringType?.FullName}.FilePath";
-                var filePath = (object)memoryCacheProvider.Get(filePathKey);
+                var filePath = (object) memoryCacheProvider.Get(filePathKey);
                 if (null == filePath)
                 {
                     var appSettingsSetupFilePath = Path.Combine(BaseDirectory!, SetupFileName!);
@@ -104,12 +104,14 @@ namespace NetAppCommon.AppSettings.Models
                             ConnectionString = appSettingsSetupConnectionString;
                             AppSettingsRepository?.SaveAsync(this);
                         }
-                        else if (!string.IsNullOrWhiteSpace(appSettingsUserConnectionString) && AppSettingsRepository.MssqlCheckConnectionString(appSettingsUserConnectionString))
+                        else if (!string.IsNullOrWhiteSpace(appSettingsUserConnectionString) &&
+                                 AppSettingsRepository.MssqlCheckConnectionString(appSettingsUserConnectionString))
                         {
                             ConnectionString = appSettingsUserConnectionString;
                             AppSettingsRepository?.SaveAsync(this);
                         }
-                        else if(!string.IsNullOrWhiteSpace(appSettingsConnectionString) && AppSettingsRepository.MssqlCheckConnectionString(appSettingsConnectionString))
+                        else if (!string.IsNullOrWhiteSpace(appSettingsConnectionString) &&
+                                 AppSettingsRepository.MssqlCheckConnectionString(appSettingsConnectionString))
                         {
                             ConnectionString = appSettingsConnectionString;
                             AppSettingsRepository?.SaveAsync(this);
@@ -121,7 +123,7 @@ namespace NetAppCommon.AppSettings.Models
 
                 if (null != UserProfileDirectory && null != FileName)
                 {
-                    FilePath = (string)(filePath ?? Path.Combine(UserProfileDirectory!, FileName!));
+                    FilePath = (string) (filePath ?? Path.Combine(UserProfileDirectory!, FileName!));
                 }
             }
             catch (Exception e)
@@ -142,7 +144,10 @@ namespace NetAppCommon.AppSettings.Models
         ///     Statyczna referencja do instancji AppSettingsBaseModel
         ///     A static reference to the AppSettingsBaseModel instance
         /// </returns>
-        public static AppSettingsModel GetInstance() => new();
+        public static AppSettingsModel GetAppSettingsModel()
+        {
+            return new();
+        }
 
         #endregion
 
@@ -177,7 +182,10 @@ namespace NetAppCommon.AppSettings.Models
         ///     Statyczna referencja do instancji AppSettingsBaseModel
         ///     A static reference to the AppSettingsBaseModel instance
         /// </returns>
-        public static AppSettingsModel GetInstance(string filePath) => new(filePath);
+        public static AppSettingsModel GetAppSettingsModel(string filePath)
+        {
+            return new(filePath);
+        }
 
         #endregion
 
@@ -200,7 +208,7 @@ namespace NetAppCommon.AppSettings.Models
         private const string Filename = "appsettings.json";
 #endif
 
-        private new string? _fileName = Filename;
+        private string? _fileName = Filename;
 
         public override string? FileName
         {
@@ -225,7 +233,7 @@ namespace NetAppCommon.AppSettings.Models
         private const string Setupfilename = "appsettings.setup.json";
 #endif
 
-        private new string? _setupFileName = Setupfilename;
+        private string? _setupFileName = Setupfilename;
 
         public override string? SetupFileName
         {
@@ -250,7 +258,7 @@ namespace NetAppCommon.AppSettings.Models
         private const string Connectionstringname = "DefaultDatabaseContext";
 #endif
 
-        private new string _connectionStringName = Connectionstringname;
+        private string _connectionStringName = Connectionstringname;
 
         public override string ConnectionStringName
         {
