@@ -7,7 +7,7 @@ using NetAppCommon.AppSettings.Models.Base;
 
 namespace NetAppCommon.AppSettings.Repositories.Interface
 {
-    public interface IAppSettingsRepository<TAppSettings> where TAppSettings : AppSettingsModel
+    public interface IAppSettingsRepository<TAppSettings> where TAppSettings : AppSettingsWithoutDatabase
     {
         public TAppSettings Save(TAppSettings appSettings = null);
 

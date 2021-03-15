@@ -19,7 +19,7 @@ namespace NetAppCommon.AppSettings.Models
     ///     Model danych ustawień aplikacji NetAppCommon.AppSettings.Models
     ///     Data model for the NetAppCommon.AppSettings.Models application settings
     /// </summary>
-    public sealed class AppSettingsModel : AppSettingsBaseModel
+    public sealed class AppSettings : AppSettingsWithDatabase
     {
         #region public AppSettingsModel()
 
@@ -27,7 +27,7 @@ namespace NetAppCommon.AppSettings.Models
         ///     Ważne - konstruktor
         ///     Important - the constructor
         /// </summary>
-        public AppSettingsModel()
+        public AppSettings()
         {
             try
             {
@@ -40,11 +40,11 @@ namespace NetAppCommon.AppSettings.Models
                     var appSettingsUserFilePath = Path.Combine(UserProfileDirectory!, FileName!);
                     var appSettingsFilePath = FilePath;
                     var appSettingsSetupConnectionString =
-                        new AppSettingsModel(appSettingsSetupFilePath!).GetConnectionString();
+                        new AppSettings(appSettingsSetupFilePath!).GetConnectionString();
                     var appSettingsUserConnectionString =
-                        new AppSettingsModel(appSettingsUserFilePath!).GetConnectionString();
+                        new AppSettings(appSettingsUserFilePath!).GetConnectionString();
                     var appSettingsConnectionString =
-                        new AppSettingsModel(appSettingsFilePath!).GetConnectionString();
+                        new AppSettings(appSettingsFilePath!).GetConnectionString();
 
                     if (!string.IsNullOrWhiteSpace(appSettingsUserFilePath) && !File.Exists(appSettingsUserFilePath))
                     {
@@ -144,7 +144,7 @@ namespace NetAppCommon.AppSettings.Models
         ///     Statyczna referencja do instancji AppSettingsBaseModel
         ///     A static reference to the AppSettingsBaseModel instance
         /// </returns>
-        public static AppSettingsModel GetAppSettingsModel()
+        public static AppSettings GetAppSettingsModel()
         {
             return new();
         }
@@ -161,7 +161,7 @@ namespace NetAppCommon.AppSettings.Models
         ///     Ścieżka do pliku konfiguracji jako string
         ///     Path to the configuration file as a string
         /// </param>
-        public AppSettingsModel(string filePath)
+        public AppSettings(string filePath)
         {
             if (File.Exists(filePath))
             {
@@ -182,7 +182,7 @@ namespace NetAppCommon.AppSettings.Models
         ///     Statyczna referencja do instancji AppSettingsBaseModel
         ///     A static reference to the AppSettingsBaseModel instance
         /// </returns>
-        public static AppSettingsModel GetAppSettingsModel(string filePath)
+        public static AppSettings GetAppSettingsModel(string filePath)
         {
             return new(filePath);
         }

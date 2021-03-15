@@ -24,7 +24,7 @@ namespace NetAppCommon.AppSettings.Models.Base
     ///     Common application settings data model
     /// </summary>
     [NotMapped]
-    public class AppSettingsBaseModel : AppSettingsModel
+    public class AppSettingsWithDatabase : AppSettingsWithoutDatabase
     {
         #region private readonly log4net.ILog log4net
 
@@ -37,11 +37,11 @@ namespace NetAppCommon.AppSettings.Models.Base
 
         #endregion
 
-        public AppSettingsBaseModel()
+        public AppSettingsWithDatabase()
         {
         }
 
-        public AppSettingsBaseModel(string filePath)
+        public AppSettingsWithDatabase(string filePath)
         {
             try
             {

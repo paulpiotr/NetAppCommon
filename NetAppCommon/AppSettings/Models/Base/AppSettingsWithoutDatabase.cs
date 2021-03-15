@@ -30,7 +30,7 @@ namespace NetAppCommon.AppSettings.Models.Base
     ///     Common application settings data model
     /// </summary>
     [NotMapped]
-    public class AppSettingsModel : RsaProvaiderBaseModel, INotifyPropertyChanged
+    public class AppSettingsWithoutDatabase : RsaProvaiderBaseModel, INotifyPropertyChanged
     {
         #region private readonly log4net.ILog log4net
 
@@ -43,11 +43,11 @@ namespace NetAppCommon.AppSettings.Models.Base
 
         #endregion
 
-        public AppSettingsModel()
+        public AppSettingsWithoutDatabase()
         {
         }
 
-        public AppSettingsModel(string filePath)
+        public AppSettingsWithoutDatabase(string filePath)
         {
             try
             {
@@ -169,14 +169,14 @@ namespace NetAppCommon.AppSettings.Models.Base
 
         #region private AppSettingsRepositoryBase...; public virtual AppSettingsRepositoryBase...
 
-        private AppSettingsRepository<AppSettingsBaseModel>? _appSettingsRepository;
+        private AppSettingsRepository<AppSettingsWithDatabase>? _appSettingsRepository;
 
         [XmlIgnore]
         [JsonIgnore]
-        public virtual AppSettingsRepository<AppSettingsBaseModel>? AppSettingsRepository
+        public virtual AppSettingsRepository<AppSettingsWithDatabase>? AppSettingsRepository
         {
             get =>
-                _appSettingsRepository ??= AppSettingsRepository<AppSettingsBaseModel>.GetInstance();
+                _appSettingsRepository ??= AppSettingsRepository<AppSettingsWithDatabase>.GetInstance();
             set
             {
                 if (value != _appSettingsRepository)
@@ -374,7 +374,7 @@ namespace NetAppCommon.AppSettings.Models.Base
 
                 return _userProfileDirectory;
             }
-            private set
+            protected set
             {
                 if (value != _userProfileDirectory && Directory.Exists(value))
                 {

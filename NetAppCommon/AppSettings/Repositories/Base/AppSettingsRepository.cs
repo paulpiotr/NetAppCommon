@@ -29,7 +29,7 @@ namespace NetAppCommon.AppSettings.Repositories.Base
     ///     Settings model type parameter inherited from AppSettingsBaseModel
     /// </typeparam>
     public class AppSettingsRepository<TAppSettings> : IAppSettingsRepository<TAppSettings>
-        where TAppSettings : AppSettingsModel, new()
+        where TAppSettings : AppSettingsWithoutDatabase, new()
     {
         #region private readonly log4net.ILog log4net
 
