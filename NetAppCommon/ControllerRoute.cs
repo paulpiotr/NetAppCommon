@@ -38,46 +38,50 @@ namespace NetAppCommon
             try
             {
                 var controllerRoutingActionsList = new List<ControllerRoutingActions>();
-                provider.ActionDescriptors.Items.ToList().OrderBy(o => o.DisplayName)/*.ThenBy(o => o.RouteValues["Action"])*/.ToList().ForEach(actionDescriptorItem =>
-                {
-                    var routeParameters = new Dictionary<string, string>();
-                    actionDescriptorItem.Parameters.ToList().ForEach(parameter =>
-                    {
-                        routeParameters.Add(parameter.Name, parameter.ParameterType.Name);
-                    });
-                    var routeUrlAction = string.Empty;
-                    try
-                    {
-                        routeUrlAction = null != actionDescriptorItem.AttributeRouteInfo?.Template! &&
-                                             !string.IsNullOrWhiteSpace(
-                                                 actionDescriptorItem.AttributeRouteInfo?.Template!)
-                            ? actionDescriptorItem.AttributeRouteInfo?.Template!
-                            : url.Action(actionDescriptorItem.RouteValues["Action"],
-                                actionDescriptorItem.RouteValues["Controller"]);
-                    }
-                    catch (Exception e)
-                    {
-                        Log4net.Error(
-                            $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
-                    }
+                provider.ActionDescriptors.Items.ToList()
+                    .OrderBy(o => o.DisplayName) /*.ThenBy(o => o.RouteValues["Action"])*/.ToList().ForEach(
+                        actionDescriptorItem =>
+                        {
+                            var routeParameters = new Dictionary<string, string>();
+                            actionDescriptorItem.Parameters.ToList().ForEach(parameter =>
+                            {
+                                routeParameters.Add(parameter.Name, parameter.ParameterType.Name);
+                            });
+                            var routeUrlAction = string.Empty;
+                            try
+                            {
+                                routeUrlAction = null != actionDescriptorItem.AttributeRouteInfo?.Template! &&
+                                                 !string.IsNullOrWhiteSpace(
+                                                     actionDescriptorItem.AttributeRouteInfo?.Template!)
+                                    ? actionDescriptorItem.AttributeRouteInfo?.Template!
+                                    : url.Action(actionDescriptorItem.RouteValues["Action"],
+                                        actionDescriptorItem.RouteValues["Controller"]);
+                            }
+                            catch (Exception e)
+                            {
+                                Log4net.Error(
+                                    $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n",
+                                    e);
+                            }
 
-                    var controllerRoutingAction = new ControllerRoutingActions
-                    {
-                        RouteId = actionDescriptorItem.Id,
-                        RouteController = actionDescriptorItem.RouteValues["Controller"],
-                        RouteAction = actionDescriptorItem.RouteValues["Action"],
-                        RouteUrlAction = routeUrlAction,
-                        RouteUrlAbsoluteAction =
-                            //$"{controllerBase.Request.Scheme}://{controllerBase.Request.Host}/{routeUrlAction}",
-                            string.Empty,
-                        RouteParameters = routeParameters,
-                        RouteAttributeInfoTemplate = actionDescriptorItem.AttributeRouteInfo?.Template!
-                    };
-                    controllerRoutingActionsList.Add(controllerRoutingAction);
-                });
-                foreach (ControllerRoutingActions controllerRoutingAction in controllerRoutingActionsList)
+                            var controllerRoutingAction = new ControllerRoutingActions
+                            {
+                                RouteId = actionDescriptorItem.Id,
+                                RouteController = actionDescriptorItem.RouteValues["Controller"],
+                                RouteAction = actionDescriptorItem.RouteValues["Action"],
+                                RouteUrlAction = routeUrlAction,
+                                RouteUrlAbsoluteAction =
+                                    //$"{controllerBase.Request.Scheme}://{controllerBase.Request.Host}/{routeUrlAction}",
+                                    string.Empty,
+                                RouteParameters = routeParameters,
+                                RouteAttributeInfoTemplate = actionDescriptorItem.AttributeRouteInfo?.Template!
+                            };
+                            controllerRoutingActionsList.Add(controllerRoutingAction);
+                        });
+                foreach (var controllerRoutingAction in controllerRoutingActionsList)
                 {
-                    Console.WriteLine($"{controllerRoutingAction.RouteController} / {controllerRoutingAction.RouteUrlAction}");
+                    Console.WriteLine(
+                        $"{controllerRoutingAction.RouteController} / {controllerRoutingAction.RouteUrlAction}");
                 }
             }
             catch (Exception e)
@@ -235,7 +239,7 @@ namespace NetAppCommon
         {
             try
             {
-                List<ControllerRoutingActions> routes = GetRouteAction(provider, controllerName, url, controllerBase);
+                var routes = GetRouteAction(provider, controllerName, url, controllerBase);
                 if (null != routes && routes.Count > 0)
                 {
                     return new KendoGrid<List<ControllerRoutingActions>> {Total = routes.Count, Data = routes};
@@ -286,7 +290,7 @@ namespace NetAppCommon
             {
                 return await Task.Run(async () =>
                 {
-                    List<ControllerRoutingActions> routes =
+                    var routes =
                         await GetRouteActionAsync(provider, controllerName, url, controllerBase);
                     if (null != routes && routes.Count > 0)
                     {

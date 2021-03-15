@@ -63,7 +63,10 @@ namespace NetAppCommon.Helpers.Files
         ///     Statuczny obiekt instancji klasy NetAppCommon.Helpers.Files.FileHelper
         ///     Statuczny obiekt instancji klasy NetAppCommon.Helpers.Files.FileHelper
         /// </returns>
-        public static FileHelper GetInstance() => new();
+        public static FileHelper GetInstance()
+        {
+            return new();
+        }
 
         #endregion
 
@@ -117,11 +120,10 @@ namespace NetAppCommon.Helpers.Files
         ///     Skrót MD5 z treści pliku jako string lub null
         ///     MD5 hash from the file content as string or null
         /// </returns>
-        public static async Task<string> GetMD5HashAsync(string filePath) =>
-            await Task.Run(() =>
-            {
-                return GetMD5Hash(filePath);
-            });
+        public static async Task<string> GetMD5HashAsync(string filePath)
+        {
+            return await Task.Run(() => { return GetMD5Hash(filePath); });
+        }
 
         #endregion
 
@@ -175,11 +177,10 @@ namespace NetAppCommon.Helpers.Files
         ///     Skrót MD5 z treści pliku jako string lub null
         ///     MD5 hash from the file content as string or null
         /// </returns>
-        public static async Task<string> GetMD5HashAsync(byte[] fileContent) =>
-            await Task.Run(() =>
-            {
-                return GetMD5Hash(fileContent);
-            });
+        public static async Task<string> GetMD5HashAsync(byte[] fileContent)
+        {
+            return await Task.Run(() => { return GetMD5Hash(fileContent); });
+        }
 
         #endregion
 
@@ -229,11 +230,10 @@ namespace NetAppCommon.Helpers.Files
         ///     prawda, jeśli błąd dotyczy udostępniania lub blokady pliku lub fałsz jeśli inny jako bool
         ///     true if the error is related to sharing or locking the file, or false if different as bool
         /// </returns>
-        private async Task<bool> IsLockedAsync(Exception exception) =>
-            await Task.Run(() =>
-            {
-                return IsLocked(exception);
-            });
+        private async Task<bool> IsLockedAsync(Exception exception)
+        {
+            return await Task.Run(() => { return IsLocked(exception); });
+        }
 
         #endregion
 
@@ -259,7 +259,7 @@ namespace NetAppCommon.Helpers.Files
                 {
                     if (File.Exists(filePath))
                     {
-                        using (FileStream fileStream =
+                        using (var fileStream =
                             File.Open(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
                         {
                             if (fileStream != null)
@@ -275,7 +275,7 @@ namespace NetAppCommon.Helpers.Files
                 {
                     if (IsLocked(e))
                     {
-                        Thread.Sleep((int)TimeSpan.FromSeconds(1).TotalMilliseconds);
+                        Thread.Sleep((int) TimeSpan.FromSeconds(1).TotalMilliseconds);
                     }
                     else
                     {
@@ -323,7 +323,7 @@ namespace NetAppCommon.Helpers.Files
             {
                 try
                 {
-                    using (FileStream fileStream =
+                    using (var fileStream =
                         File.Open(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
                     {
                         if (fileStream != null)
@@ -337,7 +337,7 @@ namespace NetAppCommon.Helpers.Files
                 {
                     if (IsLocked(e))
                     {
-                        Thread.Sleep((int)TimeSpan.FromSeconds(1).TotalMilliseconds);
+                        Thread.Sleep((int) TimeSpan.FromSeconds(1).TotalMilliseconds);
                     }
                     else
                     {

@@ -142,7 +142,7 @@ namespace NetAppCommon.Validation
         {
             if (null != value && null != ListOfAttributes && ListOfAttributes.Count > 0)
             {
-                if (ListOfAttributes.Contains((string)value))
+                if (ListOfAttributes.Contains((string) value))
                 {
                     return ValidationResult.Success;
                 }
@@ -153,7 +153,7 @@ namespace NetAppCommon.Validation
                 }
 
                 return new ValidationResult(string.Format("Wartość {0} nie występuje w podanej liście argumentów {1}",
-                    (string)value, string.Join(",", ListOfAttributes)));
+                    (string) value, string.Join(",", ListOfAttributes)));
             }
 
             return ValidationResult.Success;

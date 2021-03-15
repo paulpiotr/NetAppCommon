@@ -8,6 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include=".bin\win86\wget.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include=".bin\win64\wget.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="log4net" Version="2.0.12" />
     <PackageReference Include="log4net-loggly" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
@@ -52,6 +61,27 @@
 
   <ItemGroup>
     <Folder Include="Resources\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include=".bin\win86\COPYING">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include=".bin\win86\wget.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include=".bin\win86\wget.exe.debug">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include=".bin\win64\COPYING">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include=".bin\win64\wget.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include=".bin\win64\wget.exe.debug">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <Target Name="SetEnvConfig" BeforeTargets="Compile">

@@ -25,7 +25,11 @@ namespace NetAppCommon
             SettingsJsonFileName = settingsJsonFileName;
         }
 
-        public override string ConnectionString { get => base.ConnectionString; set => base.ConnectionString = value; }
+        public override string ConnectionString
+        {
+            get => base.ConnectionString;
+            set => base.ConnectionString = value;
+        }
 
         public override string ConnectionStringName
         {
@@ -69,16 +73,23 @@ namespace NetAppCommon
             return _instance;
         }
 
-        public async Task<bool> CreateAsync() =>
-            await Task.Run(() =>
+        public async Task<bool> CreateAsync()
+        {
+            return await Task.Run(() =>
             {
                 return base.Create(ConnectionString, ConnectionStringName, SettingsJsonFileName);
             });
+        }
 
-        public bool Create() => base.Create(ConnectionString, ConnectionStringName, SettingsJsonFileName);
+        public bool Create()
+        {
+            return base.Create(ConnectionString, ConnectionStringName, SettingsJsonFileName);
+        }
 
         public override bool Create(string connectionString = null, string connectionStringName = null,
-            string settingsJsonFileName = null) =>
-            base.Create(connectionString, connectionStringName, settingsJsonFileName);
+            string settingsJsonFileName = null)
+        {
+            return base.Create(connectionString, connectionStringName, settingsJsonFileName);
+        }
     }
 }

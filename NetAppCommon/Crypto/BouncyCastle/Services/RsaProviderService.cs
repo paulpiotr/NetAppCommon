@@ -147,8 +147,10 @@ namespace NetAppCommon.Crypto.BouncyCastle.Services
         ///     samego siebie jako RsaServiceProvider
         ///     self as RsaServiceProvider
         /// </returns>
-        public async Task<RsaProviderService> InitializeAsync(int dwKeySize = DwKeySize) =>
-            await Task.Run(() => Initialize(dwKeySize));
+        public async Task<RsaProviderService> InitializeAsync(int dwKeySize = DwKeySize)
+        {
+            return await Task.Run(() => Initialize(dwKeySize));
+        }
 
         #endregion
 
@@ -180,8 +182,10 @@ namespace NetAppCommon.Crypto.BouncyCastle.Services
         }
 
         public async Task<string> GetAsymmetricPrivateKeyAsStringAsync(
-            string asymmetricPrivateKeyFilePath = null) =>
-            await Task.Run(() => GetAsymmetricPrivateKeyAsString(asymmetricPrivateKeyFilePath));
+            string asymmetricPrivateKeyFilePath = null)
+        {
+            return await Task.Run(() => GetAsymmetricPrivateKeyAsString(asymmetricPrivateKeyFilePath));
+        }
 
         public string GetAsymmetricPublicKeyAsString(string asymmetricPublicKeyFilePath = null)
         {
@@ -211,8 +215,10 @@ namespace NetAppCommon.Crypto.BouncyCastle.Services
         }
 
         public async Task<string>
-            GetAsymmetricPublicKeyAsStringAsync(string asymmetricPublicKeyFilePath = null) =>
-            await Task.Run(() => GetAsymmetricPublicKeyAsString(asymmetricPublicKeyFilePath));
+            GetAsymmetricPublicKeyAsStringAsync(string asymmetricPublicKeyFilePath = null)
+        {
+            return await Task.Run(() => GetAsymmetricPublicKeyAsString(asymmetricPublicKeyFilePath));
+        }
 
         #region public static RsaProviderService GetRsaProviderService()
 
@@ -224,15 +230,23 @@ namespace NetAppCommon.Crypto.BouncyCastle.Services
         ///     Statyczna referencja jako RsaProviderService
         ///     Static reference as Rsa Provider Service
         /// </returns>
-        public static RsaProviderService GetRsaProviderService() => new();
+        public static RsaProviderService GetRsaProviderService()
+        {
+            return new();
+        }
 
         #endregion
 
-        public static RsaProviderService GetRsaProviderService(int dwKeySize) => new(dwKeySize);
+        public static RsaProviderService GetRsaProviderService(int dwKeySize)
+        {
+            return new(dwKeySize);
+        }
 
         public static RsaProviderService GetRsaProviderService(string asymmetricPrivateKeyFilePath,
-            string asymmetricPublicKeyFilePath, bool initialize = true, int dwKeySize = DwKeySize) =>
-            new(asymmetricPrivateKeyFilePath, asymmetricPublicKeyFilePath, initialize, dwKeySize);
+            string asymmetricPublicKeyFilePath, bool initialize = true, int dwKeySize = DwKeySize)
+        {
+            return new(asymmetricPrivateKeyFilePath, asymmetricPublicKeyFilePath, initialize, dwKeySize);
+        }
 
         private void SaveAsymmetricPrivateKeyToFile(string asymmetricPrivateKeyFilePath = null,
             bool checkIfExists = false)
@@ -303,10 +317,10 @@ namespace NetAppCommon.Crypto.BouncyCastle.Services
                         var bytesToDecrypt = Convert.FromBase64String(text);
                         var stringReader = new StringReader(publicKey);
                         var pemReader = new PemReader(stringReader);
-                        var @object = (object)pemReader.ReadObject();
+                        var @object = pemReader.ReadObject();
                         if (@object is { } o)
                         {
-                            var asymmetricKeyParameter = (AsymmetricKeyParameter)o;
+                            var asymmetricKeyParameter = (AsymmetricKeyParameter) o;
                             //Pkcs1Encoding.StrictLengthEnabled = false;
                             var pkcs1Encoding = new Pkcs1Encoding(new RsaEngine());
                             pkcs1Encoding.Init(false, asymmetricKeyParameter);
@@ -337,10 +351,10 @@ namespace NetAppCommon.Crypto.BouncyCastle.Services
                         var bytesToDecrypt = Convert.FromBase64String(text);
                         var stringReader = new StringReader(privateKey);
                         var pemReader = new PemReader(stringReader);
-                        object @object = pemReader.ReadObject();
+                        var @object = pemReader.ReadObject();
                         if (@object is { } o)
                         {
-                            var asymmetricCipherKeyPair = (AsymmetricCipherKeyPair)o;
+                            var asymmetricCipherKeyPair = (AsymmetricCipherKeyPair) o;
                             //Pkcs1Encoding.StrictLengthEnabled = false;
                             var pkcs1Encoding = new Pkcs1Encoding(new RsaEngine());
                             pkcs1Encoding.Init(false, asymmetricCipherKeyPair.Public);
@@ -371,8 +385,8 @@ namespace NetAppCommon.Crypto.BouncyCastle.Services
                         var bytesToEncrypt = Encoding.UTF8.GetBytes(text);
                         var stringReader = new StringReader(privateKey);
                         var pemReader = new PemReader(stringReader);
-                        object @object = pemReader.ReadObject();
-                        var asymmetricCipherKeyPair = (AsymmetricCipherKeyPair)@object;
+                        var @object = pemReader.ReadObject();
+                        var asymmetricCipherKeyPair = (AsymmetricCipherKeyPair) @object;
                         //Pkcs1Encoding.StrictLengthEnabled = false;
                         var encryptEngine = new Pkcs1Encoding(new RsaEngine());
                         encryptEngine.Init(true, asymmetricCipherKeyPair.Private);

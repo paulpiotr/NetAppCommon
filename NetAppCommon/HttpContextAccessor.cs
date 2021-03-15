@@ -20,8 +20,10 @@ namespace NetAppCommon
 
             public static HttpContext HttpContextCurrent => _httpContextAccessor?.HttpContext ?? null;
 
-            public static void Configure(IHttpContextAccessor httpContextAccessor) =>
+            public static void Configure(IHttpContextAccessor httpContextAccessor)
+            {
                 _httpContextAccessor = httpContextAccessor;
+            }
 
             public static string GetCurrentUserIdentityName()
             {

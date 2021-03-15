@@ -1,15 +1,16 @@
+#region using
+
 using System;
-using System.Threading;
-using System.Collections.Generic;
-using System.Text;
 using System.Reflection;
+using System.Threading;
 using log4net;
+
+#endregion
 
 namespace NetAppCommon.Helpers.Mutex
 {
     public class MutexHelper
     {
-
         #region private readonly log4net.ILog log4net
 
         /// <summary>
@@ -22,6 +23,7 @@ namespace NetAppCommon.Helpers.Mutex
         #endregion
 
         private System.Threading.Mutex _mutex;
+
         public System.Threading.Mutex Mutex
         {
             get => _mutex;
@@ -42,13 +44,14 @@ namespace NetAppCommon.Helpers.Mutex
                 {
                     lock (string.Intern(name))
                     {
-                        if (!System.Threading.Mutex.TryOpenExisting(name, out System.Threading.Mutex _mutex) && null == _mutex)
+                        if (!System.Threading.Mutex.TryOpenExisting(name, out var _mutex) && null == _mutex)
                         {
                             Console.WriteLine($"Run Mutex {name}");
-                            _mutex ??= System.Threading.Mutex.OpenExisting(name) ?? new System.Threading.Mutex(false, name);
+                            _mutex ??= System.Threading.Mutex.OpenExisting(name) ??
+                                       new System.Threading.Mutex(false, name);
                             func();
                             //_mutex.WaitOne();
-                            Thread.Sleep((int)TimeSpan.FromSeconds(1).TotalMilliseconds * 1);
+                            Thread.Sleep((int) TimeSpan.FromSeconds(1).TotalMilliseconds * 1);
                         }
                     }
                 }
@@ -63,6 +66,7 @@ namespace NetAppCommon.Helpers.Mutex
                         Console.WriteLine($"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n");
 #endif
             }
+
             return this;
         }
     }

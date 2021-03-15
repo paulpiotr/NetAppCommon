@@ -82,21 +82,22 @@ namespace NetAppCommon.Mssql
                             null != LogInitialCatalog && !string.IsNullOrWhiteSpace(LogInitialCatalog)
                         )
                         {
-                            var mdfCreateDatabaseScriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "scripts", "Db", "Mssql", "MdfCreateDatabaseScript.sql");
+                            var mdfCreateDatabaseScriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+                                "scripts", "Db", "Mssql", "MdfCreateDatabaseScript.sql");
                             if (File.Exists(mdfCreateDatabaseScriptPath))
                             {
                                 CreateScript = File.ReadAllText(mdfCreateDatabaseScriptPath)
-                                    .Replace("%InitialCatalog%", InitialCatalog)
-                                    .Replace("%AttachDBFilename%", AttachDBFilename)
-                                    .Replace("%Size%", Size ?? "8MB")
-                                    .Replace("%MaxSize%", MaxSize ?? "131072MB")
-                                    .Replace("%FileGrowTh%", FileGrowTh ?? "1 %")
-                                    .Replace("%LogInitialCatalog%", LogInitialCatalog)
-                                    .Replace("%LogAttachDBFilename%", LogAttachDBFilename)
-                                    .Replace("%LogSize%", LogSize ?? "8MB")
-                                    .Replace("%LogMaxSize%", LogMaxSize ?? "8192MB")
-                                    .Replace("%LogFileGrowTh%", LogFileGrowTh ?? "1 %")
-                                ;
+                                        .Replace("%InitialCatalog%", InitialCatalog)
+                                        .Replace("%AttachDBFilename%", AttachDBFilename)
+                                        .Replace("%Size%", Size ?? "8MB")
+                                        .Replace("%MaxSize%", MaxSize ?? "131072MB")
+                                        .Replace("%FileGrowTh%", FileGrowTh ?? "1 %")
+                                        .Replace("%LogInitialCatalog%", LogInitialCatalog)
+                                        .Replace("%LogAttachDBFilename%", LogAttachDBFilename)
+                                        .Replace("%LogSize%", LogSize ?? "8MB")
+                                        .Replace("%LogMaxSize%", LogMaxSize ?? "8192MB")
+                                        .Replace("%LogFileGrowTh%", LogFileGrowTh ?? "1 %")
+                                    ;
                             }
 #if DEBUG
                             _log4Net.Debug($"CreateScript{Environment.NewLine}{CreateScript}{Environment.NewLine}");
@@ -131,9 +132,10 @@ namespace NetAppCommon.Mssql
 #endif
                         Directory.CreateDirectory(Path.GetDirectoryName(AttachDBFilename));
                     }
+
                     if (Directory.Exists(Path.GetDirectoryName(AttachDBFilename)) &&
                         !File.Exists(AttachDBFilename)
-                        )
+                    )
                     {
                         lock (string.Intern(AttachDBFilename))
                         {
@@ -150,6 +152,7 @@ namespace NetAppCommon.Mssql
                                         $"Data Source={sqlConnectionStringBuilder.DataSource}; Integrated Security={sqlConnectionStringBuilder.IntegratedSecurity}");
                                 sqlCommand = new SqlCommand(CreateScript, sqlConnection);
                             }
+
                             try
                             {
                                 if (null != sqlConnection && null != sqlCommand)
@@ -157,7 +160,8 @@ namespace NetAppCommon.Mssql
                                     sqlConnection.Open();
                                     sqlCommand.ExecuteNonQuery();
 #if DEBUG
-                                    _log4Net.Debug($"Sql command execute non query {Environment.NewLine}{CreateScript}{Environment.NewLine}OK");
+                                    _log4Net.Debug(
+                                        $"Sql command execute non query {Environment.NewLine}{CreateScript}{Environment.NewLine}OK");
 #endif
                                     return true;
                                 }
@@ -176,6 +180,7 @@ namespace NetAppCommon.Mssql
                                 }
                             }
                         }
+
                         return true;
                     }
                 }
@@ -191,6 +196,9 @@ namespace NetAppCommon.Mssql
         }
 
         public virtual bool Drop(string connectionString = null, string connectionStringName = null,
-            string settingsJsonFileName = null) => throw new NotImplementedException();
+            string settingsJsonFileName = null)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

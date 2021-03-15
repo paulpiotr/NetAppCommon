@@ -41,13 +41,13 @@ namespace NetAppCommon.ObjectMapper.Attributes
             try
             {
                 // Attempt to get it from cache
-                if (!TypesInitializers.TryGetValue(@this.GetType(), out Action<object> setter))
+                if (!TypesInitializers.TryGetValue(@this.GetType(), out var setter))
                 {
                     // If no initializers are added do nothing
                     setter = o => { };
                     // Iterate through each property
-                    ParameterExpression parameterExpression = Expression.Parameter(typeof(object), "this");
-                    foreach (PropertyInfo prop in @this.GetType()
+                    var parameterExpression = Expression.Parameter(typeof(object), "this");
+                    foreach (var prop in @this.GetType()
                         .GetProperties(BindingFlags.Public | BindingFlags.Instance))
                     {
                         Expression expressionConvert;
@@ -97,7 +97,7 @@ namespace NetAppCommon.ObjectMapper.Attributes
             try
             {
                 // Attempt to get it from cache
-                if (!TypesInitializers.TryGetValue(@this.GetType(), out Action<object> setter))
+                if (!TypesInitializers.TryGetValue(@this.GetType(), out var setter))
                 {
                     // Init delegate with empty body,
                     // If no initializers are added do nothing

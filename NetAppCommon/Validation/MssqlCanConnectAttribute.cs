@@ -82,7 +82,7 @@ namespace NetAppCommon.Validation
         {
             try
             {
-                CheckForConnection = (bool)validationContext.ObjectInstance.GetType()
+                CheckForConnection = (bool) validationContext.ObjectInstance.GetType()
                     .GetProperty("CheckForConnection", BindingFlags.Public | BindingFlags.Instance)
                     .GetValue(validationContext.ObjectInstance);
             }
@@ -93,7 +93,7 @@ namespace NetAppCommon.Validation
 
             try
             {
-                ConnectionSettings = (string)validationContext.ObjectInstance.GetType()
+                ConnectionSettings = (string) validationContext.ObjectInstance.GetType()
                     .GetMethod("GetConnectionString", BindingFlags.Public | BindingFlags.Instance)
                     .Invoke(validationContext.ObjectInstance, new object[] { });
             }
@@ -136,7 +136,7 @@ namespace NetAppCommon.Validation
                 SqlConnection sqlConnection = null;
                 try
                 {
-                    using (sqlConnection = new SqlConnection(DatabaseMssql.ParseConnectionString((string)value)))
+                    using (sqlConnection = new SqlConnection(DatabaseMssql.ParseConnectionString((string) value)))
                     {
                         sqlConnection.Open();
                         return ValidationResult.Success;

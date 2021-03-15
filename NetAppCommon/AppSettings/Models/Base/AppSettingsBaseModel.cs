@@ -2,23 +2,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Xml.Serialization;
 using log4net;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using NetAppCommon.AppSettings.Repositories.Base;
-using NetAppCommon.Crypto.AesCryptography.Services;
-using NetAppCommon.Crypto.BouncyCastle.Models.Base;
-using NetAppCommon.Crypto.BouncyCastle.Services;
 using NetAppCommon.Validation;
 using Newtonsoft.Json;
-using static System.Environment;
 
 #endregion
 
@@ -33,27 +24,8 @@ namespace NetAppCommon.AppSettings.Models.Base
     ///     Common application settings data model
     /// </summary>
     [NotMapped]
-    public class AppSettingsBaseModel : RsaProvaiderBaseModel
+    public class AppSettingsBaseModel : AppSettingsModel
     {
-        public AppSettingsBaseModel()
-        {
-
-        }
-        public AppSettingsBaseModel(string filePath)
-        {
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(filePath))
-                {
-                    _filePath = filePath;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-        }
-
         #region private readonly log4net.ILog log4net
 
         /// <summary>
@@ -65,61 +37,24 @@ namespace NetAppCommon.AppSettings.Models.Base
 
         #endregion
 
-        #region public virtual string GetFileName()
+        public AppSettingsBaseModel()
+        {
+        }
 
-        /// <summary>
-        ///     Pobierz nazwę pliku z ustawieniami aplikacji
-        ///     Get the name of the application settings file
-        /// </summary>
-        /// <returns>
-        ///     Nazwa pliku z ustawieniami aplikacji jako string
-        ///     Name of the application settings file as a string
-        /// </returns>
-        public virtual string GetFileName() => FileName;
-
-        #endregion
-
-        #region public virtual string GetFilePath()
-
-        /// <summary>
-        ///     Pobierz bieżącą ścieżkę do pliku konfiguracji
-        ///     Get the current path to the configuration file
-        /// </summary>
-        /// <returns>
-        ///     Bieżąca ścieżka do pliku konfiguracji jako string
-        ///     Current path to the configuration file as a string
-        /// </returns>
-        public virtual string GetFilePath() => FilePath;
-
-        #endregion
-
-        #region public IConfigurationBuilder GetConfigurationBuilder()
-
-        /// <summary>
-        ///     Pobierz  IConfigurationBuilder ConfigurationBuilder
-        ///     Get IConfigurationBuilder ConfigurationBuilder
-        /// </summary>
-        /// <returns>
-        ///     Instancja IConfigurationBuilder ConfigurationBuilder
-        ///     IConfigurationBuilder ConfigurationBuilder instance
-        /// </returns>
-        public IConfigurationBuilder GetConfigurationBuilder() => AppSettingsConfigurationBuilder;
-
-        #endregion
-
-        #region public IConfigurationRoot GetConfigurationRoot()
-
-        /// <summary>
-        ///     public IConfigurationRoot GetConfigurationRoot()
-        ///     public IConfigurationRoot GetConfigurationRoot()
-        /// </summary>
-        /// <returns>
-        ///     public IConfigurationRoot AppSettingsConfigurationRoot
-        ///     public IConfigurationRoot AppSettingsConfigurationRoot
-        /// </returns>
-        public IConfigurationRoot GetConfigurationRoot() => AppSettingsConfigurationRoot;
-
-        #endregion
+        public AppSettingsBaseModel(string filePath)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(filePath))
+                {
+                    base.FilePath = filePath;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
 
         #region public virtual string GetConnectionStringName()
 
@@ -131,7 +66,10 @@ namespace NetAppCommon.AppSettings.Models.Base
         ///     Nazwa połączenia bazy danych Mssql (domyślna)
         ///     Mssql database connection name (default)
         /// </returns>
-        public virtual string GetConnectionStringName() => ConnectionStringName;
+        public virtual string GetConnectionStringName()
+        {
+            return ConnectionStringName!;
+        }
 
         #endregion
 
@@ -199,7 +137,7 @@ namespace NetAppCommon.AppSettings.Models.Base
                     $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
             }
 
-            return (DbContextOptionsBuilder<TContext>)DbContextOptionsBuilder;
+            return ((DbContextOptionsBuilder<TContext>) DbContextOptionsBuilder)!;
         }
 
         #endregion
@@ -231,421 +169,17 @@ namespace NetAppCommon.AppSettings.Models.Base
             catch (Exception e)
             {
                 _log4Net.Error(
-                    string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
-                        e.StackTrace), e);
+                    $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
             }
 
-            return (DbContextOptions<TContext>)DbContextOptions;
+            return ((DbContextOptions<TContext>) DbContextOptions)!;
         }
 
         #endregion
 
-        #region public virtual event PropertyChangedEventHandler PropertyChanged;
+        #region private bool _checkAndMigrate; public bool CheckAndMigrate
 
-        /// <summary>
-        ///     PropertyChangedEventHandler PropertyChanged
-        /// </summary>
-        public virtual event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion
-
-        #region protected virtual void OnPropertyChanged(PropertyChangedEventArgs args)
-
-        /// <summary>
-        ///     protected virtual void OnPropertyChanged(PropertyChangedEventArgs args)
-        /// </summary>
-        /// <param name="args"></param>
-        protected virtual void OnPropertyChanged(PropertyChangedEventArgs args) => PropertyChanged?.Invoke(this, args);
-
-        #endregion
-
-        #region protected void OnPropertyChanged(string propertyName)
-
-        /// <summary>
-        ///     protected void OnPropertyChanged(string propertyName)
-        ///     protected void OnPropertyChanged(string propertyName)
-        /// </summary>
-        /// <param name="propertyName">
-        /// </param>
-        protected void OnPropertyChanged(string propertyName) =>
-            OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
-
-        #endregion
-
-        #region protected AppSettingsRepositoryBase...; public virtual AppSettingsRepositoryBase...
-
-        protected AppSettingsRepositoryBase<AppSettingsBaseModel>? _appSettingsRepository;
-
-        [XmlIgnore]
-        [JsonIgnore]
-        public virtual AppSettingsRepositoryBase<AppSettingsBaseModel>? AppSettingsRepository
-        {
-            get =>
-                _appSettingsRepository ??= AppSettingsRepositoryBase<AppSettingsBaseModel>.GetInstance();
-            set
-            {
-                if (value != _appSettingsRepository)
-                {
-                    _appSettingsRepository = value;
-                    OnPropertyChanged(nameof(AppSettingsRepository));
-                }
-            }
-        }
-
-        #endregion
-
-        #region protected AesIVProviderService...; public AesIVProviderService...
-
-        protected AesIVProviderService? _aesIVProviderService;
-
-        [XmlIgnore]
-        [JsonIgnore]
-        [NotRequired]
-        public AesIVProviderService AesIVProviderService
-        {
-            get => _aesIVProviderService ??= new AesIVProviderService();
-            set
-            {
-                if (value != _aesIVProviderService)
-                {
-                    _aesIVProviderService = value;
-                    OnPropertyChanged(nameof(AesIVProviderService));
-                }
-            }
-        }
-
-        #endregion
-
-        #region protected RsaProviderService...; public RsaProviderService...
-
-        protected RsaProviderService? _rsaProviderService;
-
-        /// <summary>
-        ///     public RsaProviderService RsaProviderService
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        [NotRequired]
-        public RsaProviderService RsaProviderService
-        {
-            get
-            {
-                if (null == _rsaProviderService)
-                {
-                    _rsaProviderService = new RsaProviderService(
-                        AsymmetricPrivateKeyFilePath,
-                        AsymmetricPublicKeyFilePath,
-                        !File.Exists(AsymmetricPrivateKeyFilePath) || !File.Exists(AsymmetricPublicKeyFilePath)
-                    );
-                    _rsaProviderService.SaveAsymmetricKeyPairToFile(AsymmetricPrivateKeyFilePath,
-                        AsymmetricPublicKeyFilePath, true);
-                }
-
-                return _rsaProviderService;
-            }
-            set
-            {
-                if (value != _rsaProviderService)
-                {
-                    _rsaProviderService = value;
-                    OnPropertyChanged(nameof(RsaProviderService));
-                }
-            }
-        }
-
-        #endregion
-
-        #region protected new string _asymmetricPrivateKeyFilePath; public new string AsymmetricPrivateKeyFilePath
-
-        protected new string? _asymmetricPrivateKeyFilePath;
-
-        [XmlIgnore]
-        [JsonIgnore]
-        [NotRequired]
-        public new string AsymmetricPrivateKeyFilePath
-        {
-            get =>
-                _asymmetricPrivateKeyFilePath ??= Path.Combine(UserProfileDirectory!, ".ssh", "id_rsa");
-            set
-            {
-                if (value != _asymmetricPrivateKeyFilePath)
-                {
-                    _asymmetricPrivateKeyFilePath = value;
-                }
-            }
-        }
-
-        #endregion
-
-        #region protected new string _asymmetricPublicKeyFilePath; public new string AsymmetricPublicKeyFilePath
-
-        protected new string? _asymmetricPublicKeyFilePath;
-
-        [XmlIgnore]
-        [JsonIgnore]
-        [NotRequired]
-        public new string AsymmetricPublicKeyFilePath
-        {
-            get =>
-                _asymmetricPublicKeyFilePath ??= Path.Combine(UserProfileDirectory!, ".ssh", "id_rsa.pub");
-            set
-            {
-                if (value != _asymmetricPublicKeyFilePath)
-                {
-                    _asymmetricPublicKeyFilePath = value;
-                }
-            }
-        }
-
-        #endregion
-
-        #region protected string _baseDirectory; public virtual string BaseDirectory
-
-        protected string? _baseDirectory;
-
-        /// <summary>
-        ///     public virtual string BaseDirectory
-        ///     public virtual string BaseDirectory
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        [Display(Name = "Główny katalog programu",
-            Prompt = "Wpisz lub wybierz główny katalog programu",
-            Description = "Główny katalog programu")]
-        public virtual string? BaseDirectory
-        {
-            get
-            {
-                try
-                {
-                    _baseDirectory ??= AppDomain.CurrentDomain.BaseDirectory;
-                }
-                catch (Exception e)
-                {
-                    _log4Net.Error(
-                        $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
-                }
-
-                return _baseDirectory ?? string.Empty;
-            }
-            protected set
-            {
-                if (value != _baseDirectory && Directory.Exists(value))
-                {
-                    _baseDirectory = value;
-                    OnPropertyChanged(nameof(BaseDirectory));
-                }
-            }
-        }
-
-        #endregion
-
-        #region protected string _userProfileDirectory; public virtual string UserProfileDirectory
-
-        protected string? _userProfileDirectory;
-
-        /// <summary>
-        ///     public virtual string UserProfileDirectory
-        ///     public virtual string UserProfileDirectory
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public virtual string? UserProfileDirectory
-        {
-            get
-            {
-                try
-                {
-                    if (null == _userProfileDirectory)
-                    {
-                        _userProfileDirectory = GetFolderPath(SpecialFolder.UserProfile);
-                        if (Directory.Exists(_userProfileDirectory))
-                        {
-                            _userProfileDirectory = Path.Combine(_userProfileDirectory, Assembly.GetExecutingAssembly().GetName().Name);
-                            if (!Directory.Exists(_userProfileDirectory))
-                            {
-                                Directory.CreateDirectory(_userProfileDirectory);
-                            }
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    _userProfileDirectory = BaseDirectory;
-                    _log4Net.Error(
-                        $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
-                }
-
-                return _userProfileDirectory;
-            }
-            protected set
-            {
-                if (value != _userProfileDirectory && Directory.Exists(value))
-                {
-                    _userProfileDirectory = value;
-                    OnPropertyChanged(nameof(UserProfileDirectory));
-                }
-            }
-        }
-
-        #endregion
-
-        #region protected string _fileName; public virtual string FileName
-
-        protected string? _fileName;
-
-        /// <summary>
-        ///     Nazwa pliku z ustawieniami aplikacji ustawiona w zależności od wersji środowiska
-        ///     Application settings file name set depending on the version of the environment
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public virtual string? FileName
-        {
-            get => _fileName;
-            protected set
-            {
-                if (value != _fileName)
-                {
-                    _fileName = value;
-                    OnPropertyChanged("FileName");
-                }
-            }
-        }
-
-        #endregion
-
-        #region protected string _setupFileName; public virtual string SetupFileName
-
-        protected string? _setupFileName;
-
-        /// <summary>
-        ///     Nazwa pliku z ustawieniami startowymi aplikacji
-        ///     The name of the application startup settings file
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public virtual string? SetupFileName
-        {
-            get => _setupFileName;
-            protected set
-            {
-                if (value != _setupFileName)
-                {
-                    _setupFileName = value;
-                    OnPropertyChanged("SetupFileName");
-                }
-            }
-        }
-
-        #endregion
-
-        #region protected string _filePath; public virtual string FilePath
-
-        protected string? _filePath;
-
-        /// <summary>
-        ///     Absolutna ścieżka do pliku konfiguracji
-        ///     The absolute path to the configuration file
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        [Display(Name = "Absolutna ścieżka do pliku konfiguracji ustawień programu",
-            Prompt = "Wybierz lub wpisz absolutną ścieżkę do pliku konfiguracji ustawień programu",
-            Description = "Absolutna ścieżka do pliku konfiguracji ustawień programu")]
-        public virtual string? FilePath
-        {
-            get
-            {
-                _filePath ??= Path.Combine(BaseDirectory ?? string.Empty, FileName ?? string.Empty);
-                return null != _filePath && File.Exists(_filePath) ? _filePath : null;
-            }
-            set
-            {
-                if (value != _filePath)
-                {
-                    _filePath = value;
-                    OnPropertyChanged("FilePath");
-                }
-            }
-        }
-
-        #endregion
-
-        #region protected IConfigurationBuilder _appSettingsConfigurationBuilder; public virtual IConfigurationBuilder AppSettingsConfigurationBuilder
-
-        protected IConfigurationBuilder? _appSettingsConfigurationBuilder;
-
-        /// <summary>
-        ///     IConfigurationBuilder ConfigurationBuilder
-        ///     IConfigurationBuilder ConfigurationBuilder
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        [NotRequired]
-        public virtual IConfigurationBuilder? AppSettingsConfigurationBuilder
-        {
-            get
-            {
-                if (null == _appSettingsConfigurationBuilder &&
-                    !string.IsNullOrWhiteSpace(FilePath) && File.Exists(FilePath))
-                {
-                    _appSettingsConfigurationBuilder = new ConfigurationBuilder()
-                        .SetBasePath(Path.GetDirectoryName(FilePath))
-                        .AddJsonFile(Path.GetFileName(FilePath), true, true);
-                }
-
-                return _appSettingsConfigurationBuilder!;
-            }
-            set
-            {
-                if (value != _appSettingsConfigurationBuilder)
-                {
-                    _appSettingsConfigurationBuilder = value;
-                    OnPropertyChanged(nameof(AppSettingsConfigurationBuilder));
-                }
-            }
-        }
-
-        #endregion
-
-        #region protected IConfigurationRoot _appSettingsConfigurationRoot; public virtual IConfigurationRoot AppSettingsConfigurationRoot
-
-        protected IConfigurationRoot? _appSettingsConfigurationRoot;
-
-        /// <summary>
-        ///     public IConfigurationRoot AppSettingsConfigurationRoot
-        ///     public IConfigurationRoot AppSettingsConfigurationRoot
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public virtual IConfigurationRoot? AppSettingsConfigurationRoot
-        {
-            get
-            {
-                if (null == _appSettingsConfigurationRoot && !string.IsNullOrWhiteSpace(FilePath) &&
-                    File.Exists(FilePath))
-                {
-                    _appSettingsConfigurationRoot = AppSettingsConfigurationBuilder?.Build();
-                }
-
-                return _appSettingsConfigurationRoot!;
-            }
-            set
-            {
-                if (value != _appSettingsConfigurationRoot)
-                {
-                    _appSettingsConfigurationRoot = value;
-                    OnPropertyChanged(nameof(AppSettingsConfigurationRoot));
-                }
-            }
-        }
-
-        #endregion
-
-        #region protected bool _checkAndMigrate; public bool CheckAndMigrate
-
-        protected bool _checkAndMigrate;
+        private bool _checkAndMigrate;
 
         /// <summary>
         ///     Wymuś instalację i aktualizację bazy danych
@@ -671,9 +205,9 @@ namespace NetAppCommon.AppSettings.Models.Base
 
         #endregion
 
-        #region public DateTime LastMigrateDateTime { get; protected set; }
+        #region public DateTime LastMigrateDateTime { get; private set; }
 
-        protected DateTime? _lastMigrateDateTime;
+        private DateTime? _lastMigrateDateTime;
 
         /// <summary>
         ///     Data ostatniej próby aktualizacji migracji bazy danych
@@ -689,7 +223,7 @@ namespace NetAppCommon.AppSettings.Models.Base
             {
                 if (null == _lastMigrateDateTime)
                 {
-                    _lastMigrateDateTime = AppSettingsRepository.GetValue<DateTime>(this, "LastMigrateDateTime");
+                    _lastMigrateDateTime = AppSettingsRepository?.GetValue<DateTime>(this, "LastMigrateDateTime");
                 }
 
                 return _lastMigrateDateTime;
@@ -706,9 +240,9 @@ namespace NetAppCommon.AppSettings.Models.Base
 
         #endregion
 
-        #region protected int _cacheLifeTime; int CacheLifeTime
+        #region private int _cacheLifeTime; int CacheLifeTime
 
-        protected int? _cacheLifeTime;
+        private int? _cacheLifeTime;
 
         /// <summary>
         ///     Okres istnienia pamięci podręcznej (w sekundach)
@@ -728,7 +262,7 @@ namespace NetAppCommon.AppSettings.Models.Base
                 {
                     if (null == _cacheLifeTime)
                     {
-                        _cacheLifeTime = AppSettingsRepository.GetValue<int>(this, "CacheLifeTime");
+                        _cacheLifeTime = AppSettingsRepository?.GetValue<int>(this, "CacheLifeTime");
                     }
 
                     return _cacheLifeTime;
@@ -736,8 +270,7 @@ namespace NetAppCommon.AppSettings.Models.Base
                 catch (Exception e)
                 {
                     _log4Net.Error(
-                        string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
-                            e.StackTrace), e);
+                        $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
                 }
 
                 return _cacheLifeTime;
@@ -754,9 +287,9 @@ namespace NetAppCommon.AppSettings.Models.Base
 
         #endregion
 
-        #region protected bool _useGlobalDatabaseConnectionSettings; public bool UseGlobalDatabaseConnectionSettings
+        #region private bool _useGlobalDatabaseConnectionSettings; public bool UseGlobalDatabaseConnectionSettings
 
-        protected bool? _useGlobalDatabaseConnectionSettings;
+        private bool? _useGlobalDatabaseConnectionSettings;
 
         /// <summary>
         ///     Sprawdź możliwość podłączenia do bazy danych\nz wpisanego parametru Ciąg połączenia do bazy danych Mssql
@@ -781,7 +314,7 @@ namespace NetAppCommon.AppSettings.Models.Base
                         $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
                 }
 
-                return _useGlobalDatabaseConnectionSettings != null && (bool)_useGlobalDatabaseConnectionSettings;
+                return _useGlobalDatabaseConnectionSettings != null && (bool) _useGlobalDatabaseConnectionSettings;
             }
             set
             {
@@ -795,9 +328,9 @@ namespace NetAppCommon.AppSettings.Models.Base
 
         #endregion
 
-        #region protected bool _checkForConnection; public bool CheckForConnection
+        #region private bool _checkForConnection; public bool CheckForConnection
 
-        protected bool _checkForConnection;
+        private bool _checkForConnection;
 
         /// <summary>
         ///     Sprawdź możliwość podłączenia do bazy danych\nz wpisanego parametru Ciąg połączenia do bazy danych Mssql
@@ -827,9 +360,9 @@ namespace NetAppCommon.AppSettings.Models.Base
 
         #endregion
 
-        #region protected string _connectionStringName; public virtual string ConnectionStringName
+        #region private string _connectionStringName; public virtual string ConnectionStringName
 
-        protected string? _connectionStringName;
+        private string? _connectionStringName;
 
         /// <summary>
         ///     Nazwa połączenia bazy danych Mssql dla bieżącej aplikacji
@@ -852,9 +385,9 @@ namespace NetAppCommon.AppSettings.Models.Base
 
         #endregion
 
-        #region protected string _connectionString; public virtual string ConnectionString
+        #region private string _connectionString; public virtual string ConnectionString
 
-        protected string? _connectionString;
+        private string? _connectionString;
 
         /// <summary>
         ///     Ciąg połączenia do bazy danych Mssql jako string
@@ -877,16 +410,9 @@ namespace NetAppCommon.AppSettings.Models.Base
                     {
                         _connectionString = AppSettingsRepository?.GetValue<string>(this,
                             $"{nameof(ConnectionStrings)}:{ConnectionStringName}");
-                        //if (string.IsNullOrWhiteSpace(_connectionString) || (null != AppSettingsRepository && !AppSettingsRepository.MssqlCheckConnectionString(_connectionString)))
-                        //{
-                        //    _connectionString =
-                        //        @"Data Source=(LocalDB)\MSSQLLocalDB; AttachDbFilename=%Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)%\MSSQLLocalDB\MSSQLLocalDB.mdf; Database=%AttachDbFilename%; MultipleActiveResultSets=true; Integrated Security=SSPI; Trusted_Connection=Yes; Max Pool Size=65536; Pooling=True";
-                        //}
                     }
                     catch (Exception e)
                     {
-                        //_connectionString =
-                        //    @"Data Source=(LocalDB)\MSSQLLocalDB; AttachDbFilename=%Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)%\MSSQLLocalDB\MSSQLLocalDB.mdf; Database=%AttachDbFilename%; MultipleActiveResultSets=true; Integrated Security=SSPI; Trusted_Connection=Yes; Max Pool Size=65536; Pooling=True";
                         _log4Net.Error(
                             $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
                     }
@@ -926,9 +452,9 @@ namespace NetAppCommon.AppSettings.Models.Base
 
         #endregion
 
-        #region protected Dictionary<string, string> _connectionStrings; public virtual Dictionary<string, string> ConnectionStrings
+        #region private Dictionary<string, string> _connectionStrings; public virtual Dictionary<string, string> ConnectionStrings
 
-        protected Dictionary<string, string>? _connectionStrings;
+        private Dictionary<string, string>? _connectionStrings;
 
         /// <summary>
         ///     Słownik zawierający definicję połączenia z nazwą klucza konfiguracji i wartością jako Dictionary
@@ -947,7 +473,7 @@ namespace NetAppCommon.AppSettings.Models.Base
 
                 return _connectionStrings;
             }
-            protected set
+            private set
             {
                 if (value != _connectionStrings)
                 {
@@ -959,9 +485,9 @@ namespace NetAppCommon.AppSettings.Models.Base
 
         #endregion
 
-        #region protected DbContextOptionsBuilder _dbContextOptionsBuilder; public virtual DbContextOptionsBuilder DbContextOptionsBuilder
+        #region private DbContextOptionsBuilder _dbContextOptionsBuilder; public virtual DbContextOptionsBuilder DbContextOptionsBuilder
 
-        protected DbContextOptionsBuilder? _dbContextOptionsBuilder;
+        private DbContextOptionsBuilder? _dbContextOptionsBuilder;
 
         /// <summary>
         ///     DbContextOptionsBuilder DbContextOptionsBuilder
@@ -985,9 +511,9 @@ namespace NetAppCommon.AppSettings.Models.Base
 
         #endregion
 
-        #region protected DbContextOptions _dbContextOptions; public virtual DbContextOptions DbContextOptions
+        #region private DbContextOptions _dbContextOptions; public virtual DbContextOptions DbContextOptions
 
-        protected DbContextOptions? _dbContextOptions;
+        private DbContextOptions? _dbContextOptions;
 
         /// <summary>
         ///     public virtual DbContextOptions DbContextOptions

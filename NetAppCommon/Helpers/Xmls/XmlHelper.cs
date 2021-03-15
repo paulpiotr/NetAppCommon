@@ -46,7 +46,7 @@ namespace NetAppCommon.Helpers.Xmls
                 Log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
             }
 
-            return (T)Convert.ChangeType(null, typeof(T));
+            return (T) Convert.ChangeType(null, typeof(T));
         }
 
         #endregion
@@ -75,7 +75,7 @@ namespace NetAppCommon.Helpers.Xmls
             {
                 var xmlReader = XmlReader.Create(new StringReader(xml));
                 var xmlSerializer = new XmlSerializer(typeof(T));
-                var o = (T)xmlSerializer.Deserialize(xmlReader);
+                var o = (T) xmlSerializer.Deserialize(xmlReader);
                 if (null != o)
                 {
 #if DEBUG
@@ -92,7 +92,7 @@ namespace NetAppCommon.Helpers.Xmls
                 Log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
             }
 
-            return (T)Convert.ChangeType(null, typeof(T));
+            return (T) Convert.ChangeType(null, typeof(T));
         }
 
         #endregion

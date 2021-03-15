@@ -26,7 +26,10 @@ namespace NetAppCommon.Helpers.Lists
 
         public char[] DelimiterChars { get; set; } = {',', ';'};
 
-        public static ListsHelper GetInstance() => new();
+        public static ListsHelper GetInstance()
+        {
+            return new();
+        }
 
         public List<string> ConvertToListOfString(string delimiterSeparatedAttributes, char[] delimiterChars = null)
         {
@@ -47,10 +50,12 @@ namespace NetAppCommon.Helpers.Lists
         }
 
         public async Task<List<string>> ConvertToListOfStringAsync(string delimiterSeparatedAttributes,
-            char[] delimiterChars = null) =>
-            await Task.Run(() =>
+            char[] delimiterChars = null)
+        {
+            return await Task.Run(() =>
             {
                 return ConvertToListOfString(delimiterSeparatedAttributes, delimiterChars);
             });
+        }
     }
 }

@@ -92,10 +92,10 @@ namespace NetAppCommon.Logging
             try
             {
                 log4net.Debug("AfterReceiveReply(ref Message reply, object correlationState)");
-                using (MessageBuffer buffer = reply.CreateBufferedCopy(int.MaxValue))
+                using (var buffer = reply.CreateBufferedCopy(int.MaxValue))
                 {
                     /// Override payload
-                    XmlDocument xmlDocument = GetDocument(buffer.CreateMessage());
+                    var xmlDocument = GetDocument(buffer.CreateMessage());
                     using (var stringWriter = new StringWriter())
                     {
                         using (var xmlWriter = XmlWriter.Create(stringWriter))
@@ -154,9 +154,9 @@ namespace NetAppCommon.Logging
             try
             {
                 log4net.Debug("BeforeSendRequest(ref Message message, IClientChannel clientChannel)");
-                using (MessageBuffer buffer = message.CreateBufferedCopy(int.MaxValue))
+                using (var buffer = message.CreateBufferedCopy(int.MaxValue))
                 {
-                    XmlDocument xmlDocument = GetDocument(buffer.CreateMessage());
+                    var xmlDocument = GetDocument(buffer.CreateMessage());
                     //Oryginalnie
                     //Logger.LogTrace(xmlDocument.OuterXml);
                     log4net.Debug(xmlDocument.OuterXml);
