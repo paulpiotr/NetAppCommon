@@ -1,4 +1,4 @@
-﻿#region using
+#region using
 
 using System;
 using System.Reflection;
@@ -25,8 +25,7 @@ namespace NetAppCommon.Logging
         ///     Log4net Logger
         ///     Log4net Logger
         /// </summary>
-        private readonly ILog log4net =
-            Log4NetLogger.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
+        private readonly ILog _log4Net = Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
 
         #endregion
 

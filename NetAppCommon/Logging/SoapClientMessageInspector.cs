@@ -28,8 +28,7 @@ namespace NetAppCommon.Logging
 
         /// <summary>
         /// </summary>
-        private readonly ILog log4net =
-            Log4NetLogger.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
+        private readonly ILog _log4Net = Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
 
         #endregion
 
@@ -91,7 +90,7 @@ namespace NetAppCommon.Logging
         {
             try
             {
-                log4net.Debug("AfterReceiveReply(ref Message reply, object correlationState)");
+                _log4Net.Debug("AfterReceiveReply(ref Message reply, object correlationState)");
                 using (MessageBuffer buffer = reply.CreateBufferedCopy(int.MaxValue))
                 {
                     /// Override payload
@@ -113,7 +112,7 @@ namespace NetAppCommon.Logging
                         }
                     }
 
-                    log4net.Debug(xmlDocument.OuterXml);
+                    _log4Net.Debug(xmlDocument.OuterXml);
                     /// Oryginal
                     /// Logger.LogTrace(xmlDocument.OuterXml);
                     /// Oryginal
@@ -126,7 +125,7 @@ namespace NetAppCommon.Logging
             }
             catch (Exception e)
             {
-                log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
+                _log4Net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
             }
         }
 
@@ -153,20 +152,20 @@ namespace NetAppCommon.Logging
         {
             try
             {
-                log4net.Debug("BeforeSendRequest(ref Message message, IClientChannel clientChannel)");
+                _log4Net.Debug("BeforeSendRequest(ref Message message, IClientChannel clientChannel)");
                 using (MessageBuffer buffer = message.CreateBufferedCopy(int.MaxValue))
                 {
                     XmlDocument xmlDocument = GetDocument(buffer.CreateMessage());
                     //Oryginalnie
                     //Logger.LogTrace(xmlDocument.OuterXml);
-                    log4net.Debug(xmlDocument.OuterXml);
+                    _log4Net.Debug(xmlDocument.OuterXml);
                     message = buffer.CreateMessage();
                     return null;
                 }
             }
             catch (Exception e)
             {
-                log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
+                _log4Net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
             }
 
             return null;
@@ -208,7 +207,7 @@ namespace NetAppCommon.Logging
             }
             catch (Exception e)
             {
-                log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
+                _log4Net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
             }
 
             return null;

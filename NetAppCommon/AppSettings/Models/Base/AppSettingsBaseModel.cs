@@ -103,7 +103,7 @@ namespace NetAppCommon.AppSettings.Models.Base
         ///     Instancja IConfigurationBuilder ConfigurationBuilder
         ///     IConfigurationBuilder ConfigurationBuilder instance
         /// </returns>
-        public IConfigurationBuilder GetConfigurationBuilder() => AppSettingsConfigurationBuilder;
+        public IConfigurationBuilder GetConfigurationBuilder() => AppSettingsConfigurationBuilder!;
 
         #endregion
 
