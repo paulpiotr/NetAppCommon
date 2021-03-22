@@ -9,7 +9,7 @@ using log4net;
 
 #endregion
 
-namespace NetAppCommon.Logging
+namespace NetAppCommon.Logging.ClientMessageInspector
 {
     #region public class SoapEndpointBehavior : IEndpointBehavior
 
@@ -70,7 +70,7 @@ namespace NetAppCommon.Logging
 
         #endregion
 
-        #region public void AddBindingParameters(ServiceEndpoint endpoint, BindingParameterCollection bindingParameters)
+        #region public virtual void AddBindingParameters...
 
         /// <summary>
         ///     Dodaj parametry powiązania
@@ -84,13 +84,13 @@ namespace NetAppCommon.Logging
         ///     Kolekcja parametrów wiązania jako BindingParameterCollection
         ///     Collection of binding parameters as BindingParameterCollection
         /// </param>
-        public void AddBindingParameters(ServiceEndpoint endpoint, BindingParameterCollection bindingParameters)
+        public virtual void AddBindingParameters(ServiceEndpoint endpoint, BindingParameterCollection bindingParameters)
         {
         }
 
         #endregion
 
-        #region public void ApplyClientBehavior(ServiceEndpoint endpoint, ClientRuntime clientRuntime)
+        #region public virtual void ApplyClientBehavior...
 
         /// <summary>
         ///     Zastosuj zachowanie klienta
@@ -104,15 +104,12 @@ namespace NetAppCommon.Logging
         ///     Środowisko wykonawcze klienta jako ClientRuntime
         ///     Client Runtime as ClientRuntime
         /// </param>
-        public void ApplyClientBehavior(ServiceEndpoint endpoint, ClientRuntime clientRuntime)
-        {
-            //log4net.Debug("ApplyClientBehavior(ServiceEndpoint endpoint, ClientRuntime clientRuntime)");
+        public virtual void ApplyClientBehavior(ServiceEndpoint endpoint, ClientRuntime clientRuntime) =>
             clientRuntime.ClientMessageInspectors.Add(SoapClientMessageInspector);
-        }
 
         #endregion
 
-        #region public void ApplyDispatchBehavior(ServiceEndpoint endpoint, EndpointDispatcher endpointDispatcher)
+        #region public virtual void ApplyDispatchBehavior...
 
         /// <summary>
         ///     Zastosuj zachowanie wysyłki
@@ -126,14 +123,13 @@ namespace NetAppCommon.Logging
         ///     Dyspozytor punktów końcowych jako EndpointDispatcher
         ///     Endpoint Dispatcher as EndpointDispatcher
         /// </param>
-        public void ApplyDispatchBehavior(ServiceEndpoint endpoint, EndpointDispatcher endpointDispatcher)
+        public virtual void ApplyDispatchBehavior(ServiceEndpoint endpoint, EndpointDispatcher endpointDispatcher)
         {
-            //log4net.Debug("ApplyDispatchBehavior(ServiceEndpoint endpoint, EndpointDispatcher endpointDispatcher)");
         }
 
         #endregion
 
-        #region public void Validate(ServiceEndpoint endpoint)
+        #region public virtual void Validate...
 
         /// <summary>
         ///     Sprawdź poprawność
@@ -143,7 +139,7 @@ namespace NetAppCommon.Logging
         ///     Punkt końcowy jako ServiceEndpoint
         ///     Endpoint as a ServiceEndpoint
         /// </param>
-        public void Validate(ServiceEndpoint endpoint)
+        public virtual void Validate(ServiceEndpoint endpoint)
         {
         }
 

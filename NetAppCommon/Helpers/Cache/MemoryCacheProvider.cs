@@ -12,6 +12,7 @@ namespace NetAppCommon.Helpers.Cache
     public class MemoryCacheProvider
     {
         private const double MemoryCacheTimeSpan = 1000;
+
         private static readonly IMemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
 
         private readonly IMemoryCache _cache;
