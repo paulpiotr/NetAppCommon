@@ -3,16 +3,17 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using NetAppCommon.Extensions.Caching.Distributed;
+using NetAppCommon.Logging.ClientMessageInspector.Repositories;
+using NetAppCommon.Logging.ClientMessageInspector.Repositories.Interface;
 
 #endregion
 
-namespace NetAppCommon.Extensions.DependencyInjection
+namespace NetAppCommon.Logging.ClientMessageInspector.DependencyInjection
 {
     /// <summary>
     ///     Extension methods for setting up memory cache related services in an <see cref="IServiceCollection" />.
     /// </summary>
-    public static class MemoryCacheServiceCollectionExtensions
+    public static class SoapClientMessageInspector
     {
         /// <summary>
         ///     Adds a default implementation of <see cref="DistributedCache" /> that stores items in memory
@@ -28,7 +29,8 @@ namespace NetAppCommon.Extensions.DependencyInjection
         /// </remarks>
         /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
         /// <returns>The <see cref="IServiceCollection" /> so that additional calls can be chained.</returns>
-        public static IServiceCollection AddNetAppCommonDistributedMemoryCache(this IServiceCollection services)
+        public static IServiceCollection AddSoapClientMessageInspectorDistributedCacheRepository(
+            this IServiceCollection services)
         {
             if (services == null)
             {
@@ -36,7 +38,9 @@ namespace NetAppCommon.Extensions.DependencyInjection
             }
 
             services.AddOptions();
-            services.TryAdd(ServiceDescriptor.Singleton<ICommonDistributedCache, CommonMemoryDistributedCache>());
+            services.TryAdd(ServiceDescriptor
+                .Singleton<IDistributedCacheRepository,
+                    DistributedCacheRepository>());
 
             return services;
         }

@@ -199,7 +199,34 @@ namespace NetAppCommon.Helpers.Object
         /// </returns>
         public static async Task<string> ConvertObjectValuesToMD5HashAsync(object o, string separator = null)
         {
-            return await Task.Run(() => { return ConvertObjectValuesToMD5Hash(o, separator); });
+            return await Task.Run(() => ConvertObjectValuesToMD5Hash(o, separator));
+        }
+
+        #endregion
+
+        #region public static TValue GetDefaultValue<TValue>()
+
+        /// <summary>
+        ///     Pobierz domyślną wartość określonego typu określonego w parametrze TValue
+        ///     Get the default value of the specified type specified in the TValue parameter
+        /// </summary>
+        /// <typeparam name="TValue">
+        ///     Typ zwracanej wartości
+        ///     The type of the return value
+        /// </typeparam>
+        /// <returns>
+        ///     Domyślna wartość określonego typu określonego w parametrze TValue
+        ///     The default value of the specified type specified in the TValue parameter
+        /// </returns>
+        public static TValue GetDefaultValue<TValue>()
+        {
+            return typeof(TValue).FullName switch
+            {
+                "System.Boolean" => (TValue)Convert.ChangeType(false, typeof(TValue)),
+                "System.Int32" => (TValue)Convert.ChangeType(int.MinValue, typeof(TValue)),
+                "System.DateTime" => (TValue)Convert.ChangeType(DateTime.MinValue, typeof(TValue)),
+                _ => (TValue)Convert.ChangeType(null, typeof(TValue))
+            };
         }
 
         #endregion

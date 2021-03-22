@@ -18,7 +18,7 @@ using static System.String;
 
 namespace NetAppCommon.AppSettings.Repositories.Base
 {
-    #region public class AppSettingsRepositoryBase<TAppSettings> : IAppSettingsRepository<TAppSettings> where TAppSettings : AppSettingsBaseModel, new()
+    #region public class AppSettingsRepository<TAppSettings>
 
     /// <summary>
     ///     Klasa bazowa repozytorium ustawień
@@ -350,7 +350,6 @@ namespace NetAppCommon.AppSettings.Repositories.Base
             try
             {
                 appSettings ??= new TAppSettings();
-                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                 if (null != appSettings.GetFileName() &&
                     null != appSettings.UserProfileDirectory)
                 {

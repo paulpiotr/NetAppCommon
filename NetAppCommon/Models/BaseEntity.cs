@@ -1,23 +1,24 @@
-﻿#region using
+#region using
 
 using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Xml.Serialization;
 using Microsoft.EntityFrameworkCore;
 using NetAppCommon.Helpers.Object;
 using Newtonsoft.Json;
 
 #endregion
 
+#nullable enable annotations
+
 namespace NetAppCommon.Models
 {
     #region public class BaseEntity : INotifyPropertyChanged
 
     /// <summary>
-    /// BaseEntity - wspólna klasa bazowa zawierająca domyślne pola tabel
-    /// BaseEntity - common base class containing default table fields
+    ///     BaseEntity - wspólna klasa bazowa zawierająca domyślne pola tabel
+    ///     BaseEntity - common base class containing default table fields
     /// </summary>
     [Index(nameof(Id), IsUnique = true)]
     [Index(nameof(UniqueIdentifierOfTheLoggedInUser))]
@@ -33,6 +34,11 @@ namespace NetAppCommon.Models
         public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion
+
+        public BaseEntity()
+        {
+            SetUniqueIdentifierOfTheLoggedInUser();
+        }
 
         #region public void SetId(string s)
 
@@ -58,11 +64,9 @@ namespace NetAppCommon.Models
         ///     Ustaw jednoznaczny identyfikator zalogowanego użytkownika
         ///     Set a unique identifier for the logged in user
         /// </summary>
-        public void SetUniqueIdentifierOfTheLoggedInUser()
-        {
+        public void SetUniqueIdentifierOfTheLoggedInUser() =>
             UniqueIdentifierOfTheLoggedInUser =
                 HttpContextAccessor.AppContext.GetCurrentUserIdentityName();
-        }
 
         #endregion
 
@@ -72,10 +76,7 @@ namespace NetAppCommon.Models
         ///     protected virtual void OnPropertyChanged(PropertyChangedEventArgs args)
         /// </summary>
         /// <param name="args"></param>
-        protected virtual void OnPropertyChanged(PropertyChangedEventArgs args)
-        {
-            PropertyChanged?.Invoke(this, args);
-        }
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs args) => PropertyChanged?.Invoke(this, args);
 
         #endregion
 
@@ -85,10 +86,8 @@ namespace NetAppCommon.Models
         ///     protected void OnPropertyChanged(string propertyName)
         /// </summary>
         /// <param name="propertyName"></param>
-        protected void OnPropertyChanged(string propertyName)
-        {
+        protected void OnPropertyChanged(string propertyName) =>
             OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
-        }
 
         #endregion
 
@@ -100,12 +99,11 @@ namespace NetAppCommon.Models
         ///     Guid Id identyfikator klucz główny
         ///     Guid Id identifier of the primary key
         /// </summary>
-        [XmlIgnore]
         [Key]
         [JsonProperty(nameof(Id))]
         [Display(Name = "Identyfikator", Prompt = "Wpisz identyfikator",
             Description = "Identyfikator, klucz główny w bazie danych jako Guid")]
-        public Guid Id
+        public virtual Guid Id
         {
             get => _id;
             set
@@ -120,15 +118,15 @@ namespace NetAppCommon.Models
 
         #endregion
 
-        #region private string _uniqueIdentifierOfTheLoggedInUser; public string UniqueIdentifierOfTheLoggedInUser
+        #region private string _uniqueIdentifierOfTheLoggedInUser?; public string UniqueIdentifierOfTheLoggedInUser?
 
-        private string _uniqueIdentifierOfTheLoggedInUser;
+        private string? _uniqueIdentifierOfTheLoggedInUser;
 
         /// <summary>
         ///     Jednoznaczny identyfikator zalogowanego użytkownika
         ///     Unique identifier of the logged in user
         /// </summary>
-        [XmlIgnore]
+        [Column(Order = 1)]
         [JsonProperty(nameof(UniqueIdentifierOfTheLoggedInUser))]
         [Display(Name = "Użytkownik",
             Prompt = "Wybierz identyfikator zalogowanego użytkownika",
@@ -136,10 +134,10 @@ namespace NetAppCommon.Models
         [MinLength(1)]
         [MaxLength(256)]
         [StringLength(256)]
-        public string UniqueIdentifierOfTheLoggedInUser
+        public virtual string? UniqueIdentifierOfTheLoggedInUser
         {
             get => _uniqueIdentifierOfTheLoggedInUser;
-            private set
+            set
             {
                 if (_uniqueIdentifierOfTheLoggedInUser != value)
                 {
@@ -159,13 +157,13 @@ namespace NetAppCommon.Models
         ///     Data utworzenia
         ///     Date of create
         /// </summary>
-        [XmlIgnore]
+        [Column(Order = 100)]
         [JsonProperty(nameof(DateOfCreate))]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         [Display(Name = "Data utworzenia", Prompt = "Wpisz lub wybierz datę utworzenia",
             Description = "Data utworzenia")]
         [DataType(DataType.Date)]
-        public DateTime DateOfCreate
+        public virtual DateTime DateOfCreate
         {
             get => _dateOfCreate;
             set
@@ -188,12 +186,12 @@ namespace NetAppCommon.Models
         ///     Data modyfikacji
         ///     Date of modification
         /// </summary>
-        [XmlIgnore]
+        [Column(Order = 101)]
         [JsonProperty(nameof(DateOfModification))]
         [Display(Name = "Data modyfikacji", Prompt = "Wpisz lub wybierz datę modyfikacji",
             Description = "Data modyfikacji")]
         [DataType(DataType.Date)]
-        public DateTime? DateOfModification
+        public virtual DateTime? DateOfModification
         {
             get => _dateOfModification;
             set

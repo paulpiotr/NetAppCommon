@@ -11,7 +11,7 @@ namespace NetAppCommon.Extensions.Caching.Distributed
     /// <summary>
     ///     Represents a extended distributed cache of serialized values.
     /// </summary>
-    public interface IDistributedCache : Microsoft.Extensions.Caching.Distributed.IDistributedCache
+    public interface ICommonDistributedCache : IDistributedCache
     {
         /// <summary>
         ///     Gets a TValue value with the given key.
@@ -57,10 +57,7 @@ namespace NetAppCommon.Extensions.Caching.Distributed
         /// <param name="options">
         ///     The cache options for the value.
         /// </param>
-        /// <returns>
-        ///     Object value as TValue or null if not set
-        /// </returns>
-        object Set<TValue>(string key, object value, DistributedCacheEntryOptions options);
+        void Set<TValue>(string key, object value, DistributedCacheEntryOptions options = default);
 
         /// <summary>
         ///     Sets a object value as TValue with the given key async.
@@ -80,7 +77,7 @@ namespace NetAppCommon.Extensions.Caching.Distributed
         /// <returns>
         ///     Object value as TValue or null if not set
         /// </returns>
-        Task<object> SetAsync<TValue>(string key, object value, DistributedCacheEntryOptions options,
+        Task SetAsync<TValue>(string key, object value, DistributedCacheEntryOptions options = default,
             CancellationToken token = default);
     }
 }
