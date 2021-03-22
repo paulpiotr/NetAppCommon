@@ -22,23 +22,23 @@ namespace NetAppCommon.Helpers.Files
     /// </summary>
     public class FileHelper
     {
-        #region const int ERROR_SHARING_VIOLATION = 32;
+        #region const int ErrorSharingViolation = 32;
 
         /// <summary>
         ///     Numer błędu (naruszenia) udostępniania
         ///     The sharing error (violation) number
         /// </summary>
-        private const int ERROR_SHARING_VIOLATION = 32;
+        private const int ErrorSharingViolation = 32;
 
         #endregion
 
-        #region const int ERROR_LOCK_VIOLATION = 33;
+        #region const int ErrorLockViolation = 33;
 
         /// <summary>
         ///     Numer błędu (naruszenia) blokady
         ///     Lockout error (violation) number
         /// </summary>
-        private const int ERROR_LOCK_VIOLATION = 33;
+        private const int ErrorLockViolation = 33;
 
         #endregion
 
@@ -48,7 +48,7 @@ namespace NetAppCommon.Helpers.Files
         ///     Log4net Logger
         ///     Log4net Logger
         /// </summary>
-        private static readonly ILog Log4net =
+        private static readonly ILog Log4Net =
             Log4NetLogger.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
 
         #endregion
@@ -84,7 +84,7 @@ namespace NetAppCommon.Helpers.Files
         ///     Skrót MD5 z treści pliku jako string lub null
         ///     MD5 hash from the file content as string or null
         /// </returns>
-        public static string GetMD5Hash(string filePath)
+        public static string GetMd5Hash(string filePath)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace NetAppCommon.Helpers.Files
             catch (Exception e)
             {
 #if DEBUG
-                Log4net.Error(
+                Log4Net.Error(
                     $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
 #else
                 Console.WriteLine(e);
@@ -120,9 +120,9 @@ namespace NetAppCommon.Helpers.Files
         ///     Skrót MD5 z treści pliku jako string lub null
         ///     MD5 hash from the file content as string or null
         /// </returns>
-        public static async Task<string> GetMD5HashAsync(string filePath)
+        public static async Task<string> GetMd5HashAsync(string filePath)
         {
-            return await Task.Run(() => { return GetMD5Hash(filePath); });
+            return await Task.Run(() => GetMd5Hash(filePath));
         }
 
         #endregion
@@ -141,7 +141,7 @@ namespace NetAppCommon.Helpers.Files
         ///     Skrót MD5 z treści pliku jako string lub null
         ///     MD5 hash from the file content as string or null
         /// </returns>
-        public static string GetMD5Hash(byte[] fileContent)
+        public static string GetMd5Hash(byte[] fileContent)
         {
             try
             {
@@ -151,7 +151,7 @@ namespace NetAppCommon.Helpers.Files
             catch (Exception e)
             {
 #if DEBUG
-                Log4net.Error(
+                Log4Net.Error(
                     $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
 #else
                 Console.WriteLine(e);
@@ -177,9 +177,9 @@ namespace NetAppCommon.Helpers.Files
         ///     Skrót MD5 z treści pliku jako string lub null
         ///     MD5 hash from the file content as string or null
         /// </returns>
-        public static async Task<string> GetMD5HashAsync(byte[] fileContent)
+        public static async Task<string> GetMd5HashAsync(byte[] fileContent)
         {
-            return await Task.Run(() => { return GetMD5Hash(fileContent); });
+            return await Task.Run(() => GetMd5Hash(fileContent));
         }
 
         #endregion
@@ -204,7 +204,7 @@ namespace NetAppCommon.Helpers.Files
             try
             {
                 var errorCode = Marshal.GetHRForException(exception) & ((1 << 16) - 1);
-                return errorCode == ERROR_SHARING_VIOLATION || errorCode == ERROR_LOCK_VIOLATION;
+                return errorCode == ErrorSharingViolation || errorCode == ErrorLockViolation;
             }
             catch
             {
@@ -232,7 +232,7 @@ namespace NetAppCommon.Helpers.Files
         /// </returns>
         private async Task<bool> IsLockedAsync(Exception exception)
         {
-            return await Task.Run(() => { return IsLocked(exception); });
+            return await Task.Run(() => IsLocked(exception));
         }
 
         #endregion
@@ -259,16 +259,11 @@ namespace NetAppCommon.Helpers.Files
                 {
                     if (File.Exists(filePath))
                     {
-                        using (var fileStream =
-                            File.Open(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
-                        {
-                            if (fileStream != null)
-                            {
-                                fileStream.Close();
-                                func();
-                                break;
-                            }
-                        }
+                        using var fileStream =
+                            File.Open(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+                        fileStream.Close();
+                        func();
+                        break;
                     }
                 }
                 catch (Exception e) when (e is IOException)
@@ -280,9 +275,8 @@ namespace NetAppCommon.Helpers.Files
                     else
                     {
 #if DEBUG
-                        Log4net.Error(
-                            string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
-                                e.StackTrace), e);
+                        Log4Net.Error(
+                            $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
 #else
                         Console.WriteLine($"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n");
 #endif
@@ -291,9 +285,8 @@ namespace NetAppCommon.Helpers.Files
                 catch (Exception e)
                 {
 #if DEBUG
-                    Log4net.Error(
-                        string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
-                            e.StackTrace), e);
+                    Log4Net.Error(
+                        $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
 #else
                     Console.WriteLine($"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n");
 #endif
@@ -323,15 +316,10 @@ namespace NetAppCommon.Helpers.Files
             {
                 try
                 {
-                    using (var fileStream =
-                        File.Open(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
-                    {
-                        if (fileStream != null)
-                        {
-                            fileStream.Close();
-                            return func();
-                        }
-                    }
+                    using var fileStream =
+                        File.Open(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+                    fileStream.Close();
+                    return func();
                 }
                 catch (Exception e) when (e is IOException)
                 {
@@ -342,9 +330,8 @@ namespace NetAppCommon.Helpers.Files
                     else
                     {
 #if DEBUG
-                        Log4net.Error(
-                            string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
-                                e.StackTrace), e);
+                        Log4Net.Error(
+                            $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
 #else
                         Console.WriteLine($"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n");
 #endif
@@ -353,9 +340,8 @@ namespace NetAppCommon.Helpers.Files
                 catch (Exception e)
                 {
 #if DEBUG
-                    Log4net.Error(
-                        string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
-                            e.StackTrace), e);
+                    Log4Net.Error(
+                        $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
 #else
                     Console.WriteLine($"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n");
 #endif
