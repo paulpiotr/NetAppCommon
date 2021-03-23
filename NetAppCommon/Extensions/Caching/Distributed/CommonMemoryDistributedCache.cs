@@ -1,6 +1,7 @@
 #region using
 
 using System;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 #endregion
 
@@ -35,7 +37,10 @@ namespace NetAppCommon.Extensions.Caching.Distributed
                 throw new ArgumentNullException(nameof(optionsAccessor));
             }
 
-            _memoryCache ??= new MemoryCache(optionsAccessor.Value);
+            if (!DependencyInjection.MemoryCacheServiceCollectionExtensions.IsAdded())
+            {
+                _memoryCache ??= new MemoryCache(optionsAccessor.Value);
+            }
         }
 
         /// <summary>
@@ -60,7 +65,10 @@ namespace NetAppCommon.Extensions.Caching.Distributed
                 throw new ArgumentNullException(nameof(loggerFactory));
             }
 
-            _memoryCache ??= new MemoryCache(optionsAccessor.Value, loggerFactory);
+            if (!DependencyInjection.MemoryCacheServiceCollectionExtensions.IsAdded())
+            {
+                _memoryCache ??= new MemoryCache(optionsAccessor.Value, loggerFactory);
+            }
         }
 
         public object Get<TValue>(string key)
@@ -145,6 +153,6 @@ namespace NetAppCommon.Extensions.Caching.Distributed
             await SetAsync(key, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value, Formatting.Indented)),
                 options, token);
         }
-        
+
     }
 }

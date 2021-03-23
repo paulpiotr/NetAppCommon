@@ -15,6 +15,19 @@ namespace NetAppCommon.Extensions.DependencyInjection
     public static class MemoryCacheServiceCollectionExtensions
     {
         /// <summary>
+        /// Is added
+        /// </summary>
+        private static bool _isAdded;
+
+        /// <summary>
+        /// Check public static IServiceCollection AddNetAppCommonDistributedMemoryCache is added as Singleton
+        /// </summary>
+        /// <returns>
+        /// True if IServiceCollection AddNetAppCommonDistributedMemoryCache is run, else false
+        /// </returns>
+        public static bool IsAdded() => _isAdded;
+
+        /// <summary>
         ///     Adds a default implementation of <see cref="DistributedCache" /> that stores items in memory
         ///     to the <see cref="IServiceCollection" />. Frameworks that require a distributed cache to work
         ///     can safely add this dependency as part of their dependency list to ensure that there is at least
@@ -35,6 +48,7 @@ namespace NetAppCommon.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(services));
             }
 
+            _isAdded = true;
             services.AddOptions();
             services.TryAdd(ServiceDescriptor.Singleton<ICommonDistributedCache, CommonMemoryDistributedCache>());
 
