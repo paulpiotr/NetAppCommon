@@ -27,7 +27,7 @@ namespace NetAppCommon.Helpers.Object
         ///     Log4net Logger
         ///     Log4net Logger
         /// </summary>
-        private static readonly ILog Log4net =
+        private static readonly ILog _log4Net =
             Log4NetLogger.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
 
         #endregion
@@ -57,39 +57,34 @@ namespace NetAppCommon.Helpers.Object
                 if (null != o)
                 {
                     var stringBuilder = new StringBuilder();
-                    foreach (var propertyInfo in Enumerable.OrderBy(o.GetType().GetProperties(), x => x.Name))
+                    foreach (PropertyInfo propertyInfo in Enumerable.OrderBy(o.GetType().GetProperties(), x => x.Name))
                     {
                         switch (propertyInfo.PropertyType.ToString())
                         {
                             default:
                                 stringBuilder.Append(propertyInfo.Name).Append(separator)
                                     .Append(propertyInfo.GetValue(o, null) ?? string.Empty).Append(separator);
-                                //log4net.Debug($"{ propertyInfo.PropertyType } { propertyInfo.GetValue(o, null) ?? string.Empty }");
                                 break;
                             case "Decimal":
                             case "System.Decimal":
                                 var decimalValue = (decimal) (propertyInfo.GetValue(o, null) ?? 0);
                                 stringBuilder.Append(propertyInfo.Name).Append(separator)
                                     .Append(decimalValue.ToString("N", CultureInfo.InvariantCulture)).Append(separator);
-                                //log4net.Debug($"{ propertyInfo.PropertyType } { propertyInfo.GetValue(o, null) ?? string.Empty } { decimalValue } { decimalValue.ToString("N", CultureInfo.InvariantCulture) } ");
                                 break;
                             case "Double":
                             case "System.Double":
                                 var doubleValue = (double) (propertyInfo.GetValue(o, null) ?? 0);
                                 stringBuilder.Append(propertyInfo.Name).Append(separator)
                                     .Append(doubleValue.ToString("N", CultureInfo.InvariantCulture)).Append(separator);
-                                //log4net.Debug($"{ propertyInfo.PropertyType } { propertyInfo.GetValue(o, null) ?? string.Empty } { doubleValue } { doubleValue.ToString("N", CultureInfo.InvariantCulture) }");
                                 break;
                             case "System.DateTime":
                             case "System.Nullable`1[System.DateTime]":
-                                DateTime dateTime;
                                 if (DateTime.TryParse((propertyInfo.GetValue(o, null) ?? string.Empty).ToString(),
-                                    out dateTime))
+                                    out DateTime dateTime))
                                 {
                                     stringBuilder.Append(propertyInfo.Name).Append(separator)
-                                        .Append(dateTime.ToString()).Append(separator);
+                                        .Append(dateTime.ToString(CultureInfo.InvariantCulture)).Append(separator);
                                 }
-
                                 break;
                         }
                     }
@@ -100,7 +95,7 @@ namespace NetAppCommon.Helpers.Object
             catch (Exception e)
             {
 #if DEBUG
-                Log4net.Error(
+                _log4Net.Error(
                     $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
 #else
                 Console.WriteLine(e);
@@ -132,7 +127,7 @@ namespace NetAppCommon.Helpers.Object
         /// </returns>
         public static async Task<string> GetValuesToStringAsync(object o, string separator = null)
         {
-            return await Task.Run(() => { return GetValuesToString(o, separator); });
+            return await Task.Run(() => GetValuesToString(o, separator));
         }
 
         #endregion
@@ -161,7 +156,7 @@ namespace NetAppCommon.Helpers.Object
             catch (Exception e)
             {
 #if DEBUG
-                Log4net.Error(
+                _log4Net.Error(
                     $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
 #else
                 Console.WriteLine(e);
@@ -227,6 +222,52 @@ namespace NetAppCommon.Helpers.Object
                 "System.DateTime" => (TValue)Convert.ChangeType(DateTime.MinValue, typeof(TValue)),
                 _ => (TValue)Convert.ChangeType(null, typeof(TValue))
             };
+        }
+
+        #endregion
+
+        # region public static string ConvertObjectValuesToSHA512Hash...
+
+        /// <summary>
+        ///     Konwersja wartości właściwości obiektu do skrótu SHA512
+        ///     Convert object property value to SHA512 hash 
+        /// </summary>
+        /// <param name="@object">
+        ///     object @object
+        /// </param>
+        /// <param name="separator">
+        ///     Separator rozdzielający wartości właściwości obiektu jako string
+        ///     Separator separating object property values as a string
+        /// </param>
+        /// <returns>
+        ///     Skrót MD5 wartości właściwości obiektu jako string
+        ///     MD5 hash of the object property value as a string
+        /// </returns>
+        public static string ConvertObjectValuesToSHA512Hash(object @object, string separator = null)
+        {
+            try
+            {
+                return Convert.ToBase64String(SHA512.Create()
+                    .ComputeHash(Encoding.ASCII.GetBytes(GetValuesToString(@object, separator))));
+            }
+            catch (Exception e)
+            {
+#if DEBUG
+                _log4Net.Error(e);
+                if (null != e.InnerException)
+                {
+                    _log4Net.Error(e.InnerException);
+                }
+#else
+                Console.WriteLine(e);
+                if (null != e.InnerException)
+                {
+                    Console.WriteLine(e.InnerException);
+                }
+#endif
+            }
+
+            return null;
         }
 
         #endregion

@@ -23,7 +23,7 @@ namespace NetAppCommon.Logging.ClientMessageInspector.Models.Base
         ///     Obiekt Message po otrzymaniu odpowiedzi jako json string?
         ///     The Message object after receiving the response as a json string?
         /// </summary>
-        [JsonProperty(nameof(AfterReceiveReplyMessage))]
+        [JsonProperty(nameof(AfterReceiveReplyMessage), Order = 2)]
         [Display(Name = "Obiekt Message",
             Prompt = "Wpisz zawartość odpowiedzi Obiekt Message jako string? json",
             Description = "Obiekt Message po otrzymaniu odpowiedzi jako json string?")]
@@ -52,7 +52,7 @@ namespace NetAppCommon.Logging.ClientMessageInspector.Models.Base
         ///     Treść wiadomości Message po otrzymaniu odpowiedzi jako xml string?
         ///     The content of the Message after receiving the response as an xml string?
         /// </summary>
-        [JsonProperty(nameof(AfterReceiveReplyMessageAsStringXml))]
+        [JsonProperty(nameof(AfterReceiveReplyMessageAsStringXml), Order = 2)]
         [Display(Name = "Treść wiadomości",
             Prompt = "Wpisz treść wiadomości jako string? xml",
             Description = "Treść wiadomości Message po otrzymaniu odpowiedzi jako xml string?")]
@@ -82,7 +82,7 @@ namespace NetAppCommon.Logging.ClientMessageInspector.Models.Base
         ///     Obiekt CorrelationState po otrzymaniu odpowiedzi jako json string?
         ///     CorrelationState object after receiving the response as a json string?
         /// </summary>
-        [JsonProperty(nameof(AfterReceiveReplyCorrelationState))]
+        [JsonProperty(nameof(AfterReceiveReplyCorrelationState), Order = 2)]
         [Display(Name = "Obiekt CorrelationState",
             Prompt = "Wpisz zawartość obiektu CorrelationState jako string?",
             Description = "Obiekt CorrelationState po otrzymaniu odpowiedzi jako json string?")]
@@ -112,7 +112,7 @@ namespace NetAppCommon.Logging.ClientMessageInspector.Models.Base
         ///     Obiekt Message przed wysłaniem żądania jako json string?
         ///     The Message object after receiving the response as a json string?
         /// </summary>
-        [JsonProperty(nameof(BeforeSendRequestMessage))]
+        [JsonProperty(nameof(BeforeSendRequestMessage), Order = 2)]
         [Display(Name = "Obiekt Message",
             Prompt = "Wpisz zawartość odpowiedzi Obiekt Message jako string? json",
             Description = "Obiekt Message przed wysłaniem żądania jako json string?")]
@@ -142,7 +142,7 @@ namespace NetAppCommon.Logging.ClientMessageInspector.Models.Base
         ///     Treść wiadomości Message przed wysłaniem żądania jako xml string?
         ///     The content of the Message after receiving the response as an xml string?
         /// </summary>
-        [JsonProperty(nameof(BeforeSendRequestMessageAsStringXml))]
+        [JsonProperty(nameof(BeforeSendRequestMessageAsStringXml), Order = 2)]
         [Display(Name = "Treść wiadomości",
             Prompt = "Wpisz treść wiadomości jako string? xml",
             Description = "Treść wiadomości Message przed wysłaniem żądania jako xml string?")]
@@ -172,7 +172,7 @@ namespace NetAppCommon.Logging.ClientMessageInspector.Models.Base
         ///     Obiekt ClientChannel przed wysłaniem żądania jako json string?
         ///     ClientChannel object after receiving the response as a json string?
         /// </summary>
-        [JsonProperty(nameof(BeforeSendRequestClientChannel))]
+        [JsonProperty(nameof(BeforeSendRequestClientChannel), Order = 2)]
         [Display(Name = "Obiekt ClientChannel",
             Prompt = "Wpisz zawartość obiektu ClientChannel jako string?",
             Description = "Obiekt ClientChannel przed wysłaniem żądania jako json string?")]
