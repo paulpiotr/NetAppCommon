@@ -106,7 +106,8 @@ namespace NetAppCommon.Models
         ///     Guid Id identifier of the primary key
         /// </summary>
         [Key]
-        [JsonProperty(nameof(Id), Order = -1)]
+        [Column(Order = 0)]
+        [JsonProperty(nameof(Id), Order = 0)]
         [Display(Name = "Identyfikator", Prompt = "Wpisz identyfikator",
             Description = "Identyfikator, klucz główny w bazie danych jako Guid")]
         public virtual Guid Id
@@ -152,8 +153,8 @@ namespace NetAppCommon.Models
         ///     Jednoznaczny identyfikator zalogowanego użytkownika
         ///     Unique identifier of the logged in user
         /// </summary>
-        [Column(Order = 1)]
-        [JsonProperty(nameof(UniqueIdentifierOfTheLoggedInUser), Order = -1)]
+        [Column(Order = 0)]
+        [JsonProperty(nameof(UniqueIdentifierOfTheLoggedInUser), Order = 0)]
         [Display(Name = "Użytkownik",
             Prompt = "Wybierz identyfikator zalogowanego użytkownika",
             Description = "Identyfikator zalogowanego użytkownika")]
@@ -183,7 +184,7 @@ namespace NetAppCommon.Models
         ///     Data utworzenia
         ///     Date of create
         /// </summary>
-        [Column(Order = 3)]
+        //[Column(Order = 3)]
         [JsonProperty(nameof(DateOfCreate), Order = 3)]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         [Display(Name = "Data utworzenia", Prompt = "Wpisz lub wybierz datę utworzenia",
@@ -226,7 +227,7 @@ namespace NetAppCommon.Models
         ///     Data modyfikacji
         ///     Date of modification
         /// </summary>
-        [Column(Order = 3)]
+        //[Column(Order = 3)]
         [JsonProperty(nameof(DateOfModification), Order = 3)]
         [Display(Name = "Data modyfikacji", Prompt = "Wpisz lub wybierz datę modyfikacji",
             Description = "Data modyfikacji")]
@@ -258,7 +259,6 @@ namespace NetAppCommon.Models
         }
 
         #endregion
-
     }
 
     #endregion

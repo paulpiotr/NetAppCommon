@@ -11,8 +11,16 @@ using Newtonsoft.Json.Linq;
 
 #nullable enable annotations
 
+#region namespace
+
 namespace NetAppCommon.Logging.ClientMessageInspector.Models.Base
 {
+    /// <summary>
+    /// Model danych inspektor wiadomości soap
+    /// Data model inspector soap
+    /// </summary>
+    [JsonObject(nameof(MessageInspectorModel))]
+    [Display(Name = "Inspektor wiadomości soap", Description = "Model danych inspektor wiadomości soap")]
     public class MessageInspectorModel : BaseEntity
     {
         #region private string? _afterReceiveReplyMessage...
@@ -217,3 +225,5 @@ namespace NetAppCommon.Logging.ClientMessageInspector.Models.Base
         #endregion
     }
 }
+
+#endregion

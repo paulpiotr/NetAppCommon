@@ -16,7 +16,7 @@ using Newtonsoft.Json.Linq;
 
 namespace NetAppCommon.Logging.ClientMessageInspector.Repositories
 {
-    public class DistributedCacheRepository : IDistributedCacheRepository
+    public sealed class DistributedCacheRepository : IDistributedCacheRepository
     {
         private readonly ICommonDistributedCache _cache;
 
@@ -31,17 +31,47 @@ namespace NetAppCommon.Logging.ClientMessageInspector.Repositories
             _dictionary = Get();
         }
 
+        public DistributedCacheRepository(Guid guid)
+        {
+            _guid = guid;
+            IOptions<MemoryDistributedCacheOptions> options = Options.Create(new MemoryDistributedCacheOptions());
+            _cache = new CommonMemoryDistributedCache(options);
+            _dictionary = Get();
+        }
+
         public DistributedCacheRepository(ICommonDistributedCache cache)
         {
             _cache = cache;
             _dictionary = Get();
         }
 
-        public virtual Guid GetGuid() => _guid;
+        public Guid GetGuid() => _guid;
 
-        public virtual string GetGuidAsString() => _guid.ToString();
+        public string GetGuidAsString() => _guid.ToString();
 
-        public virtual IDictionary<string, MessageInspectorModel> Get()
+        public IDictionary<string, MessageInspectorModel> Get(Guid guid)
+        {
+            try
+            {
+                return (IDictionary<string, MessageInspectorModel>)_cache
+                           ?.Get<IDictionary<string, MessageInspectorModel>>(guid.ToString()) ??
+                       new Dictionary<string, MessageInspectorModel>();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+            return null;
+        }
+
+        public void Remove() => _cache?.Remove(GetGuid().ToString());
+
+        public void Remove(string key) => _cache?.Remove(key);
+
+        public void Remove(Guid guid) => _cache?.Remove(guid.ToString());
+
+        public IDictionary<string, MessageInspectorModel> Get()
         {
             try
             {
@@ -57,7 +87,7 @@ namespace NetAppCommon.Logging.ClientMessageInspector.Repositories
             return null;
         }
 
-        public virtual List<MessageInspectorModel> ToList()
+        public List<MessageInspectorModel> ToList()
         {
             try
             {
@@ -78,7 +108,7 @@ namespace NetAppCommon.Logging.ClientMessageInspector.Repositories
             return null;
         }
 
-        public virtual List<TDestination> ToList<TDestination>() where TDestination : MessageInspectorModel, new()
+        public List<TDestination> ToList<TDestination>() where TDestination : MessageInspectorModel, new()
         {
             try
             {
@@ -99,7 +129,28 @@ namespace NetAppCommon.Logging.ClientMessageInspector.Repositories
             return null;
         }
 
-        public virtual MessageInspectorModel Set(string key, MessageInspectorModel model)
+        public List<TDestination> ToList<TDestination>(Guid guid) where TDestination : MessageInspectorModel, new()
+        {
+            try
+            {
+                _dictionary = _dictionary = Get(guid);
+                if (null != _dictionary &&
+                    _dictionary.Values.Count > 0
+                )
+                {
+                    return _dictionary.Values?.Select(i => i.Cast<TDestination>()).ToList();
+                }
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+            return null;
+        }
+
+        public MessageInspectorModel Set(string key, MessageInspectorModel model)
         {
             try
             {
@@ -130,7 +181,7 @@ namespace NetAppCommon.Logging.ClientMessageInspector.Repositories
             return null;
         }
 
-        public virtual MessageInspectorModel Get(string key)
+        public MessageInspectorModel Get(string key)
         {
             try
             {
@@ -153,6 +204,5 @@ namespace NetAppCommon.Logging.ClientMessageInspector.Repositories
 
             return null;
         }
-
     }
 }

@@ -61,8 +61,8 @@ namespace NetAppCommon.Helpers.Xmls
         #region public static T DeserializeXml<T>(string xml)
 
         /// <summary>
-        ///     Ogólna metoda deserializacja ciągu xml do typu T
-        ///     General method to deserialize the xml string to type T
+        ///     Deserializacja ciągu xml do typu T
+        ///     Deserialization of the xml string to type T
         /// </summary>
         /// <typeparam name="T">
         ///     Typ danych T
@@ -73,47 +73,72 @@ namespace NetAppCommon.Helpers.Xmls
         ///     The xml string as a string
         /// </param>
         /// <returns>
-        ///     Objekt typu danych T
+        ///     Obiekt typu danych T
         ///     Object of the data type T
         /// </returns>
-        public static T DeserializeXmlFromString<T>(string xml, string tagName = null)
+        public static T DeserializeXmlFromString<T>(string xml)
         {
+            XmlReader xmlReader = null;
             try
             {
+                xmlReader = XmlReader.Create(new StringReader(xml));
 
-                //var xDocument = XDocument.Parse(xml);
-                //XElement xElement = xDocument.Elements("root")
-                //    .FirstOrDefault()
-                //    ?.Element("dane");
-                //Console.WriteLine(xElement?.ToString());
-
-                if (null != tagName && !string.IsNullOrWhiteSpace(tagName))
+                try
                 {
-                    char[] delimiterChars = { '.' };
-                    var listOfAttributes = new List<string>(tagName.Split(delimiterChars))
-                        .Select(x => x.Trim()).ToList();
-                    if (listOfAttributes.Count > 0)
+                    var xmlSerializer = new XmlSerializer(typeof(T));
+                    var @object = (T)xmlSerializer.Deserialize(xmlReader);
+                    if (null != @object)
                     {
-                        var xDocument = XDocument.Parse(xml);
-                        listOfAttributes.ForEach(name =>
-                        {
-                            XElement xElement = xDocument.Root?.Elements(name).FirstOrDefault();
-                            if (!string.IsNullOrWhiteSpace(xElement?.ToString()))
-                            {
-                                xml = xElement?.ToString();
-                                xDocument = XDocument.Parse(xml);
-                                //Console.WriteLine($"{name}");
-                                //Console.WriteLine($"{xml}");
-                            }
-                        });
+                        return @object;
                     }
                 }
-                var xmlReader = XmlReader.Create(new StringReader(xml));
-                var xmlSerializer = new XmlSerializer(typeof(T));
-                var @object = (T)xmlSerializer.Deserialize(xmlReader);
-                if (null != @object)
+                catch (Exception e)
                 {
-                    return @object;
+#if DEBUG
+                    //Log4Net.Warn(e);
+                    //if (null != e.InnerException)
+                    //{
+                    //    Log4Net.Warn(e.InnerException);
+                    //    if (null != e.InnerException.InnerException)
+                    //    {
+                    //        Log4Net.Warn(e.InnerException.InnerException);
+                    //    }
+                    //}
+#else
+                            ///Ignore
+#endif
+                }
+                while (xmlReader.Read())
+                {
+                    // First element is the root element
+                    if (xmlReader.NodeType == XmlNodeType.Element)
+                    {
+                        try
+                        {
+                            var xmlSerializer = new XmlSerializer(typeof(T));
+                            var @object = (T)xmlSerializer.Deserialize(xmlReader);
+                            if (null != @object)
+                            {
+                                return @object;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+#if DEBUG
+                            //Log4Net.Warn(e);
+                            //if (null != e.InnerException)
+                            //{
+                            //    Log4Net.Warn(e.InnerException);
+                            //    if (null != e.InnerException.InnerException)
+                            //    {
+                            //        Log4Net.Warn(e.InnerException.InnerException);
+                            //    }
+                            //}
+#else
+                            ///Ignore
+#endif
+                        }
+                    }
                 }
             }
             catch (Exception e)
@@ -124,13 +149,17 @@ namespace NetAppCommon.Helpers.Xmls
                     Log4Net.Error(e.InnerException);
                 }
             }
+            finally
+            {
+                xmlReader?.Close();
+            }
 
             return (T)Convert.ChangeType(null, typeof(T));
         }
 
-        #endregion
+#endregion
 
-        #region public static XmlDocument GetDocument(Message message)
+#region public static XmlDocument GetDocument(Message message)
 
         /// <summary>
         ///     Pobierz treść dokumentu jako obiekt XML
@@ -172,8 +201,8 @@ namespace NetAppCommon.Helpers.Xmls
             return null;
         }
 
-        #endregion
+#endregion
     }
 
-    #endregion
+#endregion
 }
