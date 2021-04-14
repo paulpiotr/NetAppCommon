@@ -1,6 +1,7 @@
 #region using
 
 using System;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NetAppCommon.Extensions.Caching.Distributed;
@@ -47,10 +48,10 @@ namespace NetAppCommon.Extensions.DependencyInjection
             {
                 throw new ArgumentNullException(nameof(services));
             }
-
-            _isAdded = true;
             services.AddOptions();
+            //services.TryAdd(ServiceDescriptor.Singleton<IDistributedCache, MemoryDistributedCache>());
             services.TryAdd(ServiceDescriptor.Singleton<ICommonDistributedCache, CommonMemoryDistributedCache>());
+            _isAdded = true;
 
             return services;
         }

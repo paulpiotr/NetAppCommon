@@ -122,7 +122,7 @@ namespace NetAppCommon.Extensions.Caching.Distributed
 
             options ??= new DistributedCacheEntryOptions
             {
-                AbsoluteExpiration = DateTime.Now.AddYears(1),
+                AbsoluteExpiration = DateTime.Now.AddMinutes(5),
                 //AbsoluteExpirationRelativeToNow = TimeSpan.FromDays((DateTime.Now.AddYears(1) - DateTime.Now).Days),
                 //SlidingExpiration = TimeSpan.FromDays((DateTime.Now.AddYears(1) - DateTime.Now).Days)
             };
@@ -143,8 +143,10 @@ namespace NetAppCommon.Extensions.Caching.Distributed
 
             else
             {
-                Set(key, valueAsByte, options);
+                base.Set(key, valueAsByte, options);
             }
+
+            //Get<TValue>(key);
         }
 
         public async Task SetAsync<TValue>(string key, object value, DistributedCacheEntryOptions options = default,
