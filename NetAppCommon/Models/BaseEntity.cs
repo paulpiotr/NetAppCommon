@@ -184,7 +184,7 @@ namespace NetAppCommon.Models
         ///     Data utworzenia
         ///     Date of create
         /// </summary>
-        //[Column(Order = 3)]
+        [Column(Order = 3)]
         [JsonProperty(nameof(DateOfCreate), Order = 3)]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         [Display(Name = "Data utworzenia", Prompt = "Wpisz lub wybierz datę utworzenia",
@@ -227,7 +227,7 @@ namespace NetAppCommon.Models
         ///     Data modyfikacji
         ///     Date of modification
         /// </summary>
-        //[Column(Order = 3)]
+        [Column(Order = 3)]
         [JsonProperty(nameof(DateOfModification), Order = 3)]
         [Display(Name = "Data modyfikacji", Prompt = "Wpisz lub wybierz datę modyfikacji",
             Description = "Data modyfikacji")]

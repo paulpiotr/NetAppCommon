@@ -1,6 +1,7 @@
 #region using
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -9,6 +10,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 #endregion
+
+#nullable enable annotations
+
+#region namespace
 
 namespace NetAppCommon.Helpers
 {
@@ -42,20 +47,21 @@ namespace NetAppCommon.Helpers
         {
             try
             {
-                using (var serviceScope =
-                    serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
+                using IServiceScope serviceScope =
+                    serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope();
+                await using TDbContext? context = serviceScope.ServiceProvider.GetService<TDbContext>();
+                if (null != context)
                 {
-                    using (var context = serviceScope.ServiceProvider.GetService<TDbContext>())
-                    {
-                        await RunMigrationAsync(context);
-                    }
+                    await RunMigrationAsync(context);
                 }
             }
             catch (Exception e)
             {
-                Log4net.Error(
-                    string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
-                        e.StackTrace), e);
+                Log4net.Error(e);
+                if (null != e.InnerException)
+                {
+                    Log4net.Error(e.InnerException);
+                }
             }
         }
 
@@ -83,59 +89,55 @@ namespace NetAppCommon.Helpers
         {
             try
             {
-                //#if DEBUG
-                //                Log4net.Debug($"RunMigrationAsync { context?.Database?.GetDbConnection()?.ConnectionString }");
-                //#endif
                 if (null != context)
                 {
-                    //#if DEBUG
-                    //                    Log4net.Debug($"context { context?.Database?.GetDbConnection()?.ConnectionString }");
-                    //#endif
                     try
                     {
-                        //#if DEBUG
-                        //                        Log4net.Debug($"Try MDF Create Async DatabaseMssqlMdf.GetInstance(context?.Database?.GetDbConnection()?.ConnectionString ).CreateAsync()...");
-                        //#endif
                         await DatabaseMssqlMdf.GetInstance(context?.Database?.GetDbConnection()?.ConnectionString)
                             .CreateAsync();
-                        //#if DEBUG
-                        //                        Log4net.Debug($"Ok");
-                        //#endif
                     }
                     catch (Exception e)
                     {
-                        Log4net.Warn(
-                            $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
+                        Log4net.Warn(e);
+                        if (null != e.InnerException)
+                        {
+                            Log4net.Warn(e.InnerException);
+                        }
                     }
 
-                    if ((await (context.Database ?? throw new InvalidOperationException()).GetPendingMigrationsAsync())
-                        .Any())
+                    IEnumerable<string> aaa = await (context.Database ?? throw new InvalidOperationException())
+                        .GetPendingMigrationsAsync();
+                    foreach (var a in aaa)
                     {
-                        //#if DEBUG
-                        //                        Log4net.Debug($"Migrate { context?.Database?.GetDbConnection()?.ConnectionString }");
-                        //#endif
+                        Console.WriteLine(a);
+                    }
+
+                    var isPendingMigrations = (await (context.Database ?? throw new InvalidOperationException()).GetPendingMigrationsAsync())
+                        .Any();
+                    if (isPendingMigrations)
+                    {
                         try
                         {
-                            //#if DEBUG
-                            //                            Log4net.Debug($"Try Migrate Async context.Database.MigrateAsync()...");
-                            //#endif
                             await context.Database.MigrateAsync();
-                            //#if DEBUG
-                            //                            Log4net.Debug($"Ok");
-                            //#endif
                         }
                         catch (Exception e)
                         {
-                            Log4net.Warn(
-                                $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
+                            Log4net.Warn(e);
+                            if (null != e.InnerException)
+                            {
+                                Log4net.Warn(e.InnerException);
+                            }
                         }
                     }
                 }
             }
             catch (Exception e)
             {
-                Log4net.Error(
-                    $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
+                Log4net.Error(e);
+                if (null != e.InnerException)
+                {
+                    Log4net.Error(e.InnerException);
+                }
             }
         }
 
@@ -144,3 +146,5 @@ namespace NetAppCommon.Helpers
 
     #endregion
 }
+
+#endregion

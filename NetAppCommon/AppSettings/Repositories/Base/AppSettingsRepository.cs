@@ -562,10 +562,10 @@ namespace NetAppCommon.AppSettings.Repositories.Base
                 if (null != filePath && !IsNullOrEmpty(filePath) && File.Exists(filePath) && null != key &&
                     !IsNullOrWhiteSpace(key))
                 {
-                    var configurationBuilder = new ConfigurationBuilder()
+                    IConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
                         .SetBasePath(Path.GetDirectoryName(filePath))
                         .AddJsonFile(Path.GetFileName(filePath), true, true);
-                    var configurationRoot = configurationBuilder.Build();
+                    IConfigurationRoot configurationRoot = configurationBuilder.Build();
                     if (null != configurationRoot)
                     {
                         return configurationRoot.GetValue<TValue>(key);

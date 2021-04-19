@@ -96,16 +96,8 @@ namespace NetAppCommon.Helpers.Xmls
                 {
 #if DEBUG
                     Log4Net.Warn(e);
-                    //if (null != e.InnerException)
-                    //{
-                    //    Log4Net.Warn(e.InnerException);
-                    //    if (null != e.InnerException.InnerException)
-                    //    {
-                    //        Log4Net.Warn(e.InnerException.InnerException);
-                    //    }
-                    //}
 #else
-                    //Ignore
+                    Log4Net.Warn(e);
 #endif
                 }
                 while (xmlReader.Read())
@@ -126,16 +118,8 @@ namespace NetAppCommon.Helpers.Xmls
                         {
 #if DEBUG
                             Log4Net.Warn(e);
-                            //if (null != e.InnerException)
-                            //{
-                            //    Log4Net.Warn(e.InnerException);
-                            //    if (null != e.InnerException.InnerException)
-                            //    {
-                            //        Log4Net.Warn(e.InnerException.InnerException);
-                            //    }
-                            //}
 #else
-                            ///Ignore
+                            Log4Net.Warn(e);
 #endif
                         }
                     }
