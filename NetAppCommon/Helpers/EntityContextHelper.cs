@@ -105,13 +105,6 @@ namespace NetAppCommon.Helpers
                         }
                     }
 
-                    IEnumerable<string> aaa = await (context.Database ?? throw new InvalidOperationException())
-                        .GetPendingMigrationsAsync();
-                    foreach (var a in aaa)
-                    {
-                        Console.WriteLine(a);
-                    }
-
                     var isPendingMigrations = (await (context.Database ?? throw new InvalidOperationException())
                             .GetPendingMigrationsAsync())
                         .Any();
