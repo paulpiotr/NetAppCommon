@@ -29,8 +29,8 @@ namespace NetAppCommon.Validation
 
         public DateYearsRangeAttribute(object min, object max)
         {
-            DateTimeMin = DateTime.Now.AddYears((int) min);
-            DateTimeMax = DateTime.Now.AddYears((int) max);
+            DateTimeMin = DateTime.Now.AddYears((int)min);
+            DateTimeMax = DateTime.Now.AddYears((int)max);
         }
 
         public int Min { get; set; }
@@ -55,12 +55,12 @@ namespace NetAppCommon.Validation
         {
             if (null != value)
             {
-                if ((DateTime) value > DateTimeMax || (DateTime) value < DateTimeMin)
+                if ((DateTime)value > DateTimeMax || (DateTime)value < DateTimeMin)
                 {
                     return null != ErrorMessage
                         ? new ValidationResult(string.Format(ErrorMessage, value))
                         : new ValidationResult(string.Format("{0}, {1} must be between {2} and {3}",
-                            validationContext.DisplayName, (DateTime) value, DateTimeMin, DateTimeMax));
+                            validationContext.DisplayName, (DateTime)value, DateTimeMin, DateTimeMax));
                 }
             }
 

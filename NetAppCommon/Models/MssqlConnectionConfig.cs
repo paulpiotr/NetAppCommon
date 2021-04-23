@@ -1,4 +1,4 @@
-﻿namespace NetAppCommon.Models
+namespace NetAppCommon.Models
 {
     /// <summary>
     ///     Model danych tworzących połączenie do bazy danych
@@ -7,13 +7,10 @@
     {
         ///Data Source
         ///Server
-
         ///AttachDbFilename
         ///Database
-
         ///User Id
         ///Password
-
         ///Integrated Security
         ///Trusted_Connection
         ///MultipleActiveResultSets

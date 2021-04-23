@@ -1,7 +1,6 @@
 #region using
 
 using System;
-using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,17 +9,17 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using NetAppCommon.Extensions.DependencyInjection;
+using NetAppCommon.Helpers.Object;
 using Newtonsoft.Json;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 #endregion
 
 namespace NetAppCommon.Extensions.Caching.Distributed
 {
     public class CommonMemoryDistributedCache : MemoryDistributedCache,
-        ICommonDistributedCache//, IMemoryCache
+        ICommonDistributedCache //, IMemoryCache
     {
-
         private static IMemoryCache _memoryCache;
 
         /// <summary>
@@ -37,7 +36,7 @@ namespace NetAppCommon.Extensions.Caching.Distributed
                 throw new ArgumentNullException(nameof(optionsAccessor));
             }
 
-            if (!DependencyInjection.MemoryCacheServiceCollectionExtensions.IsAdded())
+            if (!MemoryCacheServiceCollectionExtensions.IsAdded())
             {
                 _memoryCache ??= new MemoryCache(optionsAccessor.Value);
             }
@@ -65,7 +64,7 @@ namespace NetAppCommon.Extensions.Caching.Distributed
                 throw new ArgumentNullException(nameof(loggerFactory));
             }
 
-            if (!DependencyInjection.MemoryCacheServiceCollectionExtensions.IsAdded())
+            if (!MemoryCacheServiceCollectionExtensions.IsAdded())
             {
                 _memoryCache ??= new MemoryCache(optionsAccessor.Value, loggerFactory);
             }
@@ -94,7 +93,7 @@ namespace NetAppCommon.Extensions.Caching.Distributed
                 return JsonConvert.DeserializeObject<TValue>(Encoding.UTF8.GetString(value));
             }
 
-            return Helpers.Object.ObjectHelper.GetDefaultValue<TValue>();
+            return ObjectHelper.GetDefaultValue<TValue>();
         }
 
         public Task<object> GetAsync<TValue>(string key, CancellationToken token = default)
@@ -109,7 +108,6 @@ namespace NetAppCommon.Extensions.Caching.Distributed
 
         public void Set<TValue>(string key, object value, DistributedCacheEntryOptions options = default)
         {
-
             if (key == null)
             {
                 throw new ArgumentNullException(nameof(key));
@@ -122,7 +120,7 @@ namespace NetAppCommon.Extensions.Caching.Distributed
 
             options ??= new DistributedCacheEntryOptions
             {
-                AbsoluteExpiration = DateTime.Now.AddMinutes(5),
+                AbsoluteExpiration = DateTime.Now.AddMinutes(5)
                 //AbsoluteExpirationRelativeToNow = TimeSpan.FromDays((DateTime.Now.AddYears(1) - DateTime.Now).Days),
                 //SlidingExpiration = TimeSpan.FromDays((DateTime.Now.AddYears(1) - DateTime.Now).Days)
             };
@@ -150,11 +148,8 @@ namespace NetAppCommon.Extensions.Caching.Distributed
         }
 
         public async Task SetAsync<TValue>(string key, object value, DistributedCacheEntryOptions options = default,
-            CancellationToken token = default)
-        {
+            CancellationToken token = default) =>
             await SetAsync(key, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value, Formatting.Indented)),
                 options, token);
-        }
-
     }
 }

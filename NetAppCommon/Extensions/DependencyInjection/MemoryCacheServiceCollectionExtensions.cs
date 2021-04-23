@@ -1,7 +1,6 @@
 #region using
 
 using System;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NetAppCommon.Extensions.Caching.Distributed;
@@ -16,15 +15,15 @@ namespace NetAppCommon.Extensions.DependencyInjection
     public static class MemoryCacheServiceCollectionExtensions
     {
         /// <summary>
-        /// Is added
+        ///     Is added
         /// </summary>
         private static bool _isAdded;
 
         /// <summary>
-        /// Check public static IServiceCollection AddNetAppCommonDistributedMemoryCache is added as Singleton
+        ///     Check public static IServiceCollection AddNetAppCommonDistributedMemoryCache is added as Singleton
         /// </summary>
         /// <returns>
-        /// True if IServiceCollection AddNetAppCommonDistributedMemoryCache is run, else false
+        ///     True if IServiceCollection AddNetAppCommonDistributedMemoryCache is run, else false
         /// </returns>
         public static bool IsAdded() => _isAdded;
 
@@ -48,6 +47,7 @@ namespace NetAppCommon.Extensions.DependencyInjection
             {
                 throw new ArgumentNullException(nameof(services));
             }
+
             services.AddOptions();
             //services.TryAdd(ServiceDescriptor.Singleton<IDistributedCache, MemoryDistributedCache>());
             services.TryAdd(ServiceDescriptor.Singleton<ICommonDistributedCache, CommonMemoryDistributedCache>());

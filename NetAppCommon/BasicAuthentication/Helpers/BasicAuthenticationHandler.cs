@@ -8,6 +8,7 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -40,7 +41,7 @@ namespace NetAppCommon.Helpers.BasicAuthentication
         {
             // skip authentication if endpoint has [AllowAnonymous] attribute
             //var endpoint = Context.GetEndpoint();
-            var endpoint = Context.Features.Get<IEndpointFeature>()?.Endpoint;
+            Endpoint endpoint = Context.Features.Get<IEndpointFeature>()?.Endpoint;
             if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
             {
                 return AuthenticateResult.NoResult();

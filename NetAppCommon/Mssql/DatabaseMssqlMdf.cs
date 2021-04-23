@@ -196,9 +196,7 @@ namespace NetAppCommon.Mssql
         }
 
         public virtual bool Drop(string connectionString = null, string connectionStringName = null,
-            string settingsJsonFileName = null)
-        {
+            string settingsJsonFileName = null) =>
             throw new NotImplementedException();
-        }
     }
 }

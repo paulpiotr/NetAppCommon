@@ -9,7 +9,7 @@ using log4net;
 
 #endregion
 
-namespace NetAppCommon.ObjectMapper.Attributes
+namespace NetAppCommon.Cache.Attributes
 {
     /// <summary>
     ///     Rozszerzenia programowania zorientowanego na aspekty - Atrybut wartości domyślnej pamięci podręcznej
@@ -28,7 +28,7 @@ namespace NetAppCommon.ObjectMapper.Attributes
         ///     Instancja do klasy Log4netLogger
         ///     Instance to Log4netLogger class
         /// </summary>
-        private static readonly ILog Log4net =
+        private static readonly ILog _log4Net =
             Log4NetLogger.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
 
         #endregion
@@ -41,22 +41,21 @@ namespace NetAppCommon.ObjectMapper.Attributes
             try
             {
                 // Attempt to get it from cache
-                if (!TypesInitializers.TryGetValue(@this.GetType(), out var setter))
+                if (!TypesInitializers.TryGetValue(@this.GetType(), out Action<object> setter))
                 {
                     // If no initializers are added do nothing
                     setter = o => { };
                     // Iterate through each property
-                    var parameterExpression = Expression.Parameter(typeof(object), "this");
-                    foreach (var prop in @this.GetType()
+                    ParameterExpression parameterExpression = Expression.Parameter(typeof(object), "this");
+                    foreach (PropertyInfo prop in @this.GetType()
                         .GetProperties(BindingFlags.Public | BindingFlags.Instance))
                     {
-                        Expression expressionConvert;
                         if (prop.CanWrite &&
                             prop.GetCustomAttributes(typeof(DefaultValueAttribute), false) is DefaultValueAttribute[]
                                 attr &&
                             attr.Length > 0)
                         {
-                            expressionConvert =
+                            Expression expressionConvert =
                                 Expression.Convert(Expression.Constant(attr[0].Value), prop.PropertyType);
                             Expression expressionCall =
                                 Expression.Call(Expression.TypeAs(parameterExpression, @this.GetType()),
@@ -68,7 +67,7 @@ namespace NetAppCommon.ObjectMapper.Attributes
                         }
                     }
 
-                    if (null != setter)
+                    if (true)
                     {
                         try
                         {
@@ -97,12 +96,12 @@ namespace NetAppCommon.ObjectMapper.Attributes
             try
             {
                 // Attempt to get it from cache
-                if (!TypesInitializers.TryGetValue(@this.GetType(), out var setter))
+                if (!TypesInitializers.TryGetValue(@this.GetType(), out Action<object> setter))
                 {
                     // Init delegate with empty body,
                     // If no initializers are added do nothing
                     setter = o => { };
-                    // Go throu each property and compile Reset delegates
+                    // Go through each property and compile Reset delegates
                     foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(@this))
                     {
                         // Add only these which values can be reset

@@ -116,10 +116,10 @@ namespace NetAppCommon.AppSettings.Repositories.Base
         ///     Ścieżka do pliku docelowego jako string
         ///     Path to target file as a string
         /// </param>
-        public virtual Task MergeAndSaveAsync(string sourceFilePath, string destFilePath)
+        public virtual Task MergeAndSaveAsync(string sourceFilePath, string destFilePath) => Task.Run(() =>
         {
-            return Task.Run(() => { MergeAndSaveAsync(sourceFilePath, destFilePath); });
-        }
+            MergeAndSaveAsync(sourceFilePath, destFilePath);
+        });
 
         #endregion
 
@@ -187,10 +187,8 @@ namespace NetAppCommon.AppSettings.Repositories.Base
         ///     Nowy obiekt instancji ustawień jako TAppSettings : AppSettingsBaseModel, new()
         ///     New settings instance object as TAppSettings: AppSettingsBaseModel, new ()
         /// </returns>
-        public virtual async Task<TAppSettings> MergeAndSaveAsync(TAppSettings appSettings = null)
-        {
-            return await Task.Run(() => MergeAndSave(appSettings));
-        }
+        public virtual async Task<TAppSettings> MergeAndSaveAsync(TAppSettings appSettings = null) =>
+            await Task.Run(() => MergeAndSave(appSettings));
 
         #endregion
 
@@ -254,10 +252,8 @@ namespace NetAppCommon.AppSettings.Repositories.Base
         ///     Nowy obiekt instancji ustawień jako TAppSettings : AppSettingsBaseModel, new()
         ///     New settings instance object as TAppSettings: AppSettingsBaseModel, new ()
         /// </returns>
-        public virtual async Task<TAppSettings> SaveAsync(TAppSettings appSettings = null)
-        {
-            return await Task.Run(() => Save(appSettings));
-        }
+        public virtual async Task<TAppSettings> SaveAsync(TAppSettings appSettings = null) =>
+            await Task.Run(() => Save(appSettings));
 
         #endregion
 
@@ -324,10 +320,8 @@ namespace NetAppCommon.AppSettings.Repositories.Base
         ///     Nowy obiekt instancji ustawień jako TAppSettings : AppSettingsBaseModel, new()
         ///     New settings instance object as TAppSettings: AppSettingsBaseModel, new ()
         /// </returns>
-        public virtual async Task<TAppSettings> CopyToUserDirectoryAsync(TAppSettings appSettings = null)
-        {
-            return await Task.Run(() => CopyToUserDirectory(appSettings));
-        }
+        public virtual async Task<TAppSettings> CopyToUserDirectoryAsync(TAppSettings appSettings = null) =>
+            await Task.Run(() => CopyToUserDirectory(appSettings));
 
         #endregion
 
@@ -405,10 +399,8 @@ namespace NetAppCommon.AppSettings.Repositories.Base
         ///     Nowy obiekt instancji ustawień jako TAppSettings : AppSettingsBaseModel, new()
         ///     New settings instance object as TAppSettings: AppSettingsBaseModel, new ()
         /// </returns>
-        public virtual async Task<TAppSettings> MergeAndCopyToUserDirectoryAsync(TAppSettings appSettings = null)
-        {
-            return await Task.Run(() => MergeAndCopyToUserDirectory(appSettings));
-        }
+        public virtual async Task<TAppSettings> MergeAndCopyToUserDirectoryAsync(TAppSettings appSettings = null) =>
+            await Task.Run(() => MergeAndCopyToUserDirectory(appSettings));
 
         #endregion
 
@@ -430,10 +422,7 @@ namespace NetAppCommon.AppSettings.Repositories.Base
         ///     Wartość ustawienia na podstawie klucza jako typ określony w TValue
         ///     The key-based setting value as the type specified in TValue
         /// </returns>
-        public virtual TValue GetValue<TValue>(string key)
-        {
-            return GetValue<TValue>(new TAppSettings(), key);
-        }
+        public virtual TValue GetValue<TValue>(string key) => GetValue<TValue>(new TAppSettings(), key);
 
         #endregion
 
@@ -455,10 +444,8 @@ namespace NetAppCommon.AppSettings.Repositories.Base
         ///     Wartość ustawienia na podstawie klucza jako typ określony w TValue
         ///     The key-based setting value as the type specified in TValue
         /// </returns>
-        public virtual async Task<TValue> GetValueAsync<TValue>(string key)
-        {
-            return await Task.Run(() => GetValue<TValue>(key));
-        }
+        public virtual async Task<TValue> GetValueAsync<TValue>(string key) =>
+            await Task.Run(() => GetValue<TValue>(key));
 
         #endregion
 
@@ -526,10 +513,8 @@ namespace NetAppCommon.AppSettings.Repositories.Base
         ///     Wartość ustawienia na podstawie klucza jako typ określony w TValue
         ///     The key-based setting value as the type specified in TValue
         /// </returns>
-        public virtual async Task<TValue> GetValueAsync<TValue>(TAppSettings appSettings, string key)
-        {
-            return await Task.Run(() => GetValue<TValue>(appSettings, key));
-        }
+        public virtual async Task<TValue> GetValueAsync<TValue>(TAppSettings appSettings, string key) =>
+            await Task.Run(() => GetValue<TValue>(appSettings, key));
 
         #endregion
 
@@ -604,10 +589,8 @@ namespace NetAppCommon.AppSettings.Repositories.Base
         ///     Wartość ustawienia na podstawie klucza jako typ określony w TValue
         ///     The key-based setting value as the type specified in TValue
         /// </returns>
-        public virtual async Task<TValue> GetValueAsync<TValue>(string filePath, string key)
-        {
-            return await Task.Run(() => GetValue<TValue>(filePath, key));
-        }
+        public virtual async Task<TValue> GetValueAsync<TValue>(string filePath, string key) =>
+            await Task.Run(() => GetValue<TValue>(filePath, key));
 
         #endregion
 
@@ -678,10 +661,8 @@ namespace NetAppCommon.AppSettings.Repositories.Base
         ///     Prawda jeśli udało się połączyć z bazą danych Mssql, przeciwnie fałsz
         ///     True if successful when connecting to the Mssql database, otherwise false
         /// </returns>
-        public async Task<bool> MssqlCanConnectAsync(string connectionString)
-        {
-            return await Task.Run(() => MssqlCanConnect(connectionString));
-        }
+        public async Task<bool> MssqlCanConnectAsync(string connectionString) =>
+            await Task.Run(() => MssqlCanConnect(connectionString));
 
         #endregion
 
@@ -705,10 +686,10 @@ namespace NetAppCommon.AppSettings.Repositories.Base
             {
                 var sqlConnectionStringBuilder = new SqlConnectionStringBuilder(connectionString);
                 return !IsNullOrWhiteSpace(sqlConnectionStringBuilder.AttachDBFilename) ||
-                       !IsNullOrWhiteSpace(sqlConnectionStringBuilder.DataSource) &&
-                       !IsNullOrWhiteSpace(sqlConnectionStringBuilder.InitialCatalog) &&
-                       !IsNullOrWhiteSpace(sqlConnectionStringBuilder.UserID) &&
-                       !IsNullOrWhiteSpace(sqlConnectionStringBuilder.Password);
+                       (!IsNullOrWhiteSpace(sqlConnectionStringBuilder.DataSource) &&
+                        !IsNullOrWhiteSpace(sqlConnectionStringBuilder.InitialCatalog) &&
+                        !IsNullOrWhiteSpace(sqlConnectionStringBuilder.UserID) &&
+                        !IsNullOrWhiteSpace(sqlConnectionStringBuilder.Password));
             }
             catch (Exception e)
             {
@@ -735,10 +716,8 @@ namespace NetAppCommon.AppSettings.Repositories.Base
         ///     Prawda, jeśli warunki zostaną spełnione, przeciwnie false
         ///     True if the conditions are met, otherwise false
         /// </returns>
-        public async Task<bool> MssqlCheckConnectionStringAsync(string connectionString)
-        {
-            return await Task.Run(() => MssqlCheckConnectionString(connectionString));
-        }
+        public async Task<bool> MssqlCheckConnectionStringAsync(string connectionString) =>
+            await Task.Run(() => MssqlCheckConnectionString(connectionString));
 
         #endregion
 
@@ -752,10 +731,7 @@ namespace NetAppCommon.AppSettings.Repositories.Base
         ///     Statyczna referencja do klasy AppSettingsRepositoryBase
         ///     A static reference to the AppSettingsRepositoryBase class
         /// </returns>
-        public static AppSettingsRepository<TAppSettings> GetInstance()
-        {
-            return new();
-        }
+        public static AppSettingsRepository<TAppSettings> GetInstance() => new();
 
         #endregion
 
@@ -773,16 +749,14 @@ namespace NetAppCommon.AppSettings.Repositories.Base
         ///     Domyślna wartość określonego typu określonego w parametrze TValue
         ///     The default value of the specified type specified in the TValue parameter
         /// </returns>
-        private TValue GetDefaultValue<TValue>()
-        {
-            return typeof(TValue).FullName switch
+        private TValue GetDefaultValue<TValue>() =>
+            typeof(TValue).FullName switch
             {
-                "System.Boolean" => (TValue) Convert.ChangeType(false, typeof(TValue)),
-                "System.Int32" => (TValue) Convert.ChangeType(int.MinValue, typeof(TValue)),
-                "System.DateTime" => (TValue) Convert.ChangeType(DateTime.MinValue, typeof(TValue)),
-                _ => (TValue) Convert.ChangeType(null, typeof(TValue))
+                "System.Boolean" => (TValue)Convert.ChangeType(false, typeof(TValue)),
+                "System.Int32" => (TValue)Convert.ChangeType(int.MinValue, typeof(TValue)),
+                "System.DateTime" => (TValue)Convert.ChangeType(DateTime.MinValue, typeof(TValue)),
+                _ => (TValue)Convert.ChangeType(null, typeof(TValue))
             };
-        }
 
         #endregion
     }

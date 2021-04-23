@@ -27,7 +27,7 @@ namespace NetAppCommon.BasicAuthentication.Services
 
         public async Task<User> Authenticate(string username, string password)
         {
-            var user = await Task.Run(() =>
+            User user = await Task.Run(() =>
                 _users.SingleOrDefault(x => x.Username == username && x.Password == password));
             // return null if user not found
             if (user == null)
@@ -39,9 +39,6 @@ namespace NetAppCommon.BasicAuthentication.Services
             return user.WithoutPassword();
         }
 
-        public async Task<IEnumerable<User>> GetAll()
-        {
-            return await Task.Run(() => _users.WithoutPasswords());
-        }
+        public async Task<IEnumerable<User>> GetAll() => await Task.Run(() => _users.WithoutPasswords());
     }
 }

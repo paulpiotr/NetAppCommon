@@ -26,18 +26,18 @@ namespace NetAppCommon.Helpers.Lists
 
         public char[] DelimiterChars { get; set; } = {',', ';'};
 
-        public static ListsHelper GetInstance()
-        {
-            return new();
-        }
+        public static ListsHelper GetInstance() => new();
 
         public List<string> ConvertToListOfString(string delimiterSeparatedAttributes, char[] delimiterChars = null)
         {
             try
             {
-                delimiterChars ??= DelimiterChars;
-                return new List<string>(delimiterSeparatedAttributes.Split(delimiterChars)).Select(x => x.Trim())
-                    .ToList();
+                if (!string.IsNullOrWhiteSpace(delimiterSeparatedAttributes))
+                {
+                    delimiterChars ??= DelimiterChars;
+                    return new List<string>(delimiterSeparatedAttributes.Split(delimiterChars)).Select(x => x.Trim())
+                        .ToList();
+                }
             }
             catch (Exception e)
             {
@@ -52,7 +52,7 @@ namespace NetAppCommon.Helpers.Lists
         }
 
         public async Task<List<string>> ConvertToListOfStringAsync(string delimiterSeparatedAttributes,
-            char[] delimiterChars = null) => await Task.Run(() => ConvertToListOfString(delimiterSeparatedAttributes, delimiterChars));
-
+            char[] delimiterChars = null) =>
+            await Task.Run(() => ConvertToListOfString(delimiterSeparatedAttributes, delimiterChars));
     }
 }

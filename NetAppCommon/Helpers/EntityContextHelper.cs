@@ -112,7 +112,8 @@ namespace NetAppCommon.Helpers
                         Console.WriteLine(a);
                     }
 
-                    var isPendingMigrations = (await (context.Database ?? throw new InvalidOperationException()).GetPendingMigrationsAsync())
+                    var isPendingMigrations = (await (context.Database ?? throw new InvalidOperationException())
+                            .GetPendingMigrationsAsync())
                         .Any();
                     if (isPendingMigrations)
                     {

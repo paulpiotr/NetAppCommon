@@ -21,9 +21,7 @@ namespace NetAppCommon.Validation
 
         #endregion
 
-        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
-        {
-            return ValidationResult.Success;
-        }
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext) =>
+            ValidationResult.Success;
     }
 }

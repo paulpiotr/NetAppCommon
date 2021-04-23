@@ -2,6 +2,7 @@
 
 using System;
 using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -66,11 +67,11 @@ namespace NetAppCommon.ObjectMapper.Attributes
         {
             try
             {
-                var objectPropertyInfo = @object?.GetType()?.GetProperty(propertyName);
+                PropertyInfo objectPropertyInfo = @object?.GetType()?.GetProperty(propertyName);
                 if (null != objectPropertyInfo)
                 {
                     var objectAttribute =
-                        (ObjectMapperAttribute) GetCustomAttribute(objectPropertyInfo, typeof(ObjectMapperAttribute));
+                        (ObjectMapperAttribute)GetCustomAttribute(objectPropertyInfo, typeof(ObjectMapperAttribute));
                     if (null != objectAttribute)
                     {
                         return objectAttribute;
@@ -89,11 +90,11 @@ namespace NetAppCommon.ObjectMapper.Attributes
         {
             try
             {
-                var objectPropertyInfo = @object?.GetType()?.GetProperty(propertyName);
+                PropertyInfo objectPropertyInfo = @object?.GetType()?.GetProperty(propertyName);
                 if (null != objectPropertyInfo)
                 {
                     var objectAttribute =
-                        (ObjectMapperAttribute) GetCustomAttribute(objectPropertyInfo, typeof(ObjectMapperAttribute));
+                        (ObjectMapperAttribute)GetCustomAttribute(objectPropertyInfo, typeof(ObjectMapperAttribute));
                     if (null != objectAttribute)
                     {
                         return objectAttribute?.GetType()?.GetProperty(attributeName)?.GetValue(objectAttribute);
@@ -118,14 +119,14 @@ namespace NetAppCommon.ObjectMapper.Attributes
                 source.GetType().GetProperties().ToList().ForEach(sourceProperty =>
                 {
                     var assemblyNameSource =
-                        (string) GetCustomAttributeValue(source, sourceProperty.Name, "AssemblyNameSource");
+                        (string)GetCustomAttributeValue(source, sourceProperty.Name, "AssemblyNameSource");
                     var propertyNameSource =
-                        (string) GetCustomAttributeValue(source, sourceProperty.Name, "PropertyNameSource");
+                        (string)GetCustomAttributeValue(source, sourceProperty.Name, "PropertyNameSource");
                     if (null != assemblyNameSource && source.GetType().Name == assemblyNameSource &&
                         null != propertyNameSource)
                     {
                         var destinationMap =
-                            (string[]) GetCustomAttributeValue(source, sourceProperty.Name, "DestinationMap");
+                            (string[])GetCustomAttributeValue(source, sourceProperty.Name, "DestinationMap");
                         destinationMap.ToList().ForEach(item =>
                         {
                             var destinationMapObject = JObject.Parse(item.ToString());

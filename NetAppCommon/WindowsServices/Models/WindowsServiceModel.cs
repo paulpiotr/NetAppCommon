@@ -55,10 +55,7 @@ namespace NetAppCommon.WindowsServices.Models
         ///     protected virtual void OnPropertyChanged(PropertyChangedEventArgs args)
         /// </summary>
         /// <param name="args"></param>
-        protected virtual void OnPropertyChanged(PropertyChangedEventArgs args)
-        {
-            PropertyChanged?.Invoke(this, args);
-        }
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs args) => PropertyChanged?.Invoke(this, args);
 
         #endregion
 
@@ -68,10 +65,8 @@ namespace NetAppCommon.WindowsServices.Models
         ///     protected void OnPropertyChanged(string propertyName)
         /// </summary>
         /// <param name="propertyName"></param>
-        protected void OnPropertyChanged(string propertyName)
-        {
+        protected void OnPropertyChanged(string propertyName) =>
             OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
-        }
 
         #endregion
 
