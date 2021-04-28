@@ -269,6 +269,7 @@ namespace NetAppCommon.Helpers.Files
 #else
                         Console.WriteLine($"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n");
 #endif
+                        throw;
                     }
                 }
                 catch (Exception e)
@@ -279,6 +280,7 @@ namespace NetAppCommon.Helpers.Files
 #else
                     Console.WriteLine($"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n");
 #endif
+                    throw;
                 }
             }
         }
@@ -319,21 +321,37 @@ namespace NetAppCommon.Helpers.Files
                     else
                     {
 #if DEBUG
-                        Log4Net.Error(
-                            $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
+                        Log4Net.Error(e);
+                        if (null != e.InnerException)
+                        {
+                            Log4Net.Error(e.InnerException);
+                        }
 #else
-                        Console.WriteLine($"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n");
+                        Log4Net.Error(e);
+                        if (null != e.InnerException)
+                        {
+                            Log4Net.Error(e.InnerException);
+                        }
 #endif
+                        throw;
                     }
                 }
                 catch (Exception e)
                 {
 #if DEBUG
-                    Log4Net.Error(
-                        $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
+                    Log4Net.Error(e);
+                    if (null != e.InnerException)
+                    {
+                        Log4Net.Error(e.InnerException);
+                    }
 #else
-                    Console.WriteLine($"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n");
+                    Log4Net.Error(e);
+                    if (null != e.InnerException)
+                    {
+                        Log4Net.Error(e.InnerException);
+                    }
 #endif
+                    throw;
                 }
             }
         }
