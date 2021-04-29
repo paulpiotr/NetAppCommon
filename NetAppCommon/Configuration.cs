@@ -286,10 +286,10 @@ namespace NetAppCommon
                 var getAppSettingsPath = GetAppSettingsPath();
                 if (null != getAppSettingsPath && !string.IsNullOrWhiteSpace(getAppSettingsPath))
                 {
-                    var configurationBuilder = new ConfigurationBuilder()
+                    IConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
                         .SetBasePath(Path.GetDirectoryName(getAppSettingsPath))
                         .AddJsonFile(Path.GetFileName(getAppSettingsPath), true, true);
-                    var configurationRoot = configurationBuilder.Build();
+                    IConfigurationRoot configurationRoot = configurationBuilder.Build();
                     return configurationRoot;
                 }
 
@@ -350,10 +350,10 @@ namespace NetAppCommon
                 var getAppSettingsPath = GetAppSettingsPath(settingsJsonFilePath);
                 if (null != getAppSettingsPath && !string.IsNullOrWhiteSpace(getAppSettingsPath))
                 {
-                    var configurationBuilder = new ConfigurationBuilder()
+                    IConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
                         .SetBasePath(Path.GetDirectoryName(getAppSettingsPath))
                         .AddJsonFile(Path.GetFileName(getAppSettingsPath), true, true);
-                    var configurationRoot = configurationBuilder.Build();
+                    IConfigurationRoot configurationRoot = configurationBuilder.Build();
                     return configurationRoot;
                 }
 
@@ -421,19 +421,19 @@ namespace NetAppCommon
             {
                 if (null != key && !string.IsNullOrWhiteSpace(key))
                 {
-                    var configurationRoot = GetConfigurationRoot();
+                    IConfigurationRoot configurationRoot = GetConfigurationRoot();
                     if (null != configurationRoot)
                     {
-                        return (T) Convert.ChangeType(configurationRoot.GetValue<T>(key), typeof(T));
+                        return (T)Convert.ChangeType(configurationRoot.GetValue<T>(key), typeof(T));
                     }
                 }
 
-                return (T) Convert.ChangeType(null, typeof(T));
+                return (T)Convert.ChangeType(null, typeof(T));
             }
             catch (Exception e)
             {
                 Log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
-                return (T) Convert.ChangeType(null, typeof(T));
+                return (T)Convert.ChangeType(null, typeof(T));
             }
         }
 
@@ -466,7 +466,7 @@ namespace NetAppCommon
             catch (Exception e)
             {
                 await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
-                return (T) Convert.ChangeType(null, typeof(T));
+                return (T)Convert.ChangeType(null, typeof(T));
             }
         }
 
@@ -501,10 +501,10 @@ namespace NetAppCommon
                 if (null != settingsJsonFilePath && !string.IsNullOrEmpty(settingsJsonFilePath) && null != key &&
                     !string.IsNullOrWhiteSpace(key))
                 {
-                    var configurationRoot = GetConfigurationRoot(settingsJsonFilePath);
+                    IConfigurationRoot configurationRoot = GetConfigurationRoot(settingsJsonFilePath);
                     if (null != configurationRoot)
                     {
-                        return (T) Convert.ChangeType(configurationRoot.GetValue<T>(key), typeof(T));
+                        return (T)Convert.ChangeType(configurationRoot.GetValue<T>(key), typeof(T));
                     }
                 }
             }
@@ -513,7 +513,7 @@ namespace NetAppCommon
                 Log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
             }
 
-            return (T) Convert.ChangeType(null, typeof(T));
+            return (T)Convert.ChangeType(null, typeof(T));
         }
 
         #endregion
@@ -549,7 +549,7 @@ namespace NetAppCommon
             catch (Exception e)
             {
                 await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
-                return (T) Convert.ChangeType(null, typeof(T));
+                return (T)Convert.ChangeType(null, typeof(T));
             }
         }
 

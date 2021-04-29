@@ -2,12 +2,12 @@
 
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using log4net;
-using Enumerable = System.Linq.Enumerable;
 
 #endregion
 
@@ -57,7 +57,7 @@ namespace NetAppCommon.Helpers.Object
                 if (null != o)
                 {
                     var stringBuilder = new StringBuilder();
-                    foreach (PropertyInfo propertyInfo in Enumerable.OrderBy(o.GetType().GetProperties(), x => x.Name))
+                    foreach (PropertyInfo propertyInfo in o.GetType().GetProperties().OrderBy(x => x.Name))
                     {
                         switch (propertyInfo.PropertyType.ToString())
                         {
@@ -67,13 +67,13 @@ namespace NetAppCommon.Helpers.Object
                                 break;
                             case "Decimal":
                             case "System.Decimal":
-                                var decimalValue = (decimal) (propertyInfo.GetValue(o, null) ?? 0);
+                                var decimalValue = (decimal)(propertyInfo.GetValue(o, null) ?? 0);
                                 stringBuilder.Append(propertyInfo.Name).Append(separator)
                                     .Append(decimalValue.ToString("N", CultureInfo.InvariantCulture)).Append(separator);
                                 break;
                             case "Double":
                             case "System.Double":
-                                var doubleValue = (double) (propertyInfo.GetValue(o, null) ?? 0);
+                                var doubleValue = (double)(propertyInfo.GetValue(o, null) ?? 0);
                                 stringBuilder.Append(propertyInfo.Name).Append(separator)
                                     .Append(doubleValue.ToString("N", CultureInfo.InvariantCulture)).Append(separator);
                                 break;
@@ -85,6 +85,7 @@ namespace NetAppCommon.Helpers.Object
                                     stringBuilder.Append(propertyInfo.Name).Append(separator)
                                         .Append(dateTime.ToString(CultureInfo.InvariantCulture)).Append(separator);
                                 }
+
                                 break;
                         }
                     }
@@ -125,10 +126,8 @@ namespace NetAppCommon.Helpers.Object
         ///     Wartości właściwości obiektu rozdzielone separatorem jako string
         ///     Object property values separated by a separator as a string
         /// </returns>
-        public static async Task<string> GetValuesToStringAsync(object o, string separator = null)
-        {
-            return await Task.Run(() => GetValuesToString(o, separator));
-        }
+        public static async Task<string> GetValuesToStringAsync(object o, string separator = null) =>
+            await Task.Run(() => GetValuesToString(o, separator));
 
         #endregion
 
@@ -168,15 +167,10 @@ namespace NetAppCommon.Helpers.Object
 
         #endregion
 
-        public static Guid ConvertObjectValuesToMD5HashGuid(object o, string separator = null)
-        {
-            return new(MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(GetValuesToString(o, separator))));
-        }
+        public static Guid ConvertObjectValuesToMD5HashGuid(object o, string separator = null) =>
+            new(MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(GetValuesToString(o, separator))));
 
-        public static Guid GuidFromString(string s)
-        {
-            return new(MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(s)));
-        }
+        public static Guid GuidFromString(string s) => new(MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(s)));
 
         #region public async Task<string> ConvertObjectValuesToMD5HashAsync(object o, string separator = null)
 
@@ -192,10 +186,8 @@ namespace NetAppCommon.Helpers.Object
         ///     Skrót MD5 wartości właściwości obiektu jako string
         ///     MD5 hash of the object property value as a string
         /// </returns>
-        public static async Task<string> ConvertObjectValuesToMD5HashAsync(object o, string separator = null)
-        {
-            return await Task.Run(() => ConvertObjectValuesToMD5Hash(o, separator));
-        }
+        public static async Task<string> ConvertObjectValuesToMD5HashAsync(object o, string separator = null) =>
+            await Task.Run(() => ConvertObjectValuesToMD5Hash(o, separator));
 
         #endregion
 
@@ -213,16 +205,14 @@ namespace NetAppCommon.Helpers.Object
         ///     Domyślna wartość określonego typu określonego w parametrze TValue
         ///     The default value of the specified type specified in the TValue parameter
         /// </returns>
-        public static TValue GetDefaultValue<TValue>()
-        {
-            return typeof(TValue).FullName switch
+        public static TValue GetDefaultValue<TValue>() =>
+            typeof(TValue).FullName switch
             {
                 "System.Boolean" => (TValue)Convert.ChangeType(false, typeof(TValue)),
                 "System.Int32" => (TValue)Convert.ChangeType(int.MinValue, typeof(TValue)),
                 "System.DateTime" => (TValue)Convert.ChangeType(DateTime.MinValue, typeof(TValue)),
                 _ => (TValue)Convert.ChangeType(null, typeof(TValue))
             };
-        }
 
         #endregion
 
@@ -230,7 +220,7 @@ namespace NetAppCommon.Helpers.Object
 
         /// <summary>
         ///     Konwersja wartości właściwości obiektu do skrótu SHA512
-        ///     Convert object property value to SHA512 hash 
+        ///     Convert object property value to SHA512 hash
         /// </summary>
         /// <param name="@object">
         ///     object @object

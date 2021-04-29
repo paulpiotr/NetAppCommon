@@ -7,10 +7,9 @@ using System.Reflection;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using NetAppCommon.Extensions.Caching.Distributed;
+using NetAppCommon.Helpers.Object;
 using NetAppCommon.Logging.ClientMessageInspector.Models.Base;
 using NetAppCommon.Logging.ClientMessageInspector.Repositories.Interface;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 #endregion
 
@@ -20,7 +19,7 @@ namespace NetAppCommon.Logging.ClientMessageInspector.Repositories
     {
         private readonly ICommonDistributedCache _cache;
 
-        private readonly Guid _guid = Helpers.Object.ObjectHelper.GuidFromString(Assembly.GetExecutingAssembly().FullName);
+        private readonly Guid _guid = ObjectHelper.GuidFromString(Assembly.GetExecutingAssembly().FullName);
 
         private IDictionary<string, MessageInspectorModel> _dictionary;
 

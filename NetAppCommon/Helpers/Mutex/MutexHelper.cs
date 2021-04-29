@@ -44,14 +44,15 @@ namespace NetAppCommon.Helpers.Mutex
                 {
                     lock (string.Intern(name))
                     {
-                        if (!System.Threading.Mutex.TryOpenExisting(name, out var _mutex) && null == _mutex)
+                        if (!System.Threading.Mutex.TryOpenExisting(name, out System.Threading.Mutex _mutex) &&
+                            null == _mutex)
                         {
                             Console.WriteLine($"Run Mutex {name}");
                             _mutex ??= System.Threading.Mutex.OpenExisting(name) ??
                                        new System.Threading.Mutex(false, name);
                             func();
                             //_mutex.WaitOne();
-                            Thread.Sleep((int) TimeSpan.FromSeconds(1).TotalMilliseconds * 1);
+                            Thread.Sleep((int)TimeSpan.FromSeconds(1).TotalMilliseconds * 1);
                         }
                     }
                 }

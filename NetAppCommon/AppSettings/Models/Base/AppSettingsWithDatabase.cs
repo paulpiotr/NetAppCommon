@@ -66,10 +66,7 @@ namespace NetAppCommon.AppSettings.Models.Base
         ///     Nazwa połączenia bazy danych Mssql (domyślna)
         ///     Mssql database connection name (default)
         /// </returns>
-        public virtual string GetConnectionStringName()
-        {
-            return ConnectionStringName!;
-        }
+        public virtual string GetConnectionStringName() => ConnectionStringName!;
 
         #endregion
 
@@ -137,7 +134,7 @@ namespace NetAppCommon.AppSettings.Models.Base
                     $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
             }
 
-            return ((DbContextOptionsBuilder<TContext>) DbContextOptionsBuilder)!;
+            return ((DbContextOptionsBuilder<TContext>)DbContextOptionsBuilder)!;
         }
 
         #endregion
@@ -172,7 +169,7 @@ namespace NetAppCommon.AppSettings.Models.Base
                     $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
             }
 
-            return ((DbContextOptions<TContext>) DbContextOptions)!;
+            return ((DbContextOptions<TContext>)DbContextOptions)!;
         }
 
         #endregion
@@ -245,13 +242,13 @@ namespace NetAppCommon.AppSettings.Models.Base
         private int? _cacheLifeTime;
 
         /// <summary>
-        ///     Okres istnienia pamięci podręcznej (w sekundach)
+        ///     Okres istnienia pamięci podręcznej, w sekundach
         ///     Cache lifetime (in seconds)
         /// </summary>
         [JsonProperty(nameof(CacheLifeTime))]
-        [Display(Name = "Okres istnienia pamięci podręcznej (w sekundach)",
-            Prompt = "Wpisz okres istnienia pamięci podręcznej (w sekundach)",
-            Description = "Okres istnienia pamięci podręcznej (w sekundach)")]
+        [Display(Name = "Okres istnienia pamięci podręcznej, w sekundach",
+            Prompt = "Wpisz okres istnienia pamięci podręcznej, w sekundach",
+            Description = "Okres istnienia pamięci podręcznej, w sekundach")]
         [Range(0, 2147483647)]
         [Required]
         public int? CacheLifeTime
@@ -314,7 +311,7 @@ namespace NetAppCommon.AppSettings.Models.Base
                         $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
                 }
 
-                return _useGlobalDatabaseConnectionSettings != null && (bool) _useGlobalDatabaseConnectionSettings;
+                return _useGlobalDatabaseConnectionSettings != null && (bool)_useGlobalDatabaseConnectionSettings;
             }
             set
             {

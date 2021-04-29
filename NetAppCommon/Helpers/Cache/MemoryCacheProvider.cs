@@ -28,35 +28,23 @@ namespace NetAppCommon.Helpers.Cache
             _cache ??= memoryCache;
         }
 
-        private IMemoryCache GetMemoryCache()
-        {
-            return _cache ?? Cache;
-        }
+        private IMemoryCache GetMemoryCache() => _cache ?? Cache;
 
-        public static MemoryCacheProvider GetInstance(IMemoryCache memoryCache)
-        {
-            return new(memoryCache);
-        }
+        public static MemoryCacheProvider GetInstance(IMemoryCache memoryCache) => new(memoryCache);
 
-        public static MemoryCacheProvider GetInstance()
-        {
-            return new();
-        }
+        public static MemoryCacheProvider GetInstance() => new();
 
         public (bool hit, object value) TryGet(string key)
         {
-            var cacheHit = GetMemoryCache().TryGetValue(key, out var value);
+            var cacheHit = GetMemoryCache().TryGetValue(key, out object value);
             return (cacheHit, value);
         }
 
-        public void Put(string key, object value, TimeSpan timeSpan)
-        {
-            Put(key, value, new Ttl(timeSpan));
-        }
+        public void Put(string key, object value, TimeSpan timeSpan) => Put(key, value, new Ttl(timeSpan));
 
         public void Put(string key, object value, Ttl ttl)
         {
-            var remaining = DateTimeOffset.MaxValue - SystemClock.DateTimeOffsetUtcNow();
+            TimeSpan remaining = DateTimeOffset.MaxValue - SystemClock.DateTimeOffsetUtcNow();
             var options = new MemoryCacheEntryOptions();
             if (ttl.SlidingExpiration)
             {
@@ -79,7 +67,7 @@ namespace NetAppCommon.Helpers.Cache
 
         public object Get(string key)
         {
-            (var hit, var value) = TryGet(key);
+            (var hit, object value) = TryGet(key);
             if (hit)
             {
                 return value;
@@ -90,7 +78,7 @@ namespace NetAppCommon.Helpers.Cache
 
         public object Get(string key, object @object, double? timeSpan)
         {
-            (var hit, var value) = TryGet(key);
+            (var hit, object value) = TryGet(key);
             if (hit)
             {
                 return value;
@@ -102,7 +90,7 @@ namespace NetAppCommon.Helpers.Cache
 
         public object Get(string key, object @object, Ttl ttl)
         {
-            (var hit, var value) = TryGet(key);
+            (var hit, object value) = TryGet(key);
             if (hit)
             {
                 return value;

@@ -1,13 +1,10 @@
 #region using
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.ServiceModel.Channels;
 using System.Xml;
-using System.Xml.Linq;
 using System.Xml.Serialization;
 using log4net;
 
@@ -29,7 +26,8 @@ namespace NetAppCommon.Helpers.Xmls
         ///     private static readonly ILog Log4Net
         ///     private static readonly ILog Log4Net
         /// </summary>
-        private static readonly ILog Log4Net = Logging.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
+        private static readonly ILog Log4Net =
+            Logging.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
 
         #endregion
 
@@ -95,19 +93,12 @@ namespace NetAppCommon.Helpers.Xmls
                 catch (Exception e)
                 {
 #if DEBUG
-                    //Log4Net.Warn(e);
-                    //if (null != e.InnerException)
-                    //{
-                    //    Log4Net.Warn(e.InnerException);
-                    //    if (null != e.InnerException.InnerException)
-                    //    {
-                    //        Log4Net.Warn(e.InnerException.InnerException);
-                    //    }
-                    //}
+                    Log4Net.Warn(e);
 #else
-                            ///Ignore
+                    Log4Net.Warn(e);
 #endif
                 }
+
                 while (xmlReader.Read())
                 {
                     // First element is the root element
@@ -125,17 +116,9 @@ namespace NetAppCommon.Helpers.Xmls
                         catch (Exception e)
                         {
 #if DEBUG
-                            //Log4Net.Warn(e);
-                            //if (null != e.InnerException)
-                            //{
-                            //    Log4Net.Warn(e.InnerException);
-                            //    if (null != e.InnerException.InnerException)
-                            //    {
-                            //        Log4Net.Warn(e.InnerException.InnerException);
-                            //    }
-                            //}
+                            Log4Net.Warn(e);
 #else
-                            ///Ignore
+                            Log4Net.Warn(e);
 #endif
                         }
                     }
@@ -157,9 +140,9 @@ namespace NetAppCommon.Helpers.Xmls
             return (T)Convert.ChangeType(null, typeof(T));
         }
 
-#endregion
+        #endregion
 
-#region public static XmlDocument GetDocument(Message message)
+        #region public static XmlDocument GetDocument(Message message)
 
         /// <summary>
         ///     Pobierz treść dokumentu jako obiekt XML
@@ -201,8 +184,8 @@ namespace NetAppCommon.Helpers.Xmls
             return null;
         }
 
-#endregion
+        #endregion
     }
 
-#endregion
+    #endregion
 }

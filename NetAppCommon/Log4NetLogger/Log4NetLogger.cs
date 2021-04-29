@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using log4net;
 using log4net.Config;
+using log4net.Repository;
 
 #endregion
 
@@ -17,7 +18,7 @@ namespace NetAppCommon.Log4NetLogger
         /// </summary>
         static Log4NetLogger()
         {
-            var repository = Log4NetInstance.Logger.Repository;
+            ILoggerRepository repository = Log4NetInstance.Logger.Repository;
             var fileInfo = new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory + "\\" + "log4net.config"));
             XmlConfigurator.ConfigureAndWatch(repository, fileInfo);
         }

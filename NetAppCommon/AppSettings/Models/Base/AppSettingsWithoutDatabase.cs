@@ -52,13 +52,14 @@ namespace NetAppCommon.AppSettings.Models.Base
         #endregion
 
         #region public AppSettingsWithoutDatabase(string filePath)
+
         /// <summary>
-        /// Konstruktor
-        /// Constructor 
+        ///     Konstruktor
+        ///     Constructor
         /// </summary>
         /// <param name="filePath">
-        /// Ścieżka do pliku ustawień jako string
-        /// Path to the settings file as a string 
+        ///     Ścieżka do pliku ustawień jako string
+        ///     Path to the settings file as a string
         /// </param>
         public AppSettingsWithoutDatabase(string filePath)
         {
@@ -77,32 +78,30 @@ namespace NetAppCommon.AppSettings.Models.Base
 
         #endregion
 
-        #region public virtual AppSettingsWithoutDatabase Setup(string filePath = null!)
-        /// <summary>
-        /// Zainicjuj i ustaw
-        /// Initialize and set up 
-        /// </summary>
-        /// <param name="filePath">
-        /// Ścieżka do pliku ustawień jako string
-        /// Path to the settings file as a string 
-        /// </param>
-        /// <returns>
-        /// this
-        /// this
-        /// </returns>
-        protected virtual AppSettingsWithoutDatabase Setup(string filePath = null!)
-        {
-            return this;
-        }
-
-        #endregion
-
         #region public virtual event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
         ///     PropertyChangedEventHandler PropertyChanged
         /// </summary>
         public virtual event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
+
+        #region public virtual AppSettingsWithoutDatabase Setup(string filePath = null!)
+
+        /// <summary>
+        ///     Zainicjuj i ustaw
+        ///     Initialize and set up
+        /// </summary>
+        /// <param name="filePath">
+        ///     Ścieżka do pliku ustawień jako string
+        ///     Path to the settings file as a string
+        /// </param>
+        /// <returns>
+        ///     this
+        ///     this
+        /// </returns>
+        protected virtual AppSettingsWithoutDatabase Setup(string filePath = null!) => this;
 
         #endregion
 
@@ -116,10 +115,7 @@ namespace NetAppCommon.AppSettings.Models.Base
         ///     Nazwa pliku z ustawieniami aplikacji jako string
         ///     Name of the application settings file as a string
         /// </returns>
-        public virtual string GetFileName()
-        {
-            return FileName!;
-        }
+        public virtual string GetFileName() => FileName!;
 
         #endregion
 
@@ -133,10 +129,7 @@ namespace NetAppCommon.AppSettings.Models.Base
         ///     Bieżąca ścieżka do pliku konfiguracji jako string
         ///     Current path to the configuration file as a string
         /// </returns>
-        public virtual string GetFilePath()
-        {
-            return FilePath!;
-        }
+        public virtual string GetFilePath() => FilePath!;
 
         #endregion
 
@@ -150,10 +143,7 @@ namespace NetAppCommon.AppSettings.Models.Base
         ///     Instancja IConfigurationBuilder ConfigurationBuilder
         ///     IConfigurationBuilder ConfigurationBuilder instance
         /// </returns>
-        public IConfigurationBuilder GetConfigurationBuilder()
-        {
-            return AppSettingsConfigurationBuilder!;
-        }
+        public IConfigurationBuilder GetConfigurationBuilder() => AppSettingsConfigurationBuilder!;
 
         #endregion
 
@@ -167,10 +157,7 @@ namespace NetAppCommon.AppSettings.Models.Base
         ///     public IConfigurationRoot AppSettingsConfigurationRoot
         ///     public IConfigurationRoot AppSettingsConfigurationRoot
         /// </returns>
-        public IConfigurationRoot GetConfigurationRoot()
-        {
-            return AppSettingsConfigurationRoot!;
-        }
+        public IConfigurationRoot GetConfigurationRoot() => AppSettingsConfigurationRoot!;
 
         #endregion
 
@@ -180,10 +167,7 @@ namespace NetAppCommon.AppSettings.Models.Base
         ///     private virtual void OnPropertyChanged(PropertyChangedEventArgs args)
         /// </summary>
         /// <param name="args"></param>
-        public virtual void OnPropertyChanged(PropertyChangedEventArgs args)
-        {
-            PropertyChanged?.Invoke(this, args);
-        }
+        public virtual void OnPropertyChanged(PropertyChangedEventArgs args) => PropertyChanged?.Invoke(this, args);
 
         #endregion
 
@@ -195,10 +179,8 @@ namespace NetAppCommon.AppSettings.Models.Base
         /// </summary>
         /// <param name="propertyName">
         /// </param>
-        public void OnPropertyChanged(string propertyName)
-        {
+        public void OnPropertyChanged(string propertyName) =>
             OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
-        }
 
         #endregion
 

@@ -63,10 +63,7 @@ namespace NetAppCommon.Helpers.Files
         ///     Statuczny obiekt instancji klasy NetAppCommon.Helpers.Files.FileHelper
         ///     Statuczny obiekt instancji klasy NetAppCommon.Helpers.Files.FileHelper
         /// </returns>
-        public static FileHelper GetInstance()
-        {
-            return new();
-        }
+        public static FileHelper GetInstance() => new();
 
         #endregion
 
@@ -120,10 +117,7 @@ namespace NetAppCommon.Helpers.Files
         ///     Skrót MD5 z treści pliku jako string lub null
         ///     MD5 hash from the file content as string or null
         /// </returns>
-        public static async Task<string> GetMd5HashAsync(string filePath)
-        {
-            return await Task.Run(() => GetMd5Hash(filePath));
-        }
+        public static async Task<string> GetMd5HashAsync(string filePath) => await Task.Run(() => GetMd5Hash(filePath));
 
         #endregion
 
@@ -177,10 +171,8 @@ namespace NetAppCommon.Helpers.Files
         ///     Skrót MD5 z treści pliku jako string lub null
         ///     MD5 hash from the file content as string or null
         /// </returns>
-        public static async Task<string> GetMd5HashAsync(byte[] fileContent)
-        {
-            return await Task.Run(() => GetMd5Hash(fileContent));
-        }
+        public static async Task<string> GetMd5HashAsync(byte[] fileContent) =>
+            await Task.Run(() => GetMd5Hash(fileContent));
 
         #endregion
 
@@ -230,10 +222,7 @@ namespace NetAppCommon.Helpers.Files
         ///     prawda, jeśli błąd dotyczy udostępniania lub blokady pliku lub fałsz jeśli inny jako bool
         ///     true if the error is related to sharing or locking the file, or false if different as bool
         /// </returns>
-        private async Task<bool> IsLockedAsync(Exception exception)
-        {
-            return await Task.Run(() => IsLocked(exception));
-        }
+        private async Task<bool> IsLockedAsync(Exception exception) => await Task.Run(() => IsLocked(exception));
 
         #endregion
 
@@ -259,7 +248,7 @@ namespace NetAppCommon.Helpers.Files
                 {
                     if (File.Exists(filePath))
                     {
-                        using var fileStream =
+                        using FileStream fileStream =
                             File.Open(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
                         fileStream.Close();
                         func();
@@ -270,7 +259,7 @@ namespace NetAppCommon.Helpers.Files
                 {
                     if (IsLocked(e))
                     {
-                        Thread.Sleep((int) TimeSpan.FromSeconds(1).TotalMilliseconds);
+                        Thread.Sleep((int)TimeSpan.FromSeconds(1).TotalMilliseconds);
                     }
                     else
                     {
@@ -280,6 +269,7 @@ namespace NetAppCommon.Helpers.Files
 #else
                         Console.WriteLine($"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n");
 #endif
+                        throw;
                     }
                 }
                 catch (Exception e)
@@ -290,6 +280,7 @@ namespace NetAppCommon.Helpers.Files
 #else
                     Console.WriteLine($"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n");
 #endif
+                    throw;
                 }
             }
         }
@@ -316,7 +307,7 @@ namespace NetAppCommon.Helpers.Files
             {
                 try
                 {
-                    using var fileStream =
+                    using FileStream fileStream =
                         File.Open(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
                     fileStream.Close();
                     return func();
@@ -325,26 +316,42 @@ namespace NetAppCommon.Helpers.Files
                 {
                     if (IsLocked(e))
                     {
-                        Thread.Sleep((int) TimeSpan.FromSeconds(1).TotalMilliseconds);
+                        Thread.Sleep((int)TimeSpan.FromSeconds(1).TotalMilliseconds);
                     }
                     else
                     {
 #if DEBUG
-                        Log4Net.Error(
-                            $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
+                        Log4Net.Error(e);
+                        if (null != e.InnerException)
+                        {
+                            Log4Net.Error(e.InnerException);
+                        }
 #else
-                        Console.WriteLine($"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n");
+                        Log4Net.Error(e);
+                        if (null != e.InnerException)
+                        {
+                            Log4Net.Error(e.InnerException);
+                        }
 #endif
+                        throw;
                     }
                 }
                 catch (Exception e)
                 {
 #if DEBUG
-                    Log4Net.Error(
-                        $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
+                    Log4Net.Error(e);
+                    if (null != e.InnerException)
+                    {
+                        Log4Net.Error(e.InnerException);
+                    }
 #else
-                    Console.WriteLine($"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n");
+                    Log4Net.Error(e);
+                    if (null != e.InnerException)
+                    {
+                        Log4Net.Error(e.InnerException);
+                    }
 #endif
+                    throw;
                 }
             }
         }

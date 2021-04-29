@@ -59,6 +59,14 @@ namespace NetAppCommon.Extensions.Caching.Distributed
         /// </param>
         void Set<TValue>(string key, object value, DistributedCacheEntryOptions options = default);
 
+        ///// <summary>
+        ///// Sets a value with the given key.
+        ///// </summary>
+        ///// <param name="key">A string identifying the requested value.</param>
+        ///// <param name="value">The value to set in the cache.</param>
+        ///// <param name="options">The cache options for the value.</param>
+        //new void Set(string key, byte[] value, DistributedCacheEntryOptions options);
+
         /// <summary>
         ///     Sets a object value as TValue with the given key async.
         /// </summary>

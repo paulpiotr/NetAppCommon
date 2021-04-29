@@ -50,7 +50,7 @@ namespace NetAppCommon.Crypto.AesCryptography.Services
                     Encoding.UTF8.GetBytes(ClearTextFromWhitespace(salt)));
                 using (var aes = Aes.Create())
                 {
-                    using (var cryptoTransform = aes.CreateDecryptor(key, dst))
+                    using (ICryptoTransform cryptoTransform = aes.CreateDecryptor(key, dst))
                     {
                         using (var memoryStream = new MemoryStream(cipher))
                         {
@@ -84,10 +84,8 @@ namespace NetAppCommon.Crypto.AesCryptography.Services
         /// </param>
         /// <returns>
         /// </returns>
-        public async Task<string> DecpyptAsync(string text, string salt)
-        {
-            return await Task.Run(() => { return Decpypt(text, salt); });
-        }
+        public async Task<string> DecpyptAsync(string text, string salt) =>
+            await Task.Run(() => { return Decpypt(text, salt); });
 
         #region public string Encrypt(string text, string salt)
 
@@ -116,7 +114,7 @@ namespace NetAppCommon.Crypto.AesCryptography.Services
                     new MD5CryptoServiceProvider().ComputeHash(Encoding.UTF8.GetBytes(ClearTextFromWhitespace(salt)));
                 using (var aes = Aes.Create())
                 {
-                    using (var cryptoTransform = aes.CreateEncryptor(rgbKey, aes.IV))
+                    using (ICryptoTransform cryptoTransform = aes.CreateEncryptor(rgbKey, aes.IV))
                     {
                         using (var memoryStream = new MemoryStream())
                         {
@@ -153,10 +151,8 @@ namespace NetAppCommon.Crypto.AesCryptography.Services
 
         #region public async Task<string> EncryptAsync(string text, string salt)
 
-        public async Task<string> EncryptAsync(string text, string salt)
-        {
-            return await Task.Run(() => { return Encrypt(text, salt); });
-        }
+        public async Task<string> EncryptAsync(string text, string salt) =>
+            await Task.Run(() => { return Encrypt(text, salt); });
 
         #endregion
 

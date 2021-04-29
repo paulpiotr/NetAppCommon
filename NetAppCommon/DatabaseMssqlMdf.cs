@@ -73,23 +73,16 @@ namespace NetAppCommon
             return _instance;
         }
 
-        public async Task<bool> CreateAsync()
-        {
-            return await Task.Run(() =>
+        public async Task<bool> CreateAsync() =>
+            await Task.Run(() =>
             {
                 return base.Create(ConnectionString, ConnectionStringName, SettingsJsonFileName);
             });
-        }
 
-        public bool Create()
-        {
-            return base.Create(ConnectionString, ConnectionStringName, SettingsJsonFileName);
-        }
+        public bool Create() => base.Create(ConnectionString, ConnectionStringName, SettingsJsonFileName);
 
         public override bool Create(string connectionString = null, string connectionStringName = null,
-            string settingsJsonFileName = null)
-        {
-            return base.Create(connectionString, connectionStringName, settingsJsonFileName);
-        }
+            string settingsJsonFileName = null) =>
+            base.Create(connectionString, connectionStringName, settingsJsonFileName);
     }
 }

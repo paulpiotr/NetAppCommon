@@ -26,23 +26,24 @@ namespace NetAppCommon.Models
     [Index(nameof(DateOfModification))]
     public class BaseEntity : INotifyPropertyChanged
     {
+        #region public BaseEntity()
+
+        /// <summary>
+        ///     Konstruktor
+        /// </summary>
+        public BaseEntity()
+        {
+            SetUniqueIdentifierOfTheLoggedInUser();
+        }
+
+        #endregion
+
         #region public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
         ///     PropertyChangedEventHandler PropertyChanged
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion
-
-        #region public BaseEntity()
-        /// <summary>
-        /// Konstruktor
-        /// </summary>
-        public BaseEntity()
-        {
-            SetUniqueIdentifierOfTheLoggedInUser();
-        }
 
         #endregion
 
@@ -97,6 +98,16 @@ namespace NetAppCommon.Models
 
         #endregion
 
+        #region public string AsSHA512Hash()
+
+        /// <summary>
+        ///     Konwersja wartości właściwości obiektu do skrótu SHA512
+        ///     Convert object property value to SHA512 hash
+        /// </summary>
+        public string AsSHA512Hash() => ObjectHelper.ConvertObjectValuesToSHA512Hash(this, ";");
+
+        #endregion
+
         #region private Guid _id; public Guid Id
 
         private Guid _id;
@@ -117,7 +128,8 @@ namespace NetAppCommon.Models
                 if (_id == Guid.Empty)
                 {
                     var dateTimeNowYear = new DateTime(DateTime.Now.Year, 1, 1);
-                    _id = ObjectHelper.GuidFromString($"{ DateTime.Now }{ (DateTime.Now - dateTimeNowYear).TotalMilliseconds + Math.Abs(GetHashCode()).ToString() }");
+                    _id = ObjectHelper.GuidFromString(
+                        $"{DateTime.Now}{(DateTime.Now - dateTimeNowYear).TotalMilliseconds + Math.Abs(GetHashCode()).ToString()}");
                     OnPropertyChanged(nameof(Id));
                 }
 
@@ -130,10 +142,10 @@ namespace NetAppCommon.Models
                     if (value == Guid.Empty)
                     {
                         var dateTimeNowYear = new DateTime(DateTime.Now.Year, 1, 1);
-                        _id = ObjectHelper.GuidFromString($"{ DateTime.Now }{ (DateTime.Now - dateTimeNowYear).TotalMilliseconds + Math.Abs(GetHashCode()).ToString() }");
+                        _id = ObjectHelper.GuidFromString(
+                            $"{DateTime.Now}{(DateTime.Now - dateTimeNowYear).TotalMilliseconds + Math.Abs(GetHashCode()).ToString()}");
                         OnPropertyChanged(nameof(Id));
                     }
-
                     else
                     {
                         _id = value;
@@ -184,7 +196,7 @@ namespace NetAppCommon.Models
         ///     Data utworzenia
         ///     Date of create
         /// </summary>
-        //[Column(Order = 3)]
+        [Column(Order = 3)]
         [JsonProperty(nameof(DateOfCreate), Order = 3)]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         [Display(Name = "Data utworzenia", Prompt = "Wpisz lub wybierz datę utworzenia",
@@ -227,7 +239,7 @@ namespace NetAppCommon.Models
         ///     Data modyfikacji
         ///     Date of modification
         /// </summary>
-        //[Column(Order = 3)]
+        [Column(Order = 3)]
         [JsonProperty(nameof(DateOfModification), Order = 3)]
         [Display(Name = "Data modyfikacji", Prompt = "Wpisz lub wybierz datę modyfikacji",
             Description = "Data modyfikacji")]
@@ -243,19 +255,6 @@ namespace NetAppCommon.Models
                     OnPropertyChanged(nameof(DateOfModification));
                 }
             }
-        }
-
-        #endregion
-
-        #region public string AsSHA512Hash()
-
-        /// <summary>
-        ///     Konwersja wartości właściwości obiektu do skrótu SHA512
-        ///     Convert object property value to SHA512 hash 
-        /// </summary>
-        public string AsSHA512Hash()
-        {
-            return ObjectHelper.ConvertObjectValuesToSHA512Hash(this, ";");
         }
 
         #endregion

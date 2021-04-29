@@ -2,7 +2,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using NetAppCommon.Helpers.Object;
 using NetAppCommon.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -16,13 +16,35 @@ using Newtonsoft.Json.Linq;
 namespace NetAppCommon.Logging.ClientMessageInspector.Models.Base
 {
     /// <summary>
-    /// Model danych inspektor wiadomości soap
-    /// Data model inspector soap
+    ///     Model danych inspektor wiadomości soap
+    ///     Data model inspector soap
     /// </summary>
     [JsonObject(nameof(MessageInspectorModel))]
     [Display(Name = "Inspektor wiadomości soap", Description = "Model danych inspektor wiadomości soap")]
     public class MessageInspectorModel : BaseEntity
     {
+        #region public virtual TDestination Cast<TDestination>()
+
+        public virtual TDestination Cast<TDestination>() where TDestination : MessageInspectorModel, new()
+        {
+            try
+            {
+                var destination = JObject.Parse(JsonConvert.SerializeObject(new TDestination()));
+                var source = JObject.Parse(JsonConvert.SerializeObject(this));
+                destination.Merge(source, new JsonMergeSettings {MergeArrayHandling = MergeArrayHandling.Union});
+                return JsonConvert.DeserializeObject<TDestination>(destination.ToString());
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+            return ObjectHelper.GetDefaultValue<TDestination>();
+        }
+
+        #endregion
+
         #region private string? _afterReceiveReplyMessage...
 
         protected string? _afterReceiveReplyMessage;
@@ -198,28 +220,6 @@ namespace NetAppCommon.Logging.ClientMessageInspector.Models.Base
                     OnPropertyChanged(value!);
                 }
             }
-        }
-
-        #endregion
-
-        #region public virtual TDestination Cast<TDestination>()
-
-        public virtual TDestination Cast<TDestination>() where TDestination : MessageInspectorModel, new()
-        {
-            try
-            {
-                var destination = JObject.Parse(JsonConvert.SerializeObject(new TDestination()));
-                var source = JObject.Parse(JsonConvert.SerializeObject(this));
-                destination.Merge(source, new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Union });
-                return JsonConvert.DeserializeObject<TDestination>(destination.ToString());
-            }
-
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-
-            return Helpers.Object.ObjectHelper.GetDefaultValue<TDestination>();
         }
 
         #endregion

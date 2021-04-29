@@ -15,15 +15,15 @@ namespace NetAppCommon.Extensions.DependencyInjection
     public static class MemoryCacheServiceCollectionExtensions
     {
         /// <summary>
-        /// Is added
+        ///     Is added
         /// </summary>
         private static bool _isAdded;
 
         /// <summary>
-        /// Check public static IServiceCollection AddNetAppCommonDistributedMemoryCache is added as Singleton
+        ///     Check public static IServiceCollection AddNetAppCommonDistributedMemoryCache is added as Singleton
         /// </summary>
         /// <returns>
-        /// True if IServiceCollection AddNetAppCommonDistributedMemoryCache is run, else false
+        ///     True if IServiceCollection AddNetAppCommonDistributedMemoryCache is run, else false
         /// </returns>
         public static bool IsAdded() => _isAdded;
 
@@ -48,9 +48,10 @@ namespace NetAppCommon.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(services));
             }
 
-            _isAdded = true;
             services.AddOptions();
+            //services.TryAdd(ServiceDescriptor.Singleton<IDistributedCache, MemoryDistributedCache>());
             services.TryAdd(ServiceDescriptor.Singleton<ICommonDistributedCache, CommonMemoryDistributedCache>());
+            _isAdded = true;
 
             return services;
         }

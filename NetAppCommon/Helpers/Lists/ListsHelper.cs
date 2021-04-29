@@ -1,4 +1,4 @@
-﻿#region using
+#region using
 
 using System;
 using System.Collections.Generic;
@@ -19,43 +19,40 @@ namespace NetAppCommon.Helpers.Lists
         ///     Log4net Logger
         ///     Log4net Logger
         /// </summary>
-        private readonly ILog log4net =
+        private readonly ILog _log4Net =
             Log4NetLogger.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
 
         #endregion
 
         public char[] DelimiterChars { get; set; } = {',', ';'};
 
-        public static ListsHelper GetInstance()
-        {
-            return new();
-        }
+        public static ListsHelper GetInstance() => new();
 
         public List<string> ConvertToListOfString(string delimiterSeparatedAttributes, char[] delimiterChars = null)
         {
             try
             {
-                delimiterChars = delimiterChars ?? DelimiterChars;
-                return new List<string>(delimiterSeparatedAttributes.Split(delimiterChars)).Select(x => x.Trim())
-                    .ToList();
+                if (!string.IsNullOrWhiteSpace(delimiterSeparatedAttributes))
+                {
+                    delimiterChars ??= DelimiterChars;
+                    return new List<string>(delimiterSeparatedAttributes.Split(delimiterChars)).Select(x => x.Trim())
+                        .ToList();
+                }
             }
             catch (Exception e)
             {
-                log4net.Error(
-                    string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
-                        e.StackTrace), e);
+                _log4Net.Error(e);
+                if (null != e.InnerException)
+                {
+                    _log4Net.Error(e.InnerException);
+                }
             }
 
             return null;
         }
 
         public async Task<List<string>> ConvertToListOfStringAsync(string delimiterSeparatedAttributes,
-            char[] delimiterChars = null)
-        {
-            return await Task.Run(() =>
-            {
-                return ConvertToListOfString(delimiterSeparatedAttributes, delimiterChars);
-            });
-        }
+            char[] delimiterChars = null) =>
+            await Task.Run(() => ConvertToListOfString(delimiterSeparatedAttributes, delimiterChars));
     }
 }

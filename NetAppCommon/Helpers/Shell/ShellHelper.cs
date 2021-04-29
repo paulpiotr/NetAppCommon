@@ -190,9 +190,6 @@ namespace NetAppCommon.Helpers.Shell
         /// <param name="cmd">
         ///     Command to execute as string
         /// </param>
-        public static void BinAsync(this string cmd)
-        {
-            Task.Run(cmd.Bin);
-        }
+        public static void BinAsync(this string cmd) => Task.Run(cmd.Bin);
     }
 }
