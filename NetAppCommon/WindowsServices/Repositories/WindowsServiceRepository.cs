@@ -46,14 +46,12 @@ namespace NetAppCommon.WindowsServices.Repositories
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && !string.IsNullOrWhiteSpace(serviceName))
                 {
-                    ServiceController serviceController = ServiceController.GetServices().Where(x =>
-                        x.ServiceName.Contains(serviceName) ||
-                        x.DisplayName.Contains(serviceDisplayName ?? serviceName)).FirstOrDefault();
+                    ServiceController serviceController = ServiceController.GetServices().FirstOrDefault(x => x.ServiceName.Contains(serviceName) ||
+                        x.DisplayName.Contains(serviceDisplayName ?? serviceName));
                     if (null != serviceController)
                     {
-                        Process process = Process.GetProcesses().Where(w =>
-                            w.ProcessName.Contains(serviceController.ServiceName) ||
-                            w.ProcessName.Contains(serviceController.DisplayName)).FirstOrDefault();
+                        Process process = Process.GetProcesses().FirstOrDefault(w => w.ProcessName.Contains(serviceController.ServiceName) ||
+                            w.ProcessName.Contains(serviceController.DisplayName));
                         if (null != process)
                         {
                             return new WindowsServiceModel(serviceController, process);
@@ -88,7 +86,7 @@ namespace NetAppCommon.WindowsServices.Repositories
         /// </returns>
         public async Task<WindowsServiceModel> GetWindowsServiceAsync(string serviceName,
             string serviceDisplayName = null) =>
-            await Task.Run(() => { return GetWindowsService(serviceName, serviceDisplayName); });
+            await Task.Run(() => GetWindowsService(serviceName, serviceDisplayName));
 
         /// <summary>
         ///     Czy czas rozpoczęcia bieżącego procesu jest większy niż czas rozpoczęcia procesu usługi
@@ -119,9 +117,9 @@ namespace NetAppCommon.WindowsServices.Repositories
                 if (null != currentProcess && null != windowsServiceModel)
                 {
 //#if DEBUG
-//                    Console.WriteLine($"currentProcess {currentProcess.StartTime} windowsServiceModel.Process.StartTime {windowsServiceModel.Process.StartTime} ");
+//                    Console.WriteLine($"currentProcess {currentProcess.StartTime} windowsServiceModel.Process.StartTime {windowsServiceModel.Process?.StartTime} ");
 //#endif
-                    return currentProcess?.StartTime > windowsServiceModel?.Process?.StartTime;
+                    return currentProcess.StartTime > windowsServiceModel.Process?.StartTime;
                 }
             }
             catch (Exception e)
@@ -155,11 +153,8 @@ namespace NetAppCommon.WindowsServices.Repositories
         /// </returns>
         public async Task<bool> IsWhetherStartTimeCurrentProcessIsGreaterAsStartTimeServiceProcessAsync(
             Process currentProcess, string serviceName, string serviceDisplayName = null) =>
-            await Task.Run(() =>
-            {
-                return IsWhetherStartTimeCurrentProcessIsGreaterAsStartTimeServiceProcess(currentProcess,
-                    serviceName, serviceDisplayName);
-            });
+            await Task.Run(() => IsWhetherStartTimeCurrentProcessIsGreaterAsStartTimeServiceProcess(currentProcess,
+                serviceName, serviceDisplayName));
 
         /// <summary>
         ///     Czy czas rozpoczęcia bieżącego procesu jest mniejszy niż czas rozpoczęcia procesu usługi
@@ -208,10 +203,7 @@ namespace NetAppCommon.WindowsServices.Repositories
         /// </returns>
         public async Task<bool> IsWhetherStartTimeCurrentProcessIsLessAsStartTimeServiceProcessAsync(
             Process currentProcess, string serviceName, string serviceDisplayName = null) =>
-            await Task.Run(() =>
-            {
-                return IsWhetherStartTimeCurrentProcessIsLessAsStartTimeServiceProcess(currentProcess, serviceName,
-                    serviceDisplayName);
-            });
+            await Task.Run(() => IsWhetherStartTimeCurrentProcessIsLessAsStartTimeServiceProcess(currentProcess, serviceName,
+                serviceDisplayName));
     }
 }

@@ -1,7 +1,6 @@
 #region using
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -30,7 +29,7 @@ namespace NetAppCommon.Helpers
         /// <summary>
         ///     private readonly ILog _log4Net
         /// </summary>
-        private static readonly ILog Log4net =
+        private static readonly ILog Log4Net =
             Log4NetLogger.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
 
         #endregion
@@ -57,10 +56,10 @@ namespace NetAppCommon.Helpers
             }
             catch (Exception e)
             {
-                Log4net.Error(e);
+                Log4Net.Error(e);
                 if (null != e.InnerException)
                 {
-                    Log4net.Error(e.InnerException);
+                    Log4Net.Error(e.InnerException);
                 }
             }
         }
@@ -89,48 +88,45 @@ namespace NetAppCommon.Helpers
         {
             try
             {
-                if (null != context)
+                try
+                {
+                    await DatabaseMssqlMdf.GetInstance(context?.Database?.GetDbConnection()?.ConnectionString)
+                        .CreateAsync();
+                }
+                catch (Exception e)
+                {
+                    Log4Net.Warn(e);
+                    if (null != e.InnerException)
+                    {
+                        Log4Net.Warn(e.InnerException);
+                    }
+                }
+
+                var isPendingMigrations =
+                    (await (context.Database ?? throw new InvalidOperationException()).GetPendingMigrationsAsync())
+                    .Any();
+                if (isPendingMigrations)
                 {
                     try
                     {
-                        await DatabaseMssqlMdf.GetInstance(context?.Database?.GetDbConnection()?.ConnectionString)
-                            .CreateAsync();
+                        await context.Database.MigrateAsync();
                     }
                     catch (Exception e)
                     {
-                        Log4net.Warn(e);
+                        Log4Net.Warn(e);
                         if (null != e.InnerException)
                         {
-                            Log4net.Warn(e.InnerException);
-                        }
-                    }
-
-                    var isPendingMigrations = (await (context.Database ?? throw new InvalidOperationException())
-                            .GetPendingMigrationsAsync())
-                        .Any();
-                    if (isPendingMigrations)
-                    {
-                        try
-                        {
-                            await context.Database.MigrateAsync();
-                        }
-                        catch (Exception e)
-                        {
-                            Log4net.Warn(e);
-                            if (null != e.InnerException)
-                            {
-                                Log4net.Warn(e.InnerException);
-                            }
+                            Log4Net.Warn(e.InnerException);
                         }
                     }
                 }
             }
             catch (Exception e)
             {
-                Log4net.Error(e);
+                Log4Net.Error(e);
                 if (null != e.InnerException)
                 {
-                    Log4net.Error(e.InnerException);
+                    Log4Net.Error(e.InnerException);
                 }
             }
         }
