@@ -66,7 +66,10 @@ namespace NetAppCommon.AppSettings.Models.Base
         ///     Nazwa połączenia bazy danych Mssql (domyślna)
         ///     Mssql database connection name (default)
         /// </returns>
-        public virtual string GetConnectionStringName() => ConnectionStringName!;
+        public virtual string GetConnectionStringName()
+        {
+            return ConnectionStringName!;
+        }
 
         #endregion
 
@@ -134,7 +137,7 @@ namespace NetAppCommon.AppSettings.Models.Base
                     $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
             }
 
-            return ((DbContextOptionsBuilder<TContext>)DbContextOptionsBuilder)!;
+            return ((DbContextOptionsBuilder<TContext>) DbContextOptionsBuilder)!;
         }
 
         #endregion
@@ -169,7 +172,7 @@ namespace NetAppCommon.AppSettings.Models.Base
                     $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
             }
 
-            return ((DbContextOptions<TContext>)DbContextOptions)!;
+            return ((DbContextOptions<TContext>) DbContextOptions)!;
         }
 
         #endregion
@@ -311,7 +314,7 @@ namespace NetAppCommon.AppSettings.Models.Base
                         $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
                 }
 
-                return _useGlobalDatabaseConnectionSettings != null && (bool)_useGlobalDatabaseConnectionSettings;
+                return _useGlobalDatabaseConnectionSettings != null && (bool) _useGlobalDatabaseConnectionSettings;
             }
             set
             {

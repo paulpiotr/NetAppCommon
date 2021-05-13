@@ -57,7 +57,7 @@ namespace NetAppCommon.Extensions.Caching.Distributed
         /// <param name="options">
         ///     The cache options for the value.
         /// </param>
-        void Set<TValue>(string key, object value, DistributedCacheEntryOptions options = default);
+        void Set<TValue>(string key, TValue value, DistributedCacheEntryOptions options = default);
 
         ///// <summary>
         ///// Sets a value with the given key.
@@ -85,7 +85,7 @@ namespace NetAppCommon.Extensions.Caching.Distributed
         /// <returns>
         ///     Object value as TValue or null if not set
         /// </returns>
-        Task SetAsync<TValue>(string key, object value, DistributedCacheEntryOptions options = default,
+        Task SetAsync<TValue>(string key, TValue value, DistributedCacheEntryOptions options = default,
             CancellationToken token = default);
     }
 }
