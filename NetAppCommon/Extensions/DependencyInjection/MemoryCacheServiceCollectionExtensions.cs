@@ -25,7 +25,10 @@ namespace NetAppCommon.Extensions.DependencyInjection
         /// <returns>
         ///     True if IServiceCollection AddNetAppCommonDistributedMemoryCache is run, else false
         /// </returns>
-        public static bool IsAdded() => _isAdded;
+        public static bool IsAdded()
+        {
+            return _isAdded;
+        }
 
         /// <summary>
         ///     Adds a default implementation of <see cref="DistributedCache" /> that stores items in memory

@@ -14,7 +14,7 @@ namespace NetAppCommon.Extensions.WebClient
     {
         protected override WebRequest GetWebRequest(Uri address)
         {
-            var request = (HttpWebRequest)base.GetWebRequest(address);
+            var request = (HttpWebRequest) base.GetWebRequest(address);
             Debug.Assert(request != null, nameof(request) + " != null");
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
             return request;

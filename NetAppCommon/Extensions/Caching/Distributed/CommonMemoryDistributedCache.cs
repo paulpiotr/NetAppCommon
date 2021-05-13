@@ -18,7 +18,7 @@ using Newtonsoft.Json;
 namespace NetAppCommon.Extensions.Caching.Distributed
 {
     public class CommonMemoryDistributedCache : MemoryDistributedCache,
-        ICommonDistributedCache //, IMemoryCache
+        ICommonDistributedCache
     {
         private static IMemoryCache _memoryCache;
 
@@ -96,17 +96,12 @@ namespace NetAppCommon.Extensions.Caching.Distributed
             return ObjectHelper.GetDefaultValue<TValue>();
         }
 
-        public Task<object> GetAsync<TValue>(string key, CancellationToken token = default)
+        public async Task<object> GetAsync<TValue>(string key, CancellationToken token = default)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-
-            return Task.FromResult(Get<TValue>(key));
+            return await Task.Run(() => Task.FromResult(Get<TValue>(key)), token);
         }
 
-        public void Set<TValue>(string key, object value, DistributedCacheEntryOptions options = default)
+        public void Set<TValue>(string key, TValue value, DistributedCacheEntryOptions options)
         {
             if (key == null)
             {
@@ -118,12 +113,10 @@ namespace NetAppCommon.Extensions.Caching.Distributed
                 throw new ArgumentNullException(nameof(value));
             }
 
-            options ??= new DistributedCacheEntryOptions
+            if (options == null)
             {
-                AbsoluteExpiration = DateTime.Now.AddMinutes(5)
-                //AbsoluteExpirationRelativeToNow = TimeSpan.FromDays((DateTime.Now.AddYears(1) - DateTime.Now).Days),
-                //SlidingExpiration = TimeSpan.FromDays((DateTime.Now.AddYears(1) - DateTime.Now).Days)
-            };
+                throw new ArgumentNullException(nameof(options));
+            }
 
             var valueAsByte = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value, Formatting.Indented));
 
@@ -131,25 +124,24 @@ namespace NetAppCommon.Extensions.Caching.Distributed
             {
                 var memoryCacheEntryOptions = new MemoryCacheEntryOptions
                 {
-                    AbsoluteExpiration = options.AbsoluteExpiration,
-                    AbsoluteExpirationRelativeToNow = options.AbsoluteExpirationRelativeToNow,
-                    SlidingExpiration = options.SlidingExpiration,
+                    AbsoluteExpiration = options?.AbsoluteExpiration,
+                    AbsoluteExpirationRelativeToNow = options?.AbsoluteExpirationRelativeToNow,
+                    SlidingExpiration = options?.SlidingExpiration,
                     Size = valueAsByte.Length
                 };
+
                 _memoryCache.Set(key, valueAsByte, memoryCacheEntryOptions);
             }
-
             else
             {
                 base.Set(key, valueAsByte, options);
             }
-
-            //Get<TValue>(key);
         }
 
-        public async Task SetAsync<TValue>(string key, object value, DistributedCacheEntryOptions options = default,
-            CancellationToken token = default) =>
-            await SetAsync(key, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value, Formatting.Indented)),
-                options, token);
+        public async Task SetAsync<TValue>(string key, TValue value, DistributedCacheEntryOptions options = default,
+            CancellationToken token = default)
+        {
+            await Task.Run(() => Set(key, value, options), token);
+        }
     }
 }

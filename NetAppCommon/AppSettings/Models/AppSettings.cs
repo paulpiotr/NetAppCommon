@@ -33,7 +33,7 @@ namespace NetAppCommon.AppSettings.Models
             {
                 var memoryCacheProvider = MemoryCacheProvider.GetInstance();
                 var filePathKey = $"{MethodBase.GetCurrentMethod()?.DeclaringType?.FullName}.FilePath";
-                var filePath = (object)memoryCacheProvider.Get(filePathKey);
+                var filePath = (object) memoryCacheProvider.Get(filePathKey);
                 if (null == filePath)
                 {
                     var appSettingsSetupFilePath = Path.Combine(BaseDirectory!, SetupFileName!);
@@ -123,7 +123,7 @@ namespace NetAppCommon.AppSettings.Models
 
                 if (null != UserProfileDirectory && null != FileName)
                 {
-                    FilePath = (string)(filePath ?? Path.Combine(UserProfileDirectory!, FileName!));
+                    FilePath = (string) (filePath ?? Path.Combine(UserProfileDirectory!, FileName!));
                 }
             }
             catch (Exception e)
@@ -144,7 +144,10 @@ namespace NetAppCommon.AppSettings.Models
         ///     Statyczna referencja do instancji AppSettingsBaseModel
         ///     A static reference to the AppSettingsBaseModel instance
         /// </returns>
-        public static AppSettings GetAppSettingsModel() => new();
+        public static AppSettings GetAppSettingsModel()
+        {
+            return new();
+        }
 
         #endregion
 
@@ -179,7 +182,10 @@ namespace NetAppCommon.AppSettings.Models
         ///     Statyczna referencja do instancji AppSettingsBaseModel
         ///     A static reference to the AppSettingsBaseModel instance
         /// </returns>
-        public static AppSettings GetAppSettingsModel(string filePath) => new(filePath);
+        public static AppSettings GetAppSettingsModel(string filePath)
+        {
+            return new(filePath);
+        }
 
         #endregion
 
