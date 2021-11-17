@@ -12,570 +12,617 @@ using static System.Environment;
 
 #endregion
 
-namespace NetAppCommon
+namespace NetAppCommon;
+
+/// <summary>
+///     Klasa wspólna dla parametrów konfiguracji
+///     Class common to configuration parameters
+/// </summary>
+public class Configuration
 {
+    #region private readonly log4net.ILog log4net
+
     /// <summary>
-    ///     Klasa wspólna dla parametrów konfiguracji
-    ///     Class common to configuration parameters
+    ///     private readonly ILog _log4Net
     /// </summary>
-    public class Configuration
+    private static readonly ILog Log4net =
+        Log4NetLogger.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
+    //Log4NetLogger.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
+
+    #endregion
+
+    #region public static string SpecialFoldeGetFolderPath(string key)
+
+    /// <summary>
+    ///     Pobierz ścieżkę do katalogu specjalnego
+    ///     Get the path to the special directory
+    /// </summary>
+    /// <param name="key">
+    ///     Wyszukiwany klucz jako string
+    ///     Search key as string
+    /// </param>
+    /// <returns>
+    ///     Ścieżka do katalogu specjalnego SpecialFolder jako string
+    ///     Path to the SpecialFolder special directory as a string
+    /// </returns>
+    public static string SpecialFoldeGetFolderPath(string key)
     {
-        #region private readonly log4net.ILog log4net
-
-        /// <summary>
-        ///     private readonly ILog _log4Net
-        /// </summary>
-        private static readonly ILog Log4net =
-            Log4NetLogger.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
-        //Log4NetLogger.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
-
-        #endregion
-
-        #region public static string SpecialFoldeGetFolderPath(string key)
-
-        /// <summary>
-        ///     Pobierz ścieżkę do katalogu specjalnego
-        ///     Get the path to the special directory
-        /// </summary>
-        /// <param name="key">
-        ///     Wyszukiwany klucz jako string
-        ///     Search key as string
-        /// </param>
-        /// <returns>
-        ///     Ścieżka do katalogu specjalnego SpecialFolder jako string
-        ///     Path to the SpecialFolder special directory as a string
-        /// </returns>
-        public static string SpecialFoldeGetFolderPath(string key)
+        try
         {
-            try
+            if (Enum.TryParse(key, true, out SpecialFolder specialFolder))
             {
-                if (Enum.TryParse(key, true, out SpecialFolder specialFolder))
+                try
                 {
-                    try
-                    {
-                        return GetFolderPath(specialFolder);
-                    }
-                    catch (Exception e)
-                    {
-                        Log4net.Error(
-                            string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
-                                e.StackTrace), e);
-                    }
+                    return GetFolderPath(specialFolder);
+                }
+                catch (Exception e)
+                {
+                    Log4net.Error(
+                        string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
+                            e.StackTrace), e);
                 }
             }
-            catch (Exception e)
-            {
-                Log4net.Error(
-                    string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
-                        e.StackTrace), e);
-            }
-
-            return null;
+        }
+        catch (Exception e)
+        {
+            Log4net.Error(
+                string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
+                    e.StackTrace), e);
         }
 
-        #endregion
+        return null;
+    }
 
-        #region public static string GetBaseDirectory()
+    #endregion
 
-        /// <summary>
-        ///     Pobierz podstawową (bazową) ścieżkę aplikacji
-        ///     Get the application's base path
-        /// </summary>
-        /// <returns>
-        ///     Podstawowa ścieżka aplikacji jako string lub null
-        ///     Base application path as string or null
-        /// </returns>
-        public static string GetBaseDirectory()
+    #region public static string GetBaseDirectory()
+
+    /// <summary>
+    ///     Pobierz podstawową (bazową) ścieżkę aplikacji
+    ///     Get the application's base path
+    /// </summary>
+    /// <returns>
+    ///     Podstawowa ścieżka aplikacji jako string lub null
+    ///     Base application path as string or null
+    /// </returns>
+    public static string GetBaseDirectory()
+    {
+        try
         {
-            try
-            {
-                return AppDomain.CurrentDomain.BaseDirectory;
-            }
-            catch (Exception e)
-            {
-                Log4net.Error(
-                    string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
-                        e.StackTrace), e);
-            }
-
-            return null;
+            return AppDomain.CurrentDomain.BaseDirectory;
+        }
+        catch (Exception e)
+        {
+            Log4net.Error(
+                string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
+                    e.StackTrace), e);
         }
 
-        #endregion
+        return null;
+    }
 
-        #region public static string GetUserProfileDirectory()
+    #endregion
 
-        /// <summary>
-        ///     Pobierz podstawowy folder (katalog) użytkownika
-        ///     Get the application's base path
-        /// </summary>
-        /// <returns>
-        ///     Podstawowa ścieżka aplikacji jako string lub null
-        ///     Base application path as string or null
-        /// </returns>
-        public static string GetUserProfileDirectory()
+    #region public static string GetUserProfileDirectory()
+
+    /// <summary>
+    ///     Pobierz podstawowy folder (katalog) użytkownika
+    ///     Get the application's base path
+    /// </summary>
+    /// <returns>
+    ///     Podstawowa ścieżka aplikacji jako string lub null
+    ///     Base application path as string or null
+    /// </returns>
+    public static string GetUserProfileDirectory()
+    {
+        try
         {
-            try
-            {
-                var specialFolderUserProfile = Path.Combine(GetFolderPath(SpecialFolder.UserProfile),
-                    Assembly.GetCallingAssembly().GetName().Name);
-                return specialFolderUserProfile ?? GetBaseDirectory();
-            }
-            catch (Exception e)
-            {
-                Log4net.Error(
-                    string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
-                        e.StackTrace), e);
-            }
-
-            return null;
+            var specialFolderUserProfile = Path.Combine(GetFolderPath(SpecialFolder.UserProfile),
+                Assembly.GetCallingAssembly().GetName().Name);
+            return specialFolderUserProfile ?? GetBaseDirectory();
+        }
+        catch (Exception e)
+        {
+            Log4net.Error(
+                string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
+                    e.StackTrace), e);
         }
 
-        #endregion
+        return null;
+    }
 
-        #region public static async Task<string> GetBaseDirectoryAsync()
+    #endregion
 
-        /// <summary>
-        ///     Pobierz podstawową (bazową) ścieżkę aplikacji asynchronicznie
-        ///     Get the application's base path asynchronously
-        /// </summary>
-        /// <returns>
-        ///     Podstawowa ścieżka aplikacji jako string lub null
-        ///     Base application path as string or null
-        /// </returns>
-        public static async Task<string> GetBaseDirectoryAsync()
+    #region public static async Task<string> GetBaseDirectoryAsync()
+
+    /// <summary>
+    ///     Pobierz podstawową (bazową) ścieżkę aplikacji asynchronicznie
+    ///     Get the application's base path asynchronously
+    /// </summary>
+    /// <returns>
+    ///     Podstawowa ścieżka aplikacji jako string lub null
+    ///     Base application path as string or null
+    /// </returns>
+    public static async Task<string> GetBaseDirectoryAsync()
+    {
+        try
         {
-            try
-            {
-                await Task.Run(() => GetBaseDirectory());
-            }
-            catch (Exception e)
-            {
-                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
-            }
-
-            return null;
+            await Task.Run(() => GetBaseDirectory());
+        }
+        catch (Exception e)
+        {
+            await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
         }
 
-        #endregion
+        return null;
+    }
 
-        #region public static string GetAppSettingsPath(string settingsJsonFilePath = null)
+    #endregion
 
-        /// <summary>
-        ///     Pobierz ścieżkę do pliku konfiguracji.
-        ///     Get the path to the configuration file.
-        /// </summary>
-        /// <param name="settingsJsonFilePath">
-        ///     Nazwa pliku .json
-        ///     The name of the .json file
-        /// </param>
-        /// <returns>
-        ///     Ścieżka do pliku konfiguracji String lub null
-        ///     Path to the String configuration file or null
-        /// </returns>
-        public static string GetAppSettingsPath(string settingsJsonFilePath = null)
+    #region public static string GetAppSettingsPath(string settingsJsonFilePath = null)
+
+    /// <summary>
+    ///     Pobierz ścieżkę do pliku konfiguracji.
+    ///     Get the path to the configuration file.
+    /// </summary>
+    /// <param name="settingsJsonFilePath">
+    ///     Nazwa pliku .json
+    ///     The name of the .json file
+    /// </param>
+    /// <returns>
+    ///     Ścieżka do pliku konfiguracji String lub null
+    ///     Path to the String configuration file or null
+    /// </returns>
+    public static string GetAppSettingsPath(string settingsJsonFilePath = null)
+    {
+        try
         {
-            try
+            //log4net.Debug(string.Format("GetExecutingAssembly {0}, GetCallingAssembly {1} GetEntryAssembly {2}", Assembly.GetExecutingAssembly().GetName().Name, Assembly.GetCallingAssembly().GetName().Name, Assembly.GetEntryAssembly().GetName().Name));
+            if (File.Exists(settingsJsonFilePath) && Directory.Exists(Path.GetDirectoryName(settingsJsonFilePath)))
             {
-                //log4net.Debug(string.Format("GetExecutingAssembly {0}, GetCallingAssembly {1} GetEntryAssembly {2}", Assembly.GetExecutingAssembly().GetName().Name, Assembly.GetCallingAssembly().GetName().Name, Assembly.GetEntryAssembly().GetName().Name));
-                if (File.Exists(settingsJsonFilePath) && Directory.Exists(Path.GetDirectoryName(settingsJsonFilePath)))
+                return settingsJsonFilePath;
+            }
+
+            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            if (Directory.Exists(baseDirectory))
+            {
+                /// W pierwszej kolejności sprawdź czy istnieje plik appsettings.json w katalogu głównym projektu.
+                /// First, check if there is an settingsJsonFilePath file in the project's root directory
+                if (null != settingsJsonFilePath && File.Exists(Path.Combine(baseDirectory, settingsJsonFilePath)))
                 {
-                    return settingsJsonFilePath;
+                    return Path.Combine(baseDirectory, settingsJsonFilePath);
                 }
+                /// W pierwszej kolejności sprawdź czy istnieje plik appsettings.json w katalogu głównym projektu.
+                /// Else, check if there is an appsettings.json file in the project's root directory
 
-                var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                if (Directory.Exists(baseDirectory))
+                if (File.Exists(Path.Combine(baseDirectory, "appsettings.json")))
                 {
-                    /// W pierwszej kolejności sprawdź czy istnieje plik appsettings.json w katalogu głównym projektu.
-                    /// First, check if there is an settingsJsonFilePath file in the project's root directory
-                    if (null != settingsJsonFilePath && File.Exists(Path.Combine(baseDirectory, settingsJsonFilePath)))
-                    {
-                        return Path.Combine(baseDirectory, settingsJsonFilePath);
-                    }
-                    /// W pierwszej kolejności sprawdź czy istnieje plik appsettings.json w katalogu głównym projektu.
-                    /// Else, check if there is an appsettings.json file in the project's root directory
+                    return Path.Combine(baseDirectory, "appsettings.json");
+                }
+                /// W następnej kolejności sprawdz, czy istnieje plik {Nazwa Assembly}.json - przestrzeń nazw wykonywana
+                /// Next, check that the {Assembly Name} .json file being executed exists
 
-                    if (File.Exists(Path.Combine(baseDirectory, "appsettings.json")))
-                    {
-                        return Path.Combine(baseDirectory, "appsettings.json");
-                    }
-                    /// W następnej kolejności sprawdz, czy istnieje plik {Nazwa Assembly}.json - przestrzeń nazw wykonywana
-                    /// Next, check that the {Assembly Name} .json file being executed exists
-
-                    if (File.Exists(Path.Combine(baseDirectory,
+                if (File.Exists(Path.Combine(baseDirectory,
                         string.Format("{0}.json", Assembly.GetExecutingAssembly().GetName().Name))))
-                    {
-                        return Path.Combine(baseDirectory,
-                            string.Format("{0}.json", Assembly.GetExecutingAssembly().GetName().Name));
-                    }
-                    /// W następnej kolejności sprawdź, czy istnieje plik {Nazwa Assembly}.json - przestrzeń nazw wywołująca
-                    /// In order, check that the {Assembly Name} .json file exists- calling namespace
+                {
+                    return Path.Combine(baseDirectory,
+                        string.Format("{0}.json", Assembly.GetExecutingAssembly().GetName().Name));
+                }
+                /// W następnej kolejności sprawdź, czy istnieje plik {Nazwa Assembly}.json - przestrzeń nazw wywołująca
+                /// In order, check that the {Assembly Name} .json file exists- calling namespace
 
-                    if (File.Exists(Path.Combine(baseDirectory,
+                if (File.Exists(Path.Combine(baseDirectory,
                         string.Format("{0}.json", Assembly.GetCallingAssembly().GetName().Name))))
-                    {
-                        return Path.Combine(baseDirectory,
-                            string.Format("{0}.json", Assembly.GetCallingAssembly().GetName().Name));
-                    }
-                    /// W następnej kolejności sprawdź, czy istnieje plik {Nazwa Assembly}.json - przestrzeń nazw wykonująca
-                    /// In order, check that the {Assembly Name} .json file exists- calling entry
+                {
+                    return Path.Combine(baseDirectory,
+                        string.Format("{0}.json", Assembly.GetCallingAssembly().GetName().Name));
+                }
+                /// W następnej kolejności sprawdź, czy istnieje plik {Nazwa Assembly}.json - przestrzeń nazw wykonująca
+                /// In order, check that the {Assembly Name} .json file exists- calling entry
 
-                    if (File.Exists(Path.Combine(baseDirectory,
+                if (File.Exists(Path.Combine(baseDirectory,
                         string.Format("{0}.json", Assembly.GetEntryAssembly().GetName().Name))))
-                    {
-                        return Path.Combine(baseDirectory,
-                            string.Format("{0}.json", Assembly.GetEntryAssembly().GetName().Name));
-                    }
+                {
+                    return Path.Combine(baseDirectory,
+                        string.Format("{0}.json", Assembly.GetEntryAssembly().GetName().Name));
                 }
             }
-            catch (Exception e)
+        }
+        catch (Exception e)
+        {
+            Log4net.Error(
+                string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
+                    e.StackTrace), e);
+        }
+
+        return null;
+    }
+
+    #endregion
+
+    #region public static async Task<string> GetAppSettingsPathAsync(string settingsJsonFilePath = null)
+
+    /// <summary>
+    ///     Pobierz ścieżkę do pliku konfiguracji asynchronicznie.
+    ///     Get the path to the configuration file asynchronously.
+    /// </summary>
+    /// <param name="settingsJsonFilePath">
+    ///     Nazwa pliku .json
+    ///     The name of the .json file
+    /// </param>
+    /// <returns>
+    ///     Ścieżka do pliku konfiguracji String lub null
+    ///     Path to the String configuration file or null
+    /// </returns>
+    public static async Task<string> GetAppSettingsPathAsync(string settingsJsonFilePath = null)
+    {
+        try
+        {
+            return await Task.Run(() => GetAppSettingsPath(settingsJsonFilePath));
+        }
+        catch (Exception e)
+        {
+            await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+            return null;
+        }
+    }
+
+    #endregion
+
+    #region public static IConfigurationRoot GetConfigurationRoot()
+
+    /// <summary>
+    ///     Pobierz Objekt Konfiguracji IConfigurationRoot ConfigurationRoot
+    ///     Get ConfigurationRoot Configuration Object
+    /// </summary>
+    /// <returns>
+    ///     Objekt Konfiguracji IConfigurationRoot ConfigurationRoot lub null
+    ///     IConfigurationRoot ConfigurationRoot configuration Object or null
+    /// </returns>
+    public static IConfigurationRoot GetConfigurationRoot()
+    {
+        try
+        {
+            var getAppSettingsPath = GetAppSettingsPath();
+            if (null != getAppSettingsPath && !string.IsNullOrWhiteSpace(getAppSettingsPath))
             {
-                Log4net.Error(
-                    string.Format("\n{0}\n{1}\n{2}\n{3}\n", e.GetType(), e.InnerException?.GetType(), e.Message,
-                        e.StackTrace), e);
+                IConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
+                    .SetBasePath(Path.GetDirectoryName(getAppSettingsPath))
+                    .AddJsonFile(Path.GetFileName(getAppSettingsPath), true, true);
+                IConfigurationRoot configurationRoot = configurationBuilder.Build();
+                return configurationRoot;
             }
 
             return null;
         }
-
-        #endregion
-
-        #region public static async Task<string> GetAppSettingsPathAsync(string settingsJsonFilePath = null)
-
-        /// <summary>
-        ///     Pobierz ścieżkę do pliku konfiguracji asynchronicznie.
-        ///     Get the path to the configuration file asynchronously.
-        /// </summary>
-        /// <param name="settingsJsonFilePath">
-        ///     Nazwa pliku .json
-        ///     The name of the .json file
-        /// </param>
-        /// <returns>
-        ///     Ścieżka do pliku konfiguracji String lub null
-        ///     Path to the String configuration file or null
-        /// </returns>
-        public static async Task<string> GetAppSettingsPathAsync(string settingsJsonFilePath = null)
+        catch (Exception e)
         {
-            try
-            {
-                return await Task.Run(() => GetAppSettingsPath(settingsJsonFilePath));
-            }
-            catch (Exception e)
-            {
-                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
-                return null;
-            }
+            Log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
+            return null;
         }
+    }
 
-        #endregion
+    #endregion
 
-        #region public static IConfigurationRoot GetConfigurationRoot()
+    #region public static async Task<IConfigurationRoot> GetConfigurationRootAsync()
 
-        /// <summary>
-        ///     Pobierz Objekt Konfiguracji IConfigurationRoot ConfigurationRoot
-        ///     Get ConfigurationRoot Configuration Object
-        /// </summary>
-        /// <returns>
-        ///     Objekt Konfiguracji IConfigurationRoot ConfigurationRoot lub null
-        ///     IConfigurationRoot ConfigurationRoot configuration Object or null
-        /// </returns>
-        public static IConfigurationRoot GetConfigurationRoot()
+    /// <summary>
+    ///     Pobierz Objekt Konfiguracji IConfigurationRoot ConfigurationRoot asynchronicznie
+    ///     Get ConfigurationRoot Configuration Object asynchronously
+    /// </summary>
+    /// <returns>
+    ///     Objekt Konfiguracji IConfigurationRoot ConfigurationRoot lub null
+    ///     IConfigurationRoot ConfigurationRoot configuration Object or null
+    /// </returns>
+    public static async Task<IConfigurationRoot> GetConfigurationRootAsync()
+    {
+        try
         {
-            try
+            return await Task.Run(() => GetConfigurationRoot());
+        }
+        catch (Exception e)
+        {
+            await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+            return null;
+        }
+    }
+
+    #endregion
+
+    #region public static IConfigurationRoot GetConfigurationRoot(string settingsJsonFilePath)
+
+    /// <summary>
+    ///     Pobierz Objekt Konfiguracji IConfigurationRoot ConfigurationRoot asynchronicznie
+    ///     Get ConfigurationRoot Configuration Object asynchronously
+    /// </summary>
+    /// <param name="settingsJsonFilePath">
+    ///     Nazwa pliku .json
+    ///     The name of the .json file
+    /// </param>
+    /// <returns>
+    ///     Objekt Konfiguracji IConfigurationRoot ConfigurationRoot lub null
+    ///     IConfigurationRoot ConfigurationRoot configuration Object or null
+    /// </returns>
+    public static IConfigurationRoot GetConfigurationRoot(string settingsJsonFilePath)
+    {
+        try
+        {
+            var getAppSettingsPath = GetAppSettingsPath(settingsJsonFilePath);
+            if (null != getAppSettingsPath && !string.IsNullOrWhiteSpace(getAppSettingsPath))
             {
-                var getAppSettingsPath = GetAppSettingsPath();
-                if (null != getAppSettingsPath && !string.IsNullOrWhiteSpace(getAppSettingsPath))
+                IConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
+                    .SetBasePath(Path.GetDirectoryName(getAppSettingsPath))
+                    .AddJsonFile(Path.GetFileName(getAppSettingsPath), true, true);
+                IConfigurationRoot configurationRoot = configurationBuilder.Build();
+                return configurationRoot;
+            }
+
+            return null;
+        }
+        catch (Exception e)
+        {
+            Log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
+            return null;
+        }
+    }
+
+    #endregion
+
+    #region public static async Task<IConfigurationRoot> GetConfigurationRootAsync(string settingsJsonFilePath)
+
+    /// <summary>
+    ///     Pobierz Objekt Konfiguracji IConfigurationRoot ConfigurationRoot asynchronicznie
+    ///     Get ConfigurationRoot Configuration Object asynchronously
+    /// </summary>
+    /// <param name="settingsJsonFilePath">
+    ///     Nazwa pliku .json
+    ///     The name of the .json file
+    /// </param>
+    /// <returns>
+    ///     Objekt Konfiguracji IConfigurationRoot ConfigurationRoot lub null
+    ///     IConfigurationRoot ConfigurationRoot configuration Object or null
+    /// </returns>
+    public static async Task<IConfigurationRoot> GetConfigurationRootAsync(string settingsJsonFilePath)
+    {
+        try
+        {
+            return await Task.Run(() => GetConfigurationRoot(settingsJsonFilePath));
+        }
+        catch (Exception e)
+        {
+            await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+            return null;
+        }
+    }
+
+    #endregion
+
+    #region public static T GetValue<T>(string key)
+
+    /// <summary>
+    ///     Wyszukaj ustawienia aplikacji w pliku konfiguracji.
+    ///     Search for application settings in the configuration file.
+    /// </summary>
+    /// <typeparam name="T">
+    ///     Typ parametru.
+    ///     Parameter type.
+    /// </typeparam>
+    /// <param name="key">
+    ///     Szukany klucz.
+    ///     The key you are looking for.
+    /// </param>
+    /// <returns>
+    ///     Wartość ustawień jako typ T lub null jako typ T.
+    ///     Setting value as type T or null as type T.
+    /// </returns>
+    public static T GetValue<T>(string key)
+    {
+        try
+        {
+            if (null != key && !string.IsNullOrWhiteSpace(key))
+            {
+                IConfigurationRoot configurationRoot = GetConfigurationRoot();
+                if (null != configurationRoot)
                 {
-                    IConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
-                        .SetBasePath(Path.GetDirectoryName(getAppSettingsPath))
-                        .AddJsonFile(Path.GetFileName(getAppSettingsPath), true, true);
-                    IConfigurationRoot configurationRoot = configurationBuilder.Build();
-                    return configurationRoot;
+                    return (T)Convert.ChangeType(configurationRoot.GetValue<T>(key), typeof(T));
                 }
-
-                return null;
-            }
-            catch (Exception e)
-            {
-                Log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
-                return null;
-            }
-        }
-
-        #endregion
-
-        #region public static async Task<IConfigurationRoot> GetConfigurationRootAsync()
-
-        /// <summary>
-        ///     Pobierz Objekt Konfiguracji IConfigurationRoot ConfigurationRoot asynchronicznie
-        ///     Get ConfigurationRoot Configuration Object asynchronously
-        /// </summary>
-        /// <returns>
-        ///     Objekt Konfiguracji IConfigurationRoot ConfigurationRoot lub null
-        ///     IConfigurationRoot ConfigurationRoot configuration Object or null
-        /// </returns>
-        public static async Task<IConfigurationRoot> GetConfigurationRootAsync()
-        {
-            try
-            {
-                return await Task.Run(() => GetConfigurationRoot());
-            }
-            catch (Exception e)
-            {
-                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
-                return null;
-            }
-        }
-
-        #endregion
-
-        #region public static IConfigurationRoot GetConfigurationRoot(string settingsJsonFilePath)
-
-        /// <summary>
-        ///     Pobierz Objekt Konfiguracji IConfigurationRoot ConfigurationRoot asynchronicznie
-        ///     Get ConfigurationRoot Configuration Object asynchronously
-        /// </summary>
-        /// <param name="settingsJsonFilePath">
-        ///     Nazwa pliku .json
-        ///     The name of the .json file
-        /// </param>
-        /// <returns>
-        ///     Objekt Konfiguracji IConfigurationRoot ConfigurationRoot lub null
-        ///     IConfigurationRoot ConfigurationRoot configuration Object or null
-        /// </returns>
-        public static IConfigurationRoot GetConfigurationRoot(string settingsJsonFilePath)
-        {
-            try
-            {
-                var getAppSettingsPath = GetAppSettingsPath(settingsJsonFilePath);
-                if (null != getAppSettingsPath && !string.IsNullOrWhiteSpace(getAppSettingsPath))
-                {
-                    IConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
-                        .SetBasePath(Path.GetDirectoryName(getAppSettingsPath))
-                        .AddJsonFile(Path.GetFileName(getAppSettingsPath), true, true);
-                    IConfigurationRoot configurationRoot = configurationBuilder.Build();
-                    return configurationRoot;
-                }
-
-                return null;
-            }
-            catch (Exception e)
-            {
-                Log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
-                return null;
-            }
-        }
-
-        #endregion
-
-        #region public static async Task<IConfigurationRoot> GetConfigurationRootAsync(string settingsJsonFilePath)
-
-        /// <summary>
-        ///     Pobierz Objekt Konfiguracji IConfigurationRoot ConfigurationRoot asynchronicznie
-        ///     Get ConfigurationRoot Configuration Object asynchronously
-        /// </summary>
-        /// <param name="settingsJsonFilePath">
-        ///     Nazwa pliku .json
-        ///     The name of the .json file
-        /// </param>
-        /// <returns>
-        ///     Objekt Konfiguracji IConfigurationRoot ConfigurationRoot lub null
-        ///     IConfigurationRoot ConfigurationRoot configuration Object or null
-        /// </returns>
-        public static async Task<IConfigurationRoot> GetConfigurationRootAsync(string settingsJsonFilePath)
-        {
-            try
-            {
-                return await Task.Run(() => GetConfigurationRoot(settingsJsonFilePath));
-            }
-            catch (Exception e)
-            {
-                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
-                return null;
-            }
-        }
-
-        #endregion
-
-        #region public static T GetValue<T>(string key)
-
-        /// <summary>
-        ///     Wyszukaj ustawienia aplikacji w pliku konfiguracji.
-        ///     Search for application settings in the configuration file.
-        /// </summary>
-        /// <typeparam name="T">
-        ///     Typ parametru.
-        ///     Parameter type.
-        /// </typeparam>
-        /// <param name="key">
-        ///     Szukany klucz.
-        ///     The key you are looking for.
-        /// </param>
-        /// <returns>
-        ///     Wartość ustawień jako typ T lub null jako typ T.
-        ///     Setting value as type T or null as type T.
-        /// </returns>
-        public static T GetValue<T>(string key)
-        {
-            try
-            {
-                if (null != key && !string.IsNullOrWhiteSpace(key))
-                {
-                    IConfigurationRoot configurationRoot = GetConfigurationRoot();
-                    if (null != configurationRoot)
-                    {
-                        return (T)Convert.ChangeType(configurationRoot.GetValue<T>(key), typeof(T));
-                    }
-                }
-
-                return (T)Convert.ChangeType(null, typeof(T));
-            }
-            catch (Exception e)
-            {
-                Log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
-                return (T)Convert.ChangeType(null, typeof(T));
-            }
-        }
-
-        #endregion
-
-        #region public static async Task<T> GetValueAsync<T>(string key)
-
-        /// <summary>
-        ///     Wyszukaj ustawienia aplikacji w pliku konfiguracji - asynchronicznie.
-        ///     Search for application settings in the configuration file - asynchronously.
-        /// </summary>
-        /// <typeparam name="T">
-        ///     Typ parametru.
-        ///     Parameter type.
-        /// </typeparam>
-        /// <param name="key">
-        ///     Szukany klucz.
-        ///     The key you are looking for.
-        /// </param>
-        /// <returns>
-        ///     Wartość ustawień jako typ T lub null jako typ T.
-        ///     Setting value as type T or null as type T.
-        /// </returns>
-        public static async Task<T> GetValueAsync<T>(string key)
-        {
-            try
-            {
-                return await Task.Run(() => GetValue<T>(key));
-            }
-            catch (Exception e)
-            {
-                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
-                return (T)Convert.ChangeType(null, typeof(T));
-            }
-        }
-
-        #endregion
-
-        #region public static T GetValue<T>(string settingsJsonFilePath, string key)
-
-        /// <summary>
-        ///     Wyszukaj ustawienia aplikacji w pliku konfiguracji.
-        ///     Search for application settings in the configuration file.
-        /// </summary>
-        /// <typeparam name="T">
-        ///     Typ parametru.
-        ///     Parameter type.
-        /// </typeparam>
-        /// <param name="settingsJsonFilePath">
-        ///     Nazwa pliku .json
-        ///     The name of the .json file
-        /// </param>
-        /// <param name="key">
-        ///     Szukany klucz.
-        ///     The key you are looking for.
-        /// </param>
-        /// <returns>
-        ///     Wartość ustawień jako typ T lub null jako typ T.
-        ///     Setting value as type T or null as type T.
-        /// </returns>
-        public static T GetValue<T>(string settingsJsonFilePath, string key)
-        {
-            try
-            {
-                if (null != settingsJsonFilePath && !string.IsNullOrEmpty(settingsJsonFilePath) && null != key &&
-                    !string.IsNullOrWhiteSpace(key))
-                {
-                    IConfigurationRoot configurationRoot = GetConfigurationRoot(settingsJsonFilePath);
-                    if (null != configurationRoot)
-                    {
-                        return (T)Convert.ChangeType(configurationRoot.GetValue<T>(key), typeof(T));
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
             }
 
             return (T)Convert.ChangeType(null, typeof(T));
         }
-
-        #endregion
-
-        #region public static async Task<T> GetValueAsync<T>(string settingsJsonFilePath, string key)
-
-        /// <summary>
-        ///     Wyszukaj ustawienia aplikacji w pliku konfiguracji - asynchronicznie.
-        ///     Search for application settings in the configuration file - asynchronously.
-        /// </summary>
-        /// <typeparam name="T">
-        ///     Typ parametru.
-        ///     Parameter type.
-        /// </typeparam>
-        /// <param name="settingsJsonFilePath">
-        ///     Nazwa pliku .json
-        ///     The name of the .json file
-        /// </param>
-        /// <param name="key">
-        ///     Szukany klucz.
-        ///     The key you are looking for.
-        /// </param>
-        /// <returns>
-        ///     Wartość ustawień jako typ T lub null jako typ T.
-        ///     Setting value as type T or null as type T.
-        /// </returns>
-        public static async Task<T> GetValueAsync<T>(string settingsJsonFilePath, string key)
+        catch (Exception e)
         {
-            try
+            Log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
+            return (T)Convert.ChangeType(null, typeof(T));
+        }
+    }
+
+    #endregion
+
+    #region public static async Task<T> GetValueAsync<T>(string key)
+
+    /// <summary>
+    ///     Wyszukaj ustawienia aplikacji w pliku konfiguracji - asynchronicznie.
+    ///     Search for application settings in the configuration file - asynchronously.
+    /// </summary>
+    /// <typeparam name="T">
+    ///     Typ parametru.
+    ///     Parameter type.
+    /// </typeparam>
+    /// <param name="key">
+    ///     Szukany klucz.
+    ///     The key you are looking for.
+    /// </param>
+    /// <returns>
+    ///     Wartość ustawień jako typ T lub null jako typ T.
+    ///     Setting value as type T or null as type T.
+    /// </returns>
+    public static async Task<T> GetValueAsync<T>(string key)
+    {
+        try
+        {
+            return await Task.Run(() => GetValue<T>(key));
+        }
+        catch (Exception e)
+        {
+            await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+            return (T)Convert.ChangeType(null, typeof(T));
+        }
+    }
+
+    #endregion
+
+    #region public static T GetValue<T>(string settingsJsonFilePath, string key)
+
+    /// <summary>
+    ///     Wyszukaj ustawienia aplikacji w pliku konfiguracji.
+    ///     Search for application settings in the configuration file.
+    /// </summary>
+    /// <typeparam name="T">
+    ///     Typ parametru.
+    ///     Parameter type.
+    /// </typeparam>
+    /// <param name="settingsJsonFilePath">
+    ///     Nazwa pliku .json
+    ///     The name of the .json file
+    /// </param>
+    /// <param name="key">
+    ///     Szukany klucz.
+    ///     The key you are looking for.
+    /// </param>
+    /// <returns>
+    ///     Wartość ustawień jako typ T lub null jako typ T.
+    ///     Setting value as type T or null as type T.
+    /// </returns>
+    public static T GetValue<T>(string settingsJsonFilePath, string key)
+    {
+        try
+        {
+            if (null != settingsJsonFilePath && !string.IsNullOrEmpty(settingsJsonFilePath) && null != key &&
+                !string.IsNullOrWhiteSpace(key))
             {
-                return await Task.Run(() => GetValue<T>(settingsJsonFilePath, key));
-            }
-            catch (Exception e)
-            {
-                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
-                return (T)Convert.ChangeType(null, typeof(T));
+                IConfigurationRoot configurationRoot = GetConfigurationRoot(settingsJsonFilePath);
+                if (null != configurationRoot)
+                {
+                    return (T)Convert.ChangeType(configurationRoot.GetValue<T>(key), typeof(T));
+                }
             }
         }
-
-        #endregion
-
-        #region public static void SaveToFile<T>(T @object, string appSettingsPath = null)
-
-        /// <summary>
-        ///     Zapisz kofigurację do pliku
-        ///     Save configuration to file
-        /// </summary>
-        /// <typeparam name="T">
-        ///     Typ obiektu jako parametr typu T
-        ///     Object type as a parameter of type T
-        /// </typeparam>
-        /// <param name="object">
-        ///     Obiekt typu parametru T
-        ///     Object of the T parameter type
-        /// </param>
-        /// <param name="appSettingsPath">
-        ///     Opcjonalnie ścieżka do pliku jako string
-        ///     Optional file path as string
-        /// </param>
-        public static void SaveToFile<T>(T @object, string appSettingsPath = null)
+        catch (Exception e)
         {
-            try
+            Log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
+        }
+
+        return (T)Convert.ChangeType(null, typeof(T));
+    }
+
+    #endregion
+
+    #region public static async Task<T> GetValueAsync<T>(string settingsJsonFilePath, string key)
+
+    /// <summary>
+    ///     Wyszukaj ustawienia aplikacji w pliku konfiguracji - asynchronicznie.
+    ///     Search for application settings in the configuration file - asynchronously.
+    /// </summary>
+    /// <typeparam name="T">
+    ///     Typ parametru.
+    ///     Parameter type.
+    /// </typeparam>
+    /// <param name="settingsJsonFilePath">
+    ///     Nazwa pliku .json
+    ///     The name of the .json file
+    /// </param>
+    /// <param name="key">
+    ///     Szukany klucz.
+    ///     The key you are looking for.
+    /// </param>
+    /// <returns>
+    ///     Wartość ustawień jako typ T lub null jako typ T.
+    ///     Setting value as type T or null as type T.
+    /// </returns>
+    public static async Task<T> GetValueAsync<T>(string settingsJsonFilePath, string key)
+    {
+        try
+        {
+            return await Task.Run(() => GetValue<T>(settingsJsonFilePath, key));
+        }
+        catch (Exception e)
+        {
+            await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+            return (T)Convert.ChangeType(null, typeof(T));
+        }
+    }
+
+    #endregion
+
+    #region public static void SaveToFile<T>(T @object, string appSettingsPath = null)
+
+    /// <summary>
+    ///     Zapisz kofigurację do pliku
+    ///     Save configuration to file
+    /// </summary>
+    /// <typeparam name="T">
+    ///     Typ obiektu jako parametr typu T
+    ///     Object type as a parameter of type T
+    /// </typeparam>
+    /// <param name="object">
+    ///     Obiekt typu parametru T
+    ///     Object of the T parameter type
+    /// </param>
+    /// <param name="appSettingsPath">
+    ///     Opcjonalnie ścieżka do pliku jako string
+    ///     Optional file path as string
+    /// </param>
+    public static void SaveToFile<T>(T @object, string appSettingsPath = null)
+    {
+        try
+        {
+            if (null == appSettingsPath)
+            {
+                appSettingsPath = GetAppSettingsPath();
+            }
+
+            if (null != appSettingsPath && !string.IsNullOrWhiteSpace(appSettingsPath) &&
+                File.Exists(appSettingsPath))
+            {
+                var json = JsonConvert.SerializeObject(@object, Formatting.Indented);
+                if (null != json)
+                {
+                    File.WriteAllText(appSettingsPath, json);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
+        }
+    }
+
+    #endregion
+
+    #region public static async Task SaveToFileAsync<T>(T @object, string appSettingsPath = null)
+
+    /// <summary>
+    ///     Zapisz kofigurację do pliku asynchronicznie
+    ///     Save configuration to file asynchronously
+    /// </summary>
+    /// <typeparam name="T">
+    ///     Typ obiektu jako parametr typu T
+    ///     Object type as a parameter of type T
+    /// </typeparam>
+    /// <param name="object">
+    ///     Obiekt typu parametru T
+    ///     Object of the T parameter type
+    /// </param>
+    /// <param name="appSettingsPath">
+    ///     Opcjonalnie ścieżka do pliku jako string
+    ///     Optional file path as string
+    /// </param>
+    public static async Task SaveToFileAsync<T>(T @object, string appSettingsPath = null)
+    {
+        try
+        {
+            await Task.Run(() =>
             {
                 if (null == appSettingsPath)
                 {
@@ -591,144 +638,96 @@ namespace NetAppCommon
                         File.WriteAllText(appSettingsPath, json);
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                Log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
-            }
+            });
         }
-
-        #endregion
-
-        #region public static async Task SaveToFileAsync<T>(T @object, string appSettingsPath = null)
-
-        /// <summary>
-        ///     Zapisz kofigurację do pliku asynchronicznie
-        ///     Save configuration to file asynchronously
-        /// </summary>
-        /// <typeparam name="T">
-        ///     Typ obiektu jako parametr typu T
-        ///     Object type as a parameter of type T
-        /// </typeparam>
-        /// <param name="object">
-        ///     Obiekt typu parametru T
-        ///     Object of the T parameter type
-        /// </param>
-        /// <param name="appSettingsPath">
-        ///     Opcjonalnie ścieżka do pliku jako string
-        ///     Optional file path as string
-        /// </param>
-        public static async Task SaveToFileAsync<T>(T @object, string appSettingsPath = null)
+        catch (Exception e)
         {
-            try
-            {
-                await Task.Run(() =>
-                {
-                    if (null == appSettingsPath)
-                    {
-                        appSettingsPath = GetAppSettingsPath();
-                    }
-
-                    if (null != appSettingsPath && !string.IsNullOrWhiteSpace(appSettingsPath) &&
-                        File.Exists(appSettingsPath))
-                    {
-                        var json = JsonConvert.SerializeObject(@object, Formatting.Indented);
-                        if (null != json)
-                        {
-                            File.WriteAllText(appSettingsPath, json);
-                        }
-                    }
-                });
-            }
-            catch (Exception e)
-            {
-                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
-            }
+            await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
         }
-
-        #endregion
-
-        #region public static void SetAppSettingValue<T>(string key, T value, string appSettingsPath = null)
-
-        /// <summary>
-        ///     Zapisz ustawienia wegług klucza key jako typ T do pliku ustawień.
-        ///     Save the settings by key as type T to the settings file.
-        /// </summary>
-        /// <param name="key">
-        ///     Klucz String
-        ///     The String key
-        /// </param>
-        /// <param name="value">
-        ///     Nowa wartość jako T.
-        ///     New value as T.
-        /// </param>
-        /// <param name="appSettingsPath">
-        ///     Ścieżka do pliku ustawień String
-        ///     Path to the settings file String
-        /// </param>
-        public static void SetAppSettingValue<T>(string key, T value, string appSettingsPath = null)
-        {
-            try
-            {
-                if (null == appSettingsPath)
-                {
-                    appSettingsPath = GetAppSettingsPath();
-                }
-
-                if (null != appSettingsPath && !string.IsNullOrWhiteSpace(appSettingsPath) &&
-                    File.Exists(appSettingsPath))
-                {
-                    var json = File.ReadAllText(appSettingsPath);
-                    dynamic jsonObj = JsonConvert.DeserializeObject<JObject>(json);
-                    if (null != jsonObj)
-                    {
-                        jsonObj[key] = value;
-                        string output = JsonConvert.SerializeObject(jsonObj, Formatting.Indented);
-                        if (null != output)
-                        {
-                            File.WriteAllText(appSettingsPath, output);
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
-            }
-        }
-
-        #endregion
-
-        #region public static async Task SetAppSettingValueAsync<T>(string key, T value, string appSettingsPath = null)
-
-        /// <summary>
-        ///     Zapisz ustawienia wegług klucza key jako typ T do pliku ustawień - asynchronicznie.
-        ///     Save the settings by key as type T to the settings file - asynchronously.
-        /// </summary>
-        /// <param name="key">
-        ///     Klucz String
-        ///     The String key
-        /// </param>
-        /// <param name="value">
-        ///     Nowa wartość jako T.
-        ///     New value as T.
-        /// </param>
-        /// <param name="appSettingsPath">
-        ///     Ścieżka do pliku ustawień String
-        ///     Path to the settings file String
-        /// </param>
-        public static async Task SetAppSettingValueAsync<T>(string key, T value, string appSettingsPath = null)
-        {
-            try
-            {
-                await Task.Run(() => SetAppSettingValue(key, value, appSettingsPath));
-            }
-            catch (Exception e)
-            {
-                await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
-            }
-        }
-
-        #endregion
     }
+
+    #endregion
+
+    #region public static void SetAppSettingValue<T>(string key, T value, string appSettingsPath = null)
+
+    /// <summary>
+    ///     Zapisz ustawienia wegług klucza key jako typ T do pliku ustawień.
+    ///     Save the settings by key as type T to the settings file.
+    /// </summary>
+    /// <param name="key">
+    ///     Klucz String
+    ///     The String key
+    /// </param>
+    /// <param name="value">
+    ///     Nowa wartość jako T.
+    ///     New value as T.
+    /// </param>
+    /// <param name="appSettingsPath">
+    ///     Ścieżka do pliku ustawień String
+    ///     Path to the settings file String
+    /// </param>
+    public static void SetAppSettingValue<T>(string key, T value, string appSettingsPath = null)
+    {
+        try
+        {
+            if (null == appSettingsPath)
+            {
+                appSettingsPath = GetAppSettingsPath();
+            }
+
+            if (null != appSettingsPath && !string.IsNullOrWhiteSpace(appSettingsPath) &&
+                File.Exists(appSettingsPath))
+            {
+                var json = File.ReadAllText(appSettingsPath);
+                dynamic jsonObj = JsonConvert.DeserializeObject<JObject>(json);
+                if (null != jsonObj)
+                {
+                    jsonObj[key] = value;
+                    string output = JsonConvert.SerializeObject(jsonObj, Formatting.Indented);
+                    if (null != output)
+                    {
+                        File.WriteAllText(appSettingsPath, output);
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Log4net.Error(string.Format("{0}, {1}", e.Message, e.StackTrace), e);
+        }
+    }
+
+    #endregion
+
+    #region public static async Task SetAppSettingValueAsync<T>(string key, T value, string appSettingsPath = null)
+
+    /// <summary>
+    ///     Zapisz ustawienia wegług klucza key jako typ T do pliku ustawień - asynchronicznie.
+    ///     Save the settings by key as type T to the settings file - asynchronously.
+    /// </summary>
+    /// <param name="key">
+    ///     Klucz String
+    ///     The String key
+    /// </param>
+    /// <param name="value">
+    ///     Nowa wartość jako T.
+    ///     New value as T.
+    /// </param>
+    /// <param name="appSettingsPath">
+    ///     Ścieżka do pliku ustawień String
+    ///     Path to the settings file String
+    /// </param>
+    public static async Task SetAppSettingValueAsync<T>(string key, T value, string appSettingsPath = null)
+    {
+        try
+        {
+            await Task.Run(() => SetAppSettingValue(key, value, appSettingsPath));
+        }
+        catch (Exception e)
+        {
+            await Task.Run(() => Log4net.Error(string.Format("{0}, {1}.", e.Message, e.StackTrace), e));
+        }
+    }
+
+    #endregion
 }

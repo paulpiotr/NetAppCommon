@@ -9,38 +9,37 @@ using log4net.Repository;
 
 #endregion
 
-namespace NetAppCommon.Logging
+namespace NetAppCommon.Logging;
+
+public class Log4NetLogger
 {
-    public class Log4NetLogger
+    /// <summary>
+    /// </summary>
+    static Log4NetLogger()
     {
-        /// <summary>
-        /// </summary>
-        static Log4NetLogger()
-        {
-            ILoggerRepository repository = Log4NetInstance.Logger.Repository;
-            var fileInfo = new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory + "\\" + "log4net.config"));
-            XmlConfigurator.ConfigureAndWatch(repository, fileInfo);
-        }
+        ILoggerRepository repository = Log4NetInstance.Logger.Repository;
+        var fileInfo = new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory + "\\" + "log4net.config"));
+        XmlConfigurator.ConfigureAndWatch(repository, fileInfo);
+    }
 
-        /// <summary>
-        /// </summary>
-        public static Type TypeofLogger { get; set; }
+    /// <summary>
+    /// </summary>
+    public static Type TypeofLogger { get; set; }
 
-        /// <summary>
-        /// </summary>
-        public static ILog Log4NetInstance { get; } =
-            LogManager.GetLogger(TypeofLogger ?? MethodBase.GetCurrentMethod()?.DeclaringType);
+    /// <summary>
+    /// </summary>
+    public static ILog Log4NetInstance { get; } =
+        LogManager.GetLogger(TypeofLogger ?? MethodBase.GetCurrentMethod()?.DeclaringType);
 
-        /// <summary>
-        /// </summary>
-        /// <param name="t"></param>
-        /// <returns>
-        ///     ILog
-        /// </returns>
-        public static ILog GetLog4NetInstance(Type t)
-        {
-            TypeofLogger = t;
-            return LogManager.GetLogger(t);
-        }
+    /// <summary>
+    /// </summary>
+    /// <param name="t"></param>
+    /// <returns>
+    ///     ILog
+    /// </returns>
+    public static ILog GetLog4NetInstance(Type t)
+    {
+        TypeofLogger = t;
+        return LogManager.GetLogger(t);
     }
 }

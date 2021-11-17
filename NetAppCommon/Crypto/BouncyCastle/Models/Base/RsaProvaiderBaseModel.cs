@@ -15,249 +15,248 @@ using Org.BouncyCastle.OpenSsl;
 
 #nullable enable annotations
 
-namespace NetAppCommon.Crypto.BouncyCastle.Models.Base
+namespace NetAppCommon.Crypto.BouncyCastle.Models.Base;
+
+public class RsaProvaiderBaseModel
 {
-    public class RsaProvaiderBaseModel
+    #region private readonly log4net.ILog _log4Net
+
+    /// <summary>
+    ///     Referencja klasy Log4NetLogger
+    ///     Reference to the Log4NetLogger class
+    /// </summary>
+    private readonly ILog _log4Net =
+        Log4NetLogger.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
+
+    #endregion
+
+    protected string? _asymmetricPrivateKeyFilePath;
+
+    protected string? _asymmetricPublicKeyFilePath;
+
+    [XmlIgnore]
+    [JsonIgnore]
+    [NotRequired]
+    public string? AsymmetricPrivateKeyFilePath
     {
-        #region private readonly log4net.ILog _log4Net
-
-        /// <summary>
-        ///     Referencja klasy Log4NetLogger
-        ///     Reference to the Log4NetLogger class
-        /// </summary>
-        private readonly ILog _log4Net =
-            Log4NetLogger.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
-
-        #endregion
-
-        protected string? _asymmetricPrivateKeyFilePath;
-
-        protected string? _asymmetricPublicKeyFilePath;
-
-        [XmlIgnore]
-        [JsonIgnore]
-        [NotRequired]
-        public string? AsymmetricPrivateKeyFilePath
+        get => _asymmetricPrivateKeyFilePath;
+        set
         {
-            get => _asymmetricPrivateKeyFilePath;
-            set
+            if (value != _asymmetricPrivateKeyFilePath)
             {
-                if (value != _asymmetricPrivateKeyFilePath)
-                {
-                    _asymmetricPrivateKeyFilePath = value;
-                }
+                _asymmetricPrivateKeyFilePath = value;
             }
         }
+    }
 
-        [XmlIgnore]
-        [JsonIgnore]
-        [NotRequired]
-        public string? AsymmetricPublicKeyFilePath
+    [XmlIgnore]
+    [JsonIgnore]
+    [NotRequired]
+    public string? AsymmetricPublicKeyFilePath
+    {
+        get => _asymmetricPublicKeyFilePath;
+        set
         {
-            get => _asymmetricPublicKeyFilePath;
-            set
+            if (value != _asymmetricPublicKeyFilePath)
             {
-                if (value != _asymmetricPublicKeyFilePath)
-                {
-                    _asymmetricPublicKeyFilePath = value;
-                }
+                _asymmetricPublicKeyFilePath = value;
             }
         }
+    }
 
-        #region protected RsaKeyPairGenerator _rsaKeyPairGenerator; public RsaKeyPairGenerator RsaKeyPairGenerator
+    #region protected RsaKeyPairGenerator _rsaKeyPairGenerator; public RsaKeyPairGenerator RsaKeyPairGenerator
 
-        protected RsaKeyPairGenerator? _rsaKeyPairGenerator;
+    protected RsaKeyPairGenerator? _rsaKeyPairGenerator;
 
-        [JsonIgnore]
-        [XmlIgnore]
-        [NotRequired]
-        public RsaKeyPairGenerator? RsaKeyPairGenerator
+    [JsonIgnore]
+    [XmlIgnore]
+    [NotRequired]
+    public RsaKeyPairGenerator? RsaKeyPairGenerator
+    {
+        get => _rsaKeyPairGenerator;
+        set
         {
-            get => _rsaKeyPairGenerator;
-            set
+            if (value != _rsaKeyPairGenerator)
             {
-                if (value != _rsaKeyPairGenerator)
-                {
-                    _rsaKeyPairGenerator = value;
-                }
+                _rsaKeyPairGenerator = value;
             }
         }
+    }
 
-        #endregion
+    #endregion
 
-        #region protected AsymmetricCipherKeyPair _keyPair; public AsymmetricCipherKeyPair KeyPair
+    #region protected AsymmetricCipherKeyPair _keyPair; public AsymmetricCipherKeyPair KeyPair
 
-        protected AsymmetricCipherKeyPair? _keyPair;
+    protected AsymmetricCipherKeyPair? _keyPair;
 
-        [JsonIgnore]
-        [XmlIgnore]
-        [NotRequired]
-        public AsymmetricCipherKeyPair? KeyPair
+    [JsonIgnore]
+    [XmlIgnore]
+    [NotRequired]
+    public AsymmetricCipherKeyPair? KeyPair
+    {
+        get
         {
-            get
+            if (null != RsaKeyPairGenerator && null == _keyPair)
             {
-                if (null != RsaKeyPairGenerator && null == _keyPair)
-                {
-                    _keyPair = RsaKeyPairGenerator.GenerateKeyPair();
-                }
-
-                return _keyPair;
+                _keyPair = RsaKeyPairGenerator.GenerateKeyPair();
             }
-            set
+
+            return _keyPair;
+        }
+        set
+        {
+            if (value != _keyPair)
             {
-                if (value != _keyPair)
-                {
-                    _keyPair = value;
-                }
+                _keyPair = value;
             }
         }
+    }
 
-        #endregion
+    #endregion
 
-        #region protected AsymmetricKeyParameter _asymmetricPrivateKey; public AsymmetricKeyParameter AsymmetricPrivateKey
+    #region protected AsymmetricKeyParameter _asymmetricPrivateKey; public AsymmetricKeyParameter AsymmetricPrivateKey
 
-        protected AsymmetricKeyParameter? _asymmetricPrivateKey;
+    protected AsymmetricKeyParameter? _asymmetricPrivateKey;
 
-        [JsonIgnore]
-        [XmlIgnore]
-        [NotRequired]
-        public AsymmetricKeyParameter? AsymmetricPrivateKey
+    [JsonIgnore]
+    [XmlIgnore]
+    [NotRequired]
+    public AsymmetricKeyParameter? AsymmetricPrivateKey
+    {
+        get
         {
-            get
+            if (KeyPair != null && null == _asymmetricPrivateKey)
             {
-                if (KeyPair != null && null == _asymmetricPrivateKey)
-                {
-                    _asymmetricPrivateKey = KeyPair.Private;
-                }
-
-                return _asymmetricPrivateKey;
+                _asymmetricPrivateKey = KeyPair.Private;
             }
-            set
+
+            return _asymmetricPrivateKey;
+        }
+        set
+        {
+            if (!Equals(value, _asymmetricPrivateKey))
             {
-                if (!Equals(value, _asymmetricPrivateKey))
-                {
-                    _asymmetricPrivateKey = value;
-                }
+                _asymmetricPrivateKey = value;
             }
         }
+    }
 
-        #endregion
+    #endregion
 
-        #region protected AsymmetricKeyParameter _asymmetricPublicKey; public AsymmetricKeyParameter AsymmetricPublicKey
+    #region protected AsymmetricKeyParameter _asymmetricPublicKey; public AsymmetricKeyParameter AsymmetricPublicKey
 
-        protected AsymmetricKeyParameter? _asymmetricPublicKey;
+    protected AsymmetricKeyParameter? _asymmetricPublicKey;
 
-        [JsonIgnore]
-        [XmlIgnore]
-        [NotRequired]
-        public AsymmetricKeyParameter? AsymmetricPublicKey
+    [JsonIgnore]
+    [XmlIgnore]
+    [NotRequired]
+    public AsymmetricKeyParameter? AsymmetricPublicKey
+    {
+        get
         {
-            get
+            if (null != KeyPair && null == _asymmetricPublicKey)
             {
-                if (null != KeyPair && null == _asymmetricPublicKey)
-                {
-                    _asymmetricPublicKey = KeyPair.Public;
-                }
-
-                return _asymmetricPublicKey;
+                _asymmetricPublicKey = KeyPair.Public;
             }
-            set
+
+            return _asymmetricPublicKey;
+        }
+        set
+        {
+            if (!Equals(value, _asymmetricPublicKey))
             {
-                if (!Equals(value, _asymmetricPublicKey))
-                {
-                    _asymmetricPublicKey = value;
-                }
+                _asymmetricPublicKey = value;
             }
         }
+    }
 
-        #endregion
+    #endregion
 
-        #region protected string _asymmetricPrivateKeyAsString; public string AsymmetricPrivateKeyAsString
+    #region protected string _asymmetricPrivateKeyAsString; public string AsymmetricPrivateKeyAsString
 
-        protected string? _asymmetricPrivateKeyAsString;
+    protected string? _asymmetricPrivateKeyAsString;
 
-        [JsonIgnore]
-        [XmlIgnore]
-        [NotRequired]
-        public string? AsymmetricPrivateKeyAsString
+    [JsonIgnore]
+    [XmlIgnore]
+    [NotRequired]
+    public string? AsymmetricPrivateKeyAsString
+    {
+        get
         {
-            get
+            if (string.IsNullOrWhiteSpace(_asymmetricPrivateKeyAsString))
             {
-                if (string.IsNullOrWhiteSpace(_asymmetricPrivateKeyAsString))
+                try
                 {
-                    try
+                    if (null != AsymmetricPrivateKeyFilePath && File.Exists(AsymmetricPrivateKeyFilePath))
                     {
-                        if (null != AsymmetricPrivateKeyFilePath && File.Exists(AsymmetricPrivateKeyFilePath))
-                        {
-                            _asymmetricPrivateKeyAsString = File.ReadAllText(AsymmetricPrivateKeyFilePath);
-                        }
-                        else if (null != AsymmetricPrivateKey)
-                        {
-                            using TextWriter textWriter = new StringWriter();
-                            var pemWriter = new PemWriter(textWriter);
-                            pemWriter.WriteObject(AsymmetricPrivateKey);
-                            pemWriter.Writer.Flush();
-                            _asymmetricPrivateKeyAsString = textWriter.ToString();
-                        }
+                        _asymmetricPrivateKeyAsString = File.ReadAllText(AsymmetricPrivateKeyFilePath);
                     }
-                    catch (Exception e)
-                    {
-                        _log4Net.Error(
-                            $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
-                    }
-                }
-
-                return _asymmetricPrivateKeyAsString ?? string.Empty;
-            }
-            set
-            {
-                if (value != _asymmetricPrivateKeyAsString)
-                {
-                    _asymmetricPrivateKeyAsString = value;
-                }
-            }
-        }
-
-        #endregion
-
-        #region protected string _asymmetricPublicKeyAsString; public string AsymmetricPublicKeyAsString
-
-        protected string? _asymmetricPublicKeyAsString;
-
-        [JsonIgnore]
-        [XmlIgnore]
-        [NotRequired]
-        public string? AsymmetricPublicKeyAsString
-        {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(_asymmetricPublicKeyAsString))
-                {
-                    if (null != AsymmetricPublicKeyFilePath && File.Exists(AsymmetricPublicKeyFilePath))
-                    {
-                        _asymmetricPublicKeyAsString = File.ReadAllText(AsymmetricPublicKeyFilePath);
-                    }
-                    else if (null != AsymmetricPublicKey)
+                    else if (null != AsymmetricPrivateKey)
                     {
                         using TextWriter textWriter = new StringWriter();
                         var pemWriter = new PemWriter(textWriter);
-                        pemWriter.WriteObject(AsymmetricPublicKey);
+                        pemWriter.WriteObject(AsymmetricPrivateKey);
                         pemWriter.Writer.Flush();
-                        _asymmetricPublicKeyAsString = textWriter.ToString();
+                        _asymmetricPrivateKeyAsString = textWriter.ToString();
                     }
                 }
-
-                return _asymmetricPublicKeyAsString ?? string.Empty;
-            }
-            set
-            {
-                if (value != _asymmetricPublicKeyAsString)
+                catch (Exception e)
                 {
-                    _asymmetricPublicKeyAsString = value;
+                    _log4Net.Error(
+                        $"\n{e.GetType()}\n{e.InnerException?.GetType()}\n{e.Message}\n{e.StackTrace}\n", e);
                 }
             }
-        }
 
-        #endregion
+            return _asymmetricPrivateKeyAsString ?? string.Empty;
+        }
+        set
+        {
+            if (value != _asymmetricPrivateKeyAsString)
+            {
+                _asymmetricPrivateKeyAsString = value;
+            }
+        }
     }
+
+    #endregion
+
+    #region protected string _asymmetricPublicKeyAsString; public string AsymmetricPublicKeyAsString
+
+    protected string? _asymmetricPublicKeyAsString;
+
+    [JsonIgnore]
+    [XmlIgnore]
+    [NotRequired]
+    public string? AsymmetricPublicKeyAsString
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(_asymmetricPublicKeyAsString))
+            {
+                if (null != AsymmetricPublicKeyFilePath && File.Exists(AsymmetricPublicKeyFilePath))
+                {
+                    _asymmetricPublicKeyAsString = File.ReadAllText(AsymmetricPublicKeyFilePath);
+                }
+                else if (null != AsymmetricPublicKey)
+                {
+                    using TextWriter textWriter = new StringWriter();
+                    var pemWriter = new PemWriter(textWriter);
+                    pemWriter.WriteObject(AsymmetricPublicKey);
+                    pemWriter.Writer.Flush();
+                    _asymmetricPublicKeyAsString = textWriter.ToString();
+                }
+            }
+
+            return _asymmetricPublicKeyAsString ?? string.Empty;
+        }
+        set
+        {
+            if (value != _asymmetricPublicKeyAsString)
+            {
+                _asymmetricPublicKeyAsString = value;
+            }
+        }
+    }
+
+    #endregion
 }

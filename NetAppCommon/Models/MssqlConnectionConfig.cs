@@ -1,18 +1,17 @@
-namespace NetAppCommon.Models
+namespace NetAppCommon.Models;
+
+/// <summary>
+///     Model danych tworzących połączenie do bazy danych
+/// </summary>
+public class MssqlConnectionConfig
 {
-    /// <summary>
-    ///     Model danych tworzących połączenie do bazy danych
-    /// </summary>
-    public class MssqlConnectionConfig
-    {
-        ///Data Source
-        ///Server
-        ///AttachDbFilename
-        ///Database
-        ///User Id
-        ///Password
-        ///Integrated Security
-        ///Trusted_Connection
-        ///MultipleActiveResultSets
-    }
+    ///Data Source
+    ///Server
+    ///AttachDbFilename
+    ///Database
+    ///User Id
+    ///Password
+    ///Integrated Security
+    ///Trusted_Connection
+    ///MultipleActiveResultSets
 }

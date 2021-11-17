@@ -1,6 +1,5 @@
-﻿namespace NetAppCommon
+﻿namespace NetAppCommon;
+
+public class NetAppCommon
 {
-    public class NetAppCommon
-    {
-    }
 }

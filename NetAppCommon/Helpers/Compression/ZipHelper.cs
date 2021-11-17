@@ -10,79 +10,72 @@ using log4net;
 
 #endregion
 
-namespace NetAppCommon.Helpers.Compression
+namespace NetAppCommon.Helpers.Compression;
+
+public class ZipHelper
 {
-    public class ZipHelper
+    #region private readonly log4net.ILog log4net
+
+    /// <summary>
+    ///     Log4net Logger
+    ///     Log4net Logger
+    /// </summary>
+    private static readonly ILog Log4Net =
+        Logging.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
+
+    #endregion
+
+    public static async Task<byte[]> ZipAsync(string @string) => await Task.Run(() => Zip(@string));
+
+    public static byte[] Zip(string @string)
     {
-        #region private readonly log4net.ILog log4net
-
-        /// <summary>
-        ///     Log4net Logger
-        ///     Log4net Logger
-        /// </summary>
-        private static readonly ILog Log4Net =
-            Logging.Log4NetLogger.GetLog4NetInstance(MethodBase.GetCurrentMethod()?.DeclaringType);
-
-        #endregion
-
-        public static async Task<byte[]> ZipAsync(string @string)
+        byte[] compressed = null;
+        try
         {
-            return await Task.Run(() => Zip(@string));
-        }
-
-        public static byte[] Zip(string @string)
-        {
-            byte[] compressed = null;
-            try
+            using var memoryStream = new MemoryStream();
+            using (var gZipStream = new GZipStream(memoryStream, CompressionLevel.Optimal))
             {
-                using var memoryStream = new MemoryStream();
-                using (var gZipStream = new GZipStream(memoryStream, CompressionLevel.Optimal))
+                using (var streamWriter = new StreamWriter(gZipStream, Encoding.UTF8))
                 {
-                    using (var streamWriter = new StreamWriter(gZipStream, Encoding.UTF8))
-                    {
-                        streamWriter.Write(@string);
-                    }
-                }
-
-                compressed = memoryStream.ToArray();
-            }
-            catch (Exception e)
-            {
-                Log4Net.Error(e);
-                if (null != e.InnerException)
-                {
-                    Log4Net.Error(e.InnerException);
+                    streamWriter.Write(@string);
                 }
             }
 
-            return compressed ?? Encoding.UTF8.GetBytes(@string);
+            compressed = memoryStream.ToArray();
         }
-
-        public static string UnZip(byte[] compressed)
+        catch (Exception e)
         {
-            string @string = null;
-            try
+            Log4Net.Error(e);
+            if (null != e.InnerException)
             {
-                using var memoryStream = new MemoryStream(compressed);
-                using var gZipStream = new GZipStream(memoryStream, CompressionMode.Decompress);
-                using var streamReader = new StreamReader(gZipStream, Encoding.UTF8);
-                @string = streamReader.ReadToEnd();
+                Log4Net.Error(e.InnerException);
             }
-            catch (Exception e)
-            {
-                Log4Net.Error(e);
-                if (null != e.InnerException)
-                {
-                    Log4Net.Error(e.InnerException);
-                }
-            }
-
-            return @string;
         }
 
-        public static async Task<string> UnZipAsync(byte[] compressed)
-        {
-            return await Task.Run(() => UnZip(compressed));
-        }
+        return compressed ?? Encoding.UTF8.GetBytes(@string);
     }
+
+    public static string UnZip(byte[] compressed)
+    {
+        string @string = null;
+        try
+        {
+            using var memoryStream = new MemoryStream(compressed);
+            using var gZipStream = new GZipStream(memoryStream, CompressionMode.Decompress);
+            using var streamReader = new StreamReader(gZipStream, Encoding.UTF8);
+            @string = streamReader.ReadToEnd();
+        }
+        catch (Exception e)
+        {
+            Log4Net.Error(e);
+            if (null != e.InnerException)
+            {
+                Log4Net.Error(e.InnerException);
+            }
+        }
+
+        return @string;
+    }
+
+    public static async Task<string> UnZipAsync(byte[] compressed) => await Task.Run(() => UnZip(compressed));
 }

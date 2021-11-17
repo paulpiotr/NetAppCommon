@@ -9,36 +9,35 @@ using NetAppCommon.BasicAuthentication.Services.Interface;
 
 #endregion
 
-namespace NetAppCommon.BasicAuthentication.Services
+namespace NetAppCommon.BasicAuthentication.Services;
+
+public class UserService : IUserService
 {
-    public class UserService : IUserService
+    private readonly List<User> _users = new()
     {
-        private readonly List<User> _users = new()
+        new User
         {
-            new User
-            {
-                Id = 1,
-                FirstName = "Test",
-                LastName = "User",
-                Username = "test",
-                Password = "test"
-            }
-        };
+            Id = 1,
+            FirstName = "Test",
+            LastName = "User",
+            Username = "test",
+            Password = "test"
+        }
+    };
 
-        public async Task<User> Authenticate(string username, string password)
+    public async Task<User> Authenticate(string username, string password)
+    {
+        User user = await Task.Run(() =>
+            _users.SingleOrDefault(x => x.Username == username && x.Password == password));
+        // return null if user not found
+        if (user == null)
         {
-            User user = await Task.Run(() =>
-                _users.SingleOrDefault(x => x.Username == username && x.Password == password));
-            // return null if user not found
-            if (user == null)
-            {
-                return null;
-            }
-
-            // authentication successful so return user details without password
-            return user.WithoutPassword();
+            return null;
         }
 
-        public async Task<IEnumerable<User>> GetAll() => await Task.Run(() => _users.WithoutPasswords());
+        // authentication successful so return user details without password
+        return user.WithoutPassword();
     }
+
+    public async Task<IEnumerable<User>> GetAll() => await Task.Run(() => _users.WithoutPasswords());
 }

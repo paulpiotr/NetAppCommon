@@ -6,11 +6,10 @@ using NetAppCommon.BasicAuthentication.Models;
 
 #endregion
 
-namespace NetAppCommon.BasicAuthentication.Services.Interface
+namespace NetAppCommon.BasicAuthentication.Services.Interface;
+
+public interface IUserService
 {
-    public interface IUserService
-    {
-        Task<User> Authenticate(string username, string password);
-        Task<IEnumerable<User>> GetAll();
-    }
+    Task<User> Authenticate(string username, string password);
+    Task<IEnumerable<User>> GetAll();
 }
